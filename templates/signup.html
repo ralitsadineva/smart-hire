@@ -11,7 +11,12 @@
     <div class="d-flex justify-content-center">
         {% if invalid %}
             <div class="alert alert-danger" role="alert">
-                Invalid input. Please enter a string that satisfies the rules.
+                Invalid input. Please enter a password that satisfies the rules.
+            </div>
+        {% endif %}
+        {% if exist %}
+            <div class="alert alert-danger" role="alert">
+                An account with that email or username already exists. Please try again.
             </div>
         {% endif %}
     </div>
@@ -25,7 +30,7 @@
             <div class="mb-3">
                 <label for="inputUsername1" class="form-label">Username</label>
                 <input type="text" class="form-control" id="inputUsername1" name="username" aria-describedby="usernameHelp">
-                <div id="usernameHelp" class="form-text">Your username must be at least 6 characters long and contain only letters and numbers.</div>
+                <!--<div id="usernameHelp" class="form-text">Your username must be at least 6 characters long and contain only letters and numbers.</div>-->
             </div>
             <div class="mb-3">
                 <label for="inputPassword1" class="form-label">Password</label>
