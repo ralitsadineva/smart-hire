@@ -3,6 +3,14 @@ import re
 import psycopg2
 from configparser import ConfigParser
 import bcrypt
+import logging
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s [%(name)s] %(levelname)s: %(message)s',
+    # datefmt='%Y-%m-%d %H:%M:%S',
+)
+logger = logging.getLogger(__name__)
 
 def config(filename='database.ini', section='postgresql'):
     # create a parser
@@ -69,6 +77,7 @@ def signup():
         email = request.form['email']
         username = request.form['username']
         password = request.form['password']
+        print(email, username, password)
         #check if valid according to rules
         #invalid = False
         #exist=False
@@ -82,7 +91,9 @@ def signup():
                 conn.commit()
                 return 'You registered succesfully!' #redirect('/home.html')
             except (Exception, psycopg2.DatabaseError) as error:
+                logger.error(error)
                 print(error)
+                print(type(error))
                 conn.rollback()
                 return render_template('signup.html', exist=True)
         else:
@@ -92,4 +103,4 @@ def signup():
         return render_template('signup.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
