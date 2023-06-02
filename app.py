@@ -33,7 +33,7 @@ cursor.execute("""
         id SERIAL NOT NULL PRIMARY KEY, 
         email VARCHAR(255) NOT NULL UNIQUE, 
         username VARCHAR(255) NOT NULL UNIQUE, 
-        password VARCHAR(255) NOT NULL
+        password BYTEA NOT NULL
     );
     """)
 conn.commit()
@@ -55,10 +55,9 @@ def login():
         username = request.form['username']
         password = request.form['password']
         #check if in database
-        cursor.execute("SELECT * FROM users WHERE username = %s AND password = %s;", (username, password))
+        cursor.execute("SELECT * FROM users WHERE username = %s;", (username, ))
         user = cursor.fetchone()
-        print(user)
-        if user is None:
+        if user is None or not bcrypt.checkpw(password.encode(), bytes(user[3])):
             return render_template('login.html', invalid=True)
         return 'Got it!' #redirect('/home.html')
     else:
@@ -74,11 +73,12 @@ def signup():
         #invalid = False
         #exist=False
         if is_valid_password(password):
+            hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
             try:
                 cursor.execute("""
                     INSERT INTO users (email, username, password)
                     VALUES (%s, %s, %s);
-                    """, (email, username, password))
+                    """, (email, username, hashed_password))
                 conn.commit()
                 return 'You registered succesfully!' #redirect('/home.html')
             except (Exception, psycopg2.DatabaseError) as error:
