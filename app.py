@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, redirect
-import re
-import psycopg2
-from configparser import ConfigParser
+from database import create_tables, UniqueViolationError, DatabaseError, insert_user, get_user, update_password
+from validation import is_valid_username, is_valid_password
 import bcrypt
 import logging
 
@@ -12,46 +11,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def config(filename='database.ini', section='postgresql'):
-    # create a parser
-    parser = ConfigParser()
-    # read config file
-    parser.read(filename)
-
-    # get section, default to postgresql
-    db = {}
-    if parser.has_section(section):
-        params = parser.items(section)
-        for param in params:
-            db[param[0]] = param[1]
-    else:
-        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
-    return db
-
-params = config()
-
-conn = psycopg2.connect(**params)
-print(conn)
-
-cursor = conn.cursor()
-print(cursor)
-
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id SERIAL NOT NULL PRIMARY KEY, 
-        email VARCHAR(255) NOT NULL UNIQUE, 
-        username VARCHAR(255) NOT NULL UNIQUE, 
-        password BYTEA NOT NULL
-    );
-    """)
-conn.commit()
-
 app = Flask(__name__)
-
-def is_valid_password(input_str):
-    # Check if the input matches the pattern
-    pattern = r"^(?=.*[0-9])(?=.*[\W_])(?!.*\s)[A-Za-z0-9\W_]{6,}$"
-    return bool(re.match(pattern, input_str))
 
 @app.route('/')
 def index():
@@ -63,8 +23,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
         #check if in database
-        cursor.execute("SELECT * FROM users WHERE username = %s;", (username, ))
-        user = cursor.fetchone()
+        user = get_user(username)
         if user is None or not bcrypt.checkpw(password.encode(), bytes(user[3])):
             return render_template('login.html', invalid=True)
         return 'Got it!' #redirect('/home.html')
@@ -77,30 +36,60 @@ def signup():
         email = request.form['email']
         username = request.form['username']
         password = request.form['password']
-        print(email, username, password)
         #check if valid according to rules
-        #invalid = False
-        #exist=False
-        if is_valid_password(password):
-            hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-            try:
-                cursor.execute("""
-                    INSERT INTO users (email, username, password)
-                    VALUES (%s, %s, %s);
-                    """, (email, username, hashed_password))
-                conn.commit()
-                return 'You registered succesfully!' #redirect('/home.html')
-            except (Exception, psycopg2.DatabaseError) as error:
-                logger.error(error)
-                print(error)
-                print(type(error))
-                conn.rollback()
-                return render_template('signup.html', exist=True)
+        if is_valid_username(username):
+            if is_valid_password(password):
+                hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+                try:
+                    insert_user(email, username, hashed_password)
+                    return 'You registered succesfully!' #redirect('/home.html')
+                except UniqueViolationError as e:
+                    logger.error(f"{type(e)}\n{e}")
+                    return render_template('signup.html', exist=True) 
+                except DatabaseError as error:
+                    logger.error(f"{type(error)}\n{error}")
+                    return render_template('signup.html', error=True)
+            else:
+                return render_template('signup.html', invalid_password=True)
         else:
-            #invalid = True
-            return render_template('signup.html', invalid=True)
+            return render_template('signup.html', invalid_username=True)
     else:
         return render_template('signup.html')
 
+@app.route('/logout')
+def logout():
+    #session.pop('username', None)
+    return redirect('/')
+
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    # if 'username' not in session:
+    #     return redirect('/')
+    if request.method == 'POST':
+        old_password = request.form['old_password']
+        new_password = request.form['new_password']
+        user = get_user(username) #session['username']
+        if not bcrypt.checkpw(old_password.encode(), bytes(user[3])):
+            return render_template('change_password.html', invalid=True)
+        if is_valid_password(new_password):
+            hashed_password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
+            try:
+                update_password(hashed_password, username) #session['username']
+                return 'You changed your password succesfully!' #redirect('/home.html')
+            except DatabaseError as error:
+                logger.error(f"{type(error)}\n{error}")
+                return render_template('change_password.html', error=True)
+        else:
+            return render_template('change_password.html', invalid_password=True)
+    else:
+        return render_template('change_password.html')
+
+@app.route('/home')
+def home():
+    # if 'username' not in session:
+    #     return redirect('/')
+    return render_template('home.html')
+
 if __name__ == '__main__':
+    create_tables()
     app.run(debug=True, host='0.0.0.0')
