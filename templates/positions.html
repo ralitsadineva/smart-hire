@@ -15,8 +15,8 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <a class="nav-link active text-white" aria-current="page" href="home">Dashboard</a>
-                    <a class="nav-link text-white" href="positions">Positions</a>
+                    <a class="nav-link text-white" href="home">Dashboard</a>
+                    <a class="nav-link active text-white" aria-current="page" href="positions">Positions</a>
                     <a class="nav-link text-white" href="#">Add CV</a>
                     <a class="nav-link text-white" href="#">Add ML</a>
                 </div>
@@ -33,8 +33,35 @@
             </div>
         </div>
     </nav>
-    <p class="text-center mt-5 fs-4 fw-semibold"></p>
-    <div class="d-flex justify-content-center">
+    <div class="row mx-4">
+        <div class="col-11">
+            <p class="text-center mt-5 fs-4 fw-semibold">Available positions</p>
+        </div>
+        <div class="col-1 d-flex justify-content-end align-self-end">
+            <a role="button" class="btn btn-success" href="positions/add">+</a>
+        </div>
+    </div>
+    <div class="mx-4">
+        <table class="table table-success table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Created</th>
+                    <th scope="col">Updated</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for position in positions %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="positions/{{ position[0] }}">{{ position[2] }}</a></td>
+                        <td class="col-md-2">{{ position[5].replace(microsecond=0) }}</td>
+                        <td class="col-md-2">{{ position[6].replace(microsecond=0) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script> 
   </body>

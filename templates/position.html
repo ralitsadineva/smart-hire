@@ -9,14 +9,14 @@
   <body class="bg-success-subtle landing-page">
     <nav class="navbar navbar-expand-lg sticky-top bg-success">
         <div class="container-fluid">
-            <a class="navbar-brand text-white" href="home">SmartHire</a>
+            <a class="navbar-brand text-white" href="../home">SmartHire</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <a class="nav-link active text-white" aria-current="page" href="home">Dashboard</a>
-                    <a class="nav-link text-white" href="positions">Positions</a>
+                    <a class="nav-link text-white" href="../home">Dashboard</a>
+                    <a class="nav-link active text-white" aria-current="page" href="../positions">Positions</a>
                     <a class="nav-link text-white" href="#">Add CV</a>
                     <a class="nav-link text-white" href="#">Add ML</a>
                 </div>
@@ -25,17 +25,26 @@
                         <img src="" alt="Profile Picture" width="30" height="24" class="d-inline-block align-text-top">
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                      <li><a class="dropdown-item" href="profile">Profile</a></li>
+                      <li><a class="dropdown-item" href="../profile">Profile</a></li>
                       <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item" href="logout">Log out</a></li>
+                      <li><a class="dropdown-item" href="../logout">Log out</a></li>
                     </ul>
                   </li>
             </div>
         </div>
     </nav>
-    <p class="text-center mt-5 fs-4 fw-semibold"></p>
-    <div class="d-flex justify-content-center">
+    <div class="row mx-3">
+        <div class="col-11">
+            <p class="mt-5 fs-4 fw-semibold">{{ position[2] }}</p>
+        </div>
+        <div class="col-1 d-flex justify-content-end align-self-end">
+            <a role="button" class="btn btn-success" href="{{ position[0] }}/edit">Edit</a>
+        </div>
     </div>
+    <p class="ms-4 mt-4 fs-6 fw-semibold">{{ position[3] }}</p>
+    <p class="ms-4 mt-5 fs-8 fw-semibold">Created on: {{ position[5].replace(microsecond=0) }}   Last updated on: {{ position[6].replace(microsecond=0) }}</p>
+    <!-- candidates for this position (* candidates with this pos_id) -->
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script> 
   </body>
 </html>
