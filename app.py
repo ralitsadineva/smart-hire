@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session
-from database import create_tables, UniqueViolationError, DatabaseError, insert_user, get_user, update_password, get_positions, insert_position, get_position, update_position
+from database import create_tables, UniqueViolationError, DatabaseError, insert_user, get_user, update_password,update_avatar, get_positions, insert_position, get_position, update_position
 from validation import is_valid_username, is_valid_password
 import bcrypt
 import logging
@@ -31,6 +31,7 @@ def login():
         session['username'] = username
         session['user_id'] = user[0]
         session['email'] = user[1]
+        session['avatar'] = user[4]
         return redirect('/home')
     else:
         return render_template('login.html')
@@ -93,29 +94,34 @@ def change_password():
 def home():
     if 'username' not in session:
         return redirect('/')
-    return render_template('home.html')
+    return render_template('home.html', avatar=session['avatar'])
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 def profile():
     if 'username' not in session:
         return redirect('/')
-    username = session['username']
-    email = session['email']
-    return render_template('profile.html', username=username, email=email)
+    if request.method == 'POST':
+        avatar = request.files['avatar']
+        avatar.save(f"static/images/{avatar.filename}")
+        update_avatar(avatar.filename, session['username'])
+        session['avatar'] = avatar.filename
+        return redirect('/profile')
+    else:
+        return render_template('profile.html', username=session['username'], email=session['email'], avatar=session['avatar'])
 
 @app.route('/positions')
 def positions():
     if 'username' not in session:
         return redirect('/')
     positions = get_positions(session['user_id'])
-    return render_template('positions.html', positions=positions)
+    return render_template('positions.html', positions=positions, avatar=session['avatar'])
 
 @app.route('/positions/<string:position_id>')
 def position(position_id):
     if 'username' not in session:
         return redirect('/')
     position = get_position(position_id)
-    return render_template('position.html', position=position)
+    return render_template('position.html', position=position, avatar=session['avatar'])
 
 @app.route('/positions/<string:position_id>/edit', methods=['GET', 'POST'])
 def edit_position(position_id):
@@ -127,10 +133,10 @@ def edit_position(position_id):
             return redirect('/positions')
         except DatabaseError as error:
             logger.error(f"{type(error)}\n{error}")
-            return render_template('edit_position.html', error=True)
+            return render_template('edit_position.html', error=True, position=position, avatar=session['avatar'])
     else:
         position = get_position(position_id)
-        return render_template('edit_position.html', position=position)
+        return render_template('edit_position.html', position=position, avatar=session['avatar'])
 
 @app.route('/positions/add', methods=['GET', 'POST'])
 def add_position():
@@ -142,9 +148,9 @@ def add_position():
             return redirect('/positions')
         except DatabaseError as error:
             logger.error(f"{type(error)}\n{error}")
-            return render_template('add_position.html', error=True)
+            return render_template('add_position.html', error=True, avatar=session['avatar'])
     else:
-        return render_template('add_position.html')
+        return render_template('add_position.html', avatar=session['avatar'])
 
 if __name__ == '__main__':
     create_tables()

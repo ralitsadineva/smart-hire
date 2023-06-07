@@ -20,21 +20,36 @@
                     <a class="nav-link text-white" href="#">Add CV</a>
                     <a class="nav-link text-white" href="#">Add ML</a>
                 </div>
-                <li class="nav-item dropdown text-white">
+                <div class="nav-item dropdown text-white">
                     <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="" alt="Profile Picture" width="30" height="24" class="d-inline-block align-text-top">
+                        <img src="../static/images/{{ avatar }}" alt="Profile Picture" width="30" height="24" class="rounded-circle img-fluid">
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                       <li><a class="dropdown-item" aria-current="page" href="profile">Profile</a></li>
                       <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item" href="logout">Log out</a></li>
                     </ul>
-                  </li>
+                </div>
             </div>
         </div>
     </nav>
     <p class="text-center mt-5 fs-4 fw-semibold">Profile</p>
     <!-- avatar, display email, username, change password -->
+    <div class="mx-4">
+        <form class="mb-3 row" method="POST" enctype="multipart/form-data">
+            <label for="staticAvatar" class="col-sm-2 col-form-label fw-semibold">Profile picture</label>
+            <div class="col-sm-2">
+                <img src="../static/images/{{ avatar }}" alt="Profile Picture" width="30" height="24" class="rounded-circle img-fluid">
+            </div>
+            <label for="formFile" class="col-sm-1 col-form-label fw-semibold">Change picture</label>
+            <div class="col-sm-2">
+                <input class="form-control" type="file" id="formFile" name= "avatar" required>
+            </div>
+            <div class="col-sm-2">
+                <button type="submit" class="btn btn-success">Upload</button>
+            </div>
+        </form>
+    </div>
     <div class="mx-4">
         <div class="mb-3 row">
             <label for="staticEmail" class="col-sm-2 col-form-label fw-semibold">Email</label>

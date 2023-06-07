@@ -28,7 +28,8 @@ def create_tables():
             id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(), 
             email VARCHAR(255) NOT NULL UNIQUE, 
             username VARCHAR(255) NOT NULL UNIQUE, 
-            password BYTEA NOT NULL
+            password BYTEA NOT NULL,
+            avatar VARCHAR(255) DEFAULT 'user.png'
         );
         """)
     conn.commit()
@@ -100,6 +101,21 @@ def update_password(password, username):
             SET password = %s
             WHERE username = %s;
             """, (password, username))
+        conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        conn.rollback()
+        raise DatabaseError(error)
+    finally:
+        close_connection(conn, cursor)
+
+def update_avatar(avatar, username):
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("""
+            UPDATE users
+            SET avatar = %s
+            WHERE username = %s;
+            """, (avatar, username))
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
         conn.rollback()
