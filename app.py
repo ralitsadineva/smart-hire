@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session
-from database import create_tables, UniqueViolationError, DatabaseError, insert_user, get_user, update_password, create_positions_table, get_positions, insert_position, get_position, update_position
+from database import create_tables, UniqueViolationError, DatabaseError, insert_user, get_user, update_password, get_positions, insert_position, get_position, update_position
 from validation import is_valid_username, is_valid_password
 import bcrypt
 import logging
@@ -148,5 +148,4 @@ def add_position():
 
 if __name__ == '__main__':
     create_tables()
-    create_positions_table()
     app.run(debug=True, host='0.0.0.0')
