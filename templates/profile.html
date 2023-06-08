@@ -34,7 +34,13 @@
         </div>
     </nav>
     <p class="text-center mt-5 fs-4 fw-semibold">Profile</p>
-    <!-- avatar, display email, username, change password -->
+    <div class="d-flex justify-content-center">
+        {% if invalid %}
+            <div class="alert alert-danger" role="alert">
+                Not an image file or too big! Only image files less than 2MB are allowed.
+            </div>
+        {% endif %}
+    </div>
     <div class="mx-4">
         <form class="mb-3 row" method="POST" enctype="multipart/form-data">
             <label for="staticAvatar" class="col-sm-2 col-form-label fw-semibold">Profile picture</label>

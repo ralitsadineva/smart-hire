@@ -4,6 +4,10 @@ from validation import is_valid_username, is_valid_password
 import bcrypt
 import logging
 import secrets
+import os
+from datetime import datetime
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -102,9 +106,22 @@ def profile():
         return redirect('/')
     if request.method == 'POST':
         avatar = request.files['avatar']
-        avatar.save(f"static/images/{avatar.filename}")
-        update_avatar(avatar.filename, session['username'])
-        session['avatar'] = avatar.filename
+        filename = f"{session['user_id']}/{datetime.now().strftime('%Y%m%d%H%M%S')}{os.path.splitext(avatar.filename)[1]}"
+        if avatar.content_type.startswith('image/') and len(avatar.read()) < 2 * 1024 * 1024:
+            if not os.path.exists(f"static/images/{session['user_id']}"):
+                os.makedirs(f"static/images/{session['user_id']}")
+            avatar.seek(0)
+            avatar.save(f"static/images/{filename}")
+            update_avatar(filename, session['username'])
+            if session['avatar'] != 'user.png':
+                if os.path.exists(f"static/images/{session['avatar']}"):
+                    try:
+                        os.remove(f"static/images/{session['avatar']}")
+                    except OSError as error:
+                        logger.error(f"{type(error)}\n{error}")
+            session['avatar'] = filename
+        else:
+            return render_template('profile.html', invalid=True, username=session['username'], email=session['email'], avatar=session['avatar'])
         return redirect('/profile')
     else:
         return render_template('profile.html', username=session['username'], email=session['email'], avatar=session['avatar'])
