@@ -161,3 +161,6 @@ cython_debug/
 
 # PostgreSQL connection parameters
 database.ini
+
+# Google Cloud Platform service account keys
+client_secret.json

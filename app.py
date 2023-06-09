@@ -8,6 +8,7 @@ import os
 from datetime import datetime
 from google.oauth2 import id_token
 from google.auth.transport import requests
+from get_google_client_id import get_google_client_id
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -15,6 +16,8 @@ logging.basicConfig(
     # datefmt='%Y-%m-%d %H:%M:%S',
 )
 logger = logging.getLogger(__name__)
+
+client_id = get_google_client_id()
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
@@ -38,7 +41,7 @@ def login():
         session['avatar'] = user[4]
         return redirect('/home')
     else:
-        return render_template('login.html')
+        return render_template('login.html', client_id=client_id)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -64,7 +67,21 @@ def signup():
         else:
             return render_template('signup.html', invalid_username=True)
     else:
-        return render_template('signup.html')
+        return render_template('signup.html', client_id=client_id)
+
+@app.route('/signin-google', methods=['POST'])
+def googleCallback():
+    # Get authorization code Google sent back to you
+    credential = request.form.get('credential')
+    logger.info(f"{credential}")
+    try:
+        idinfo = id_token.verify_oauth2_token(credential, requests.Request(), client_id)
+        logger.info(f"{idinfo}")
+        userid = idinfo['sub']
+        logger.info(f"{userid}")
+    except ValueError:
+        logger.error("Invalid token")
+    return redirect('/home')
 
 @app.route('/logout')
 def logout():
