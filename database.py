@@ -93,6 +93,14 @@ def get_user(username):
     finally:
         close_connection(conn, cursor)
 
+def get_user_by_email(email):
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("SELECT * FROM users WHERE email = %s;", (email, ))
+        return cursor.fetchone()
+    finally:
+        close_connection(conn, cursor)
+
 def update_password(password, username):
     conn, cursor = get_connection()
     try:

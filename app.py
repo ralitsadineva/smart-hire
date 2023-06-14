@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session
-from database import create_tables, UniqueViolationError, DatabaseError, insert_user, get_user, update_password,update_avatar, get_positions, insert_position, get_position, update_position
+from database import create_tables, UniqueViolationError, DatabaseError, insert_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position
 from validation import is_valid_username, is_valid_password
 import bcrypt
 import logging
@@ -9,6 +9,7 @@ from datetime import datetime
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from get_google_client_id import get_google_client_id
+from generate_random_password import generate_random_password
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -77,10 +78,31 @@ def googleCallback():
     try:
         idinfo = id_token.verify_oauth2_token(credential, requests.Request(), client_id)
         logger.info(f"{idinfo}")
-        userid = idinfo['sub']
-        logger.info(f"{userid}")
+        # userid = idinfo['sub']
+        # logger.info(f"{userid}")
     except ValueError:
         logger.error("Invalid token")
+    email = idinfo['email']
+    logger.info(f"{email}")
+    user = get_user_by_email(email)
+    if user is None:
+        password = generate_random_password()
+        hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        try:
+            insert_user(email, idinfo['sub'], hashed_password)
+            user = get_user_by_email(email)
+        except UniqueViolationError as e:
+            logger.error(f"{type(e)}\n{e}")
+            return render_template('signup.html', exist=True)
+        except DatabaseError as error:
+            logger.error(f"{type(error)}\n{error}")
+            return render_template('signup.html', error=True)
+    else:
+        pass # check if google user, if not we do something
+    session['username'] = user[2]
+    session['user_id'] = user[0]
+    session['email'] = email
+    session['avatar'] = user[4]
     return redirect('/home')
 
 @app.route('/logout')
