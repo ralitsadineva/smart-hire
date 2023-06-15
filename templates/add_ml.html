@@ -9,49 +9,60 @@
   <body class="bg-success-subtle landing-page">
     <nav class="navbar navbar-expand-lg sticky-top bg-success">
         <div class="container-fluid">
-            <a class="navbar-brand text-white" href="../../home">SmartHire</a>
+            <a class="navbar-brand text-white" href="../home">SmartHire</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <a class="nav-link text-white" href="../../home">Dashboard</a>
-                    <a class="nav-link active text-white" aria-current="page" href="../../positions">Positions</a>
-                    <a class="nav-link text-white" href="../../add_cv">Add CV</a>
-                    <a class="nav-link text-white" href="../../add_ml">Add ML</a>
+                    <a class="nav-link text-white" href="../home">Dashboard</a>
+                    <a class="nav-link text-white" href="../positions">Positions</a>
+                    <a class="nav-link text-white" href="add_cv">Add CV</a>
+                    <a class="nav-link active text-white" aria-current="page" href="add_ml">Add ML</a>
                 </div>
                 <div class="nav-item dropdown text-white">
                     <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="../../static/images/{{ avatar }}" alt="Profile Picture" width="30" height="24" class="rounded-circle img-fluid">
+                        <img src="../static/images/{{ avatar }}" alt="Profile Picture" width="30" height="24" class="rounded-circle img-fluid">
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                      <li><a class="dropdown-item" href="../../profile">Profile</a></li>
+                      <li><a class="dropdown-item" href="../profile">Profile</a></li>
                       <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item" href="../../logout">Log out</a></li>
+                      <li><a class="dropdown-item" href="../logout">Log out</a></li>
                     </ul>
                 </div>
             </div>
         </div>
     </nav>
-    <p class="text-center mt-5 fs-4 fw-semibold">Edit the position</p>
+    <p class="text-center mt-5 fs-4 fw-semibold">Add a new motivational letter</p>
     <div class="d-flex justify-content-center">
+        {% if invalid %}
+            <div class="alert alert-danger" role="alert">
+                Not a pdf file or too big! Only pdf files less than 2MB are allowed.
+            </div>
+        {% endif %}
+    </div>
+    <!-- <div class="d-flex justify-content-center">
         {% if error %}
             <div class="alert alert-danger" role="alert">
                 Something went wrong. Please try again.
             </div>
         {% endif %}
-    </div>
+    </div> -->
     <div class="d-flex justify-content-center">
-        <form class="ms-3 col-sm-3" method="POST">
+        <form class="ms-3 col-sm-3" method="POST" enctype="multipart/form-data">
             <div class="mb-3">
-                <label for="inputTitle" class="form-label">Title</label>
-                <input type="text" class="form-control" id="inputTitle" name="title" value="{{ position[2] }}" required>
+                <label for="inputTitle" class="form-label">For candidate:</label>
+                <select class="form-select" aria-label="Candidate">
+                    <option selected>Choose candidate</option>
+                    {% for candidate in candidates %}
+                        <option value="{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</option>
+                    {% endfor %}
+                  </select>
             </div>
             <div class="mb-3">
-                <label for="inputDescription" class="form-label">Description</label>
-                <textarea class="form-control" id="inputDescription" name="description" rows="5" required>{{ position[3] }}</textarea>
+                <input class="form-control" type="file" id="formFile" name= "ml" required>
             </div>
-            <button type="submit" class="btn btn-success">Submit</button>
+            <button type="submit" class="btn btn-success">Add</button>
         </form>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script> 

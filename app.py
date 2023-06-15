@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session
-from database import create_tables, UniqueViolationError, DatabaseError, insert_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position
+from database import create_tables, UniqueViolationError, DatabaseError, insert_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, get_candidates, get_all_candidates
 from validation import is_valid_username, is_valid_password
 import bcrypt
 import logging
@@ -10,6 +10,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 from get_google_client_id import get_google_client_id
 from generate_random_password import generate_random_password
+from read_pdf import read_pdf
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -177,7 +178,8 @@ def position(position_id):
     if 'username' not in session:
         return redirect('/')
     position = get_position(position_id)
-    return render_template('position.html', position=position, avatar=session['avatar'])
+    candidates = get_candidates(position_id)
+    return render_template('position.html', position=position, candidates=candidates, avatar=session['avatar'])
 
 @app.route('/positions/<string:position_id>/edit', methods=['GET', 'POST'])
 def edit_position(position_id):
@@ -207,6 +209,43 @@ def add_position():
             return render_template('add_position.html', error=True, avatar=session['avatar'])
     else:
         return render_template('add_position.html', avatar=session['avatar'])
+
+@app.route('/add_cv', methods=['GET', 'POST'])
+def add_cv():
+    if 'username' not in session:
+        return redirect('/')
+    if request.method == 'POST':
+        cv = request.files['cv']
+        if cv.content_type == 'application/pdf' and len(cv.read()) < 2 * 1024 * 1024:
+            cv.seek(0)
+            # logger.info(len(cv.read()))
+            contents = read_pdf(cv)
+            # logger.info(contents)
+        else:
+            candidates = get_all_candidates()
+            return render_template('add_cv.html', invalid=True, candidates=candidates, avatar=session['avatar'])
+        return redirect('/add_cv')
+    else:
+        candidates = get_all_candidates()
+        return render_template('add_cv.html', candidates=candidates, avatar=session['avatar'])
+
+@app.route('/add_ml', methods=['GET', 'POST'])
+def add_ml():
+    if 'username' not in session:
+        return redirect('/')
+    if request.method == 'POST':
+        ml = request.files['ml']
+        if ml.content_type == 'application/pdf' and len(ml.read()) < 2 * 1024 * 1024:
+            ml.seek(0)
+            # logger.info(len(ml.read()))
+            contents = read_pdf(ml)
+        else:
+            candidates = get_all_candidates()
+            return render_template('add_ml.html', invalid=True, candidates=candidates, avatar=session['avatar'])
+        return redirect('/add_ml')
+    else:
+        candidates = get_all_candidates()
+        return render_template('add_ml.html', candidates=candidates, avatar=session['avatar'])
 
 if __name__ == '__main__':
     create_tables()
