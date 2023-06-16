@@ -29,9 +29,10 @@ def create_tables():
             email VARCHAR(255) NOT NULL UNIQUE, 
             username VARCHAR(255) NOT NULL UNIQUE, 
             password BYTEA NOT NULL,
-            avatar VARCHAR(255) DEFAULT 'user.png'
+            avatar VARCHAR(255) DEFAULT 'user.png',
+            type CHAR NOT NULL DEFAULT '0' CHECK (type IN ('0', '1'))
         );
-        """)
+        """)  # type 0 = default, 1 = Google
     conn.commit()
 
     cursor.execute("""
@@ -79,6 +80,20 @@ def insert_user(email, username, password):
     except psycopg2.errors.UniqueViolation as e:
         conn.rollback()
         raise UniqueViolationError(e)
+    except (Exception, psycopg2.DatabaseError) as error:
+        conn.rollback()
+        raise DatabaseError(error)
+    finally:
+        close_connection(conn, cursor)
+
+def insert_google_user(email, username, password):
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("""
+            INSERT INTO users (email, username, password, type)
+            VALUES (%s, %s, %s, '1');
+            """, (email, username, password))
+        conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
         conn.rollback()
         raise DatabaseError(error)

@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session
-from database import create_tables, UniqueViolationError, DatabaseError, insert_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, get_candidates, get_all_candidates
+from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, get_candidates, get_all_candidates
 from validation import is_valid_username, is_valid_password
 import bcrypt
 import logging
@@ -26,7 +26,7 @@ app.secret_key = secrets.token_hex(16)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', landing_page=True)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -90,16 +90,13 @@ def googleCallback():
         password = generate_random_password()
         hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
         try:
-            insert_user(email, idinfo['sub'], hashed_password)
+            insert_google_user(email, idinfo['sub'], hashed_password)
             user = get_user_by_email(email)
-        except UniqueViolationError as e:
-            logger.error(f"{type(e)}\n{e}")
-            return render_template('signup.html', exist=True)
         except DatabaseError as error:
             logger.error(f"{type(error)}\n{error}")
             return render_template('signup.html', error=True)
-    else:
-        pass # check if google user, if not we do something
+    elif user[5] == '0': # check if google user, if not ...
+        return render_template('login.html', exist=True)
     session['username'] = user[2]
     session['user_id'] = user[0]
     session['email'] = email
@@ -120,7 +117,7 @@ def change_password():
         new_password = request.form['new_password']
         user = get_user(session['username'])
         if not bcrypt.checkpw(old_password.encode(), bytes(user[3])):
-            return render_template('change_password.html', invalid=True)
+            return render_template('change_password.html', invalid=True, avatar=session['avatar'])
         if is_valid_password(new_password):
             hashed_password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
             try:
@@ -128,11 +125,11 @@ def change_password():
                 return redirect('/login')
             except DatabaseError as error:
                 logger.error(f"{type(error)}\n{error}")
-                return render_template('change_password.html', error=True)
+                return render_template('change_password.html', error=True, avatar=session['avatar'])
         else:
-            return render_template('change_password.html', invalid_password=True)
+            return render_template('change_password.html', invalid_password=True, avatar=session['avatar'])
     else:
-        return render_template('change_password.html')
+        return render_template('change_password.html', avatar=session['avatar'])
 
 @app.route('/home')
 def home():
