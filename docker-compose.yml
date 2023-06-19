@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+
+  web:
+    image: python:3.9
+    volumes:
+      - type: bind
+        source: $PWD
+        target: /mnt/app
+      - ./api-entrypoint.sh:/api-entrypoint.sh
+    working_dir: /mnt/app
+    ports:
+      - 8000:8000
+    command: bash -c "pip install -r requirements.txt && flask run --host=0.0.0.0 --port=8000"
+
+  postgres:
+    image: postgres:13.8-alpine
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+volumes:
+  pg_data:
