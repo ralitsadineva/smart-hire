@@ -1,10 +1,7 @@
 {% extends "base_logged_in.html" %}
 
-<!-- Positions should be active not Dashboard.
-<a class="nav-link text-white" href="home">Dashboard</a>
-<a class="nav-link active text-white" aria-current="page" href="positions">Positions</a>
-<a class="nav-link text-white" href="add_cv">Add CV</a>
-<a class="nav-link text-white" href="add_ml">Add ML</a> -->
+{% set title = 'Positions' %}
+{% set active_class = 'positions' %}
 
 {% block main %}
 <div class="row mx-4">
@@ -12,7 +9,7 @@
         <p class="text-center mt-5 fs-4 fw-semibold">Available positions</p>
     </div>
     <div class="col-1 d-flex justify-content-end align-self-end">
-        <a role="button" class="btn btn-success" href="positions/add">+</a>
+        <a role="button" class="btn btn-success" href="{{ base_url }}positions/add">+</a>
     </div>
 </div>
 <div class="mx-4">
@@ -29,7 +26,7 @@
             {% for position in positions %}
                 <tr>
                     <th scope="row">{{ loop.index }}</th>
-                    <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="positions/{{ position[0] }}">{{ position[2] }}</a></td>
+                    <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position[0] }}">{{ position[2] }}</a></td>
                     <td class="col-md-2">{{ position[5].replace(microsecond=0) }}</td>
                     <td class="col-md-2">{{ position[6].replace(microsecond=0) }}</td>
                 </tr>

@@ -1,13 +1,7 @@
 {% extends "base_logged_in.html"  %}
 
-<!-- Position should be active and the links begin with ../
-<a class="navbar-brand text-white" href="../home">SmartHire</a> -->
-<!-- <a class="nav-link text-white" href="../home">Dashboard</a>
-<a class="nav-link active text-white" aria-current="page" href="../positions">Positions</a>
-<a class="nav-link text-white" href="../add_cv">Add CV</a>
-<a class="nav-link text-white" href="../add_ml">Add ML</a> -->
-<!-- <li><a class="dropdown-item" href="../profile">Profile</a></li>
-<li><a class="dropdown-item" href="../logout">Log out</a></li> -->
+{% set title = 'Add a position' %}
+{% set active_class = 'positions' %}
 
 {% block main %}
 <p class="text-center mt-5 fs-4 fw-semibold">Add a new position</p>

@@ -1,10 +1,6 @@
 {% extends "base_logged_in.html" %}
 
-<!-- There shouldn't be an active tab/page in the navbar.
-<a class="nav-link text-white" href="home">Dashboard</a>
-<a class="nav-link text-white" href="positions">Positions</a>
-<a class="nav-link text-white" href="add_cv">Add CV</a>
-<a class="nav-link text-white" href="add_ml">Add ML</a> -->
+{% set title = 'Profile' %}
 
 {% block main %}
 <p class="text-center mt-5 fs-4 fw-semibold">Profile</p>
@@ -47,6 +43,6 @@
     </div>
 </div>
 <div class="mx-4">
-    <a role="button" class="btn btn-success" href="change_password">Change password</a>
+    <a role="button" class="btn btn-success" href="{{ base_url }}change_password">Change password</a>
 </div>
 {% endblock %}

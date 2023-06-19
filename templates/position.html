@@ -1,13 +1,7 @@
 {% extends "base_logged_in.html" %}
 
-<!-- Positions should be active and the links are with ../
-<a class="navbar-brand text-white" href="../home">SmartHire</a> -->
-<!-- <a class="nav-link text-white" href="../home">Dashboard</a>
-<a class="nav-link active text-white" aria-current="page" href="../positions">Positions</a>
-<a class="nav-link text-white" href="../add_cv">Add CV</a>
-<a class="nav-link text-white" href="../add_ml">Add ML</a> -->
-<!-- <li><a class="dropdown-item" href="../profile">Profile</a></li>
-<li><a class="dropdown-item" href="../logout">Log out</a></li> -->
+{% set title = position[2] %}
+{% set active_class = 'positions' %}
 
 {% block main %}
 <div class="row mx-3">
@@ -15,7 +9,7 @@
         <p class="mt-5 fs-4 fw-semibold">{{ position[2] }}</p>
     </div>
     <div class="col-1 d-flex justify-content-end align-self-end">
-        <a role="button" class="btn btn-success" href="{{ position[0] }}/edit">Edit</a>
+        <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ position[0] }}/edit">Edit</a>
     </div>
 </div>
 <p class="ms-4 mt-4 fs-5 fw-semibold">{{ position[3] }}</p>
