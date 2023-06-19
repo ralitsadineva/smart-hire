@@ -221,13 +221,13 @@ def update_position(pos_id, title, description):
     finally:
         close_connection(conn, cursor)
 
-def insert_candidate(pos_id, first_name, last_name, email, phone_number, address, postal_code, city, country, date_of_birth):
+def insert_candidate(pos_id, first_name, last_name, email):
     conn, cursor = get_connection()
     try:
         cursor.execute("""
-            INSERT INTO candidates (pos_id, first_name, last_name, email, phone_number, address, postal_code, city, country, date_of_birth)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-            """, (pos_id, first_name, last_name, email, phone_number, address, postal_code, city, country, date_of_birth))
+            INSERT INTO candidates (pos_id, first_name, last_name, email)
+            VALUES (%s, %s, %s, %s);
+            """, (pos_id, first_name, last_name, email))
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
         conn.rollback()

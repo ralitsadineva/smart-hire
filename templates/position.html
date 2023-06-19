@@ -15,7 +15,14 @@
 <p class="ms-4 mt-4 fs-5 fw-semibold">{{ position[3] }}</p>
 <p class="ms-4 mt-5 fw-semibold">Created on: {{ position[5].replace(microsecond=0) }}   Last updated on: {{ position[6].replace(microsecond=0) }}</p>
 <!-- candidates for this position (* candidates with this pos_id) -->
-<p class="ms-4 mt-5 fs-5 fw-semibold">Candidates</p>
+<div class="row mx-3">
+    <div class="col-11">
+        <p class="mt-5 fs-5 fw-semibold">Candidates</p>
+    </div>
+    <div class="col-1 d-flex justify-content-end align-self-end">
+        <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ position[0] }}/add_candidate">+</a>
+    </div>
+</div>
 {% if candidates == [] %}
     <p class="ms-4 mt-3 fw-semibold">No candidates have applied for this position yet.</p>
 {% endif %}

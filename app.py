@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session
-from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, get_candidates, get_all_candidates
+from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, get_candidates, get_all_candidates, insert_candidate
 from validation import is_valid_username, is_valid_password
 import bcrypt
 import logging
@@ -170,6 +170,20 @@ def positions():
     positions = get_positions(session['user_id'])
     return render_template('positions.html', positions=positions, avatar=session['avatar'])
 
+@app.route('/positions/add', methods=['GET', 'POST'])
+def add_position():
+    if 'username' not in session:
+        return redirect('/')
+    if request.method == 'POST':
+        try:
+            insert_position(session['user_id'], request.form['title'], request.form['description'])
+            return redirect('/positions')
+        except DatabaseError as error:
+            logger.error(f"{type(error)}\n{error}")
+            return render_template('add_position.html', error=True, avatar=session['avatar'])
+    else:
+        return render_template('add_position.html', avatar=session['avatar'])
+
 @app.route('/positions/<string:position_id>')
 def position(position_id):
     if 'username' not in session:
@@ -193,19 +207,19 @@ def edit_position(position_id):
         position = get_position(position_id)
         return render_template('edit_position.html', position=position, avatar=session['avatar'])
 
-@app.route('/positions/add', methods=['GET', 'POST'])
-def add_position():
+@app.route('/positions/<string:position_id>/add_candidate', methods=['GET', 'POST'])
+def add_candidate(position_id):
     if 'username' not in session:
         return redirect('/')
     if request.method == 'POST':
         try:
-            insert_position(session['user_id'], request.form['title'], request.form['description'])
-            return redirect('/positions')
+            insert_candidate(position_id, request.form['first_name'], request.form['last_name'], request.form['email'])
+            return redirect(f'/positions/{position_id}')
         except DatabaseError as error:
             logger.error(f"{type(error)}\n{error}")
-            return render_template('add_position.html', error=True, avatar=session['avatar'])
+            return render_template('add_candidate.html', error=True, position_id=position_id, avatar=session['avatar'])
     else:
-        return render_template('add_position.html', avatar=session['avatar'])
+        return render_template('add_candidate.html', position_id=position_id, avatar=session['avatar'])
 
 @app.route('/add_cv', methods=['GET', 'POST'])
 def add_cv():
