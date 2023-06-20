@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session
-from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, get_candidates, get_all_candidates, insert_candidate
+from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, insert_candidate, get_candidate, get_candidates, get_all_candidates
 from validation import is_valid_username, is_valid_password
 import bcrypt
 import logging
@@ -11,6 +11,7 @@ from google.auth.transport import requests
 from get_google_client_id import get_google_client_id
 from generate_random_password import generate_random_password
 from read_pdf import read_pdf
+from openai_eval import evaluate_ml
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -79,8 +80,6 @@ def googleCallback():
     try:
         idinfo = id_token.verify_oauth2_token(credential, requests.Request(), client_id)
         logger.info(f"{idinfo}")
-        # userid = idinfo['sub']
-        # logger.info(f"{userid}")
     except ValueError:
         logger.error("Invalid token")
     email = idinfo['email']
@@ -221,6 +220,13 @@ def add_candidate(position_id):
     else:
         return render_template('add_candidate.html', position_id=position_id, avatar=session['avatar'])
 
+@app.route('/positions/<string:position_id>/<string:candidate_id>')
+def candidate(position_id, candidate_id):
+    if 'username' not in session:
+        return redirect('/')
+    candidate = get_candidate(candidate_id)
+    return render_template('candidate.html', candidate=candidate, avatar=session['avatar'])
+
 @app.route('/add_cv', methods=['GET', 'POST'])
 def add_cv():
     if 'username' not in session:
@@ -250,6 +256,9 @@ def add_ml():
             ml.seek(0)
             # logger.info(len(ml.read()))
             contents = read_pdf(ml)
+            # logger.info(contents)
+            response = evaluate_ml(contents)
+            logger.info(response)
         else:
             candidates = get_all_candidates()
             return render_template('add_ml.html', invalid=True, candidates=candidates, avatar=session['avatar'])

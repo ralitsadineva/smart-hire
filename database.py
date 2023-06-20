@@ -67,6 +67,33 @@ def create_tables():
         """)
     conn.commit()
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS cvs (
+            cv_id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
+            cand_id UUID NOT NULL REFERENCES candidates (cand_id),
+            score INTEGER CHECK (score >= 0 AND score <= 100),
+            length INTEGER,
+            created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+    conn.commit()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS mls (
+            ml_id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
+            cand_id UUID NOT NULL REFERENCES candidates (cand_id),
+            motivation_lvl INTEGER CHECK (motivation_lvl > 0 AND motivation_lvl <= 10),
+            sentiment VARCHAR(255) CHECK (sentiment IN ('positive', 'negative', 'neutral')),
+            tone VARCHAR(255),
+            length INTEGER,
+            grammar VARCHAR(255),
+            created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+    conn.commit()
+
     close_connection(conn, cursor)
 
 def insert_user(email, username, password):
@@ -232,6 +259,14 @@ def insert_candidate(pos_id, first_name, last_name, email):
     except (Exception, psycopg2.DatabaseError) as error:
         conn.rollback()
         raise DatabaseError(error)
+    finally:
+        close_connection(conn, cursor)
+
+def get_candidate(cand_id):
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("SELECT * FROM candidates WHERE cand_id = %s;", (cand_id, ))
+        return cursor.fetchone()
     finally:
         close_connection(conn, cursor)
 
