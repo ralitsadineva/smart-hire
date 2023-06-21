@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session
-from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, insert_candidate, get_candidate, get_candidates, get_all_candidates
+from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, insert_candidate, get_candidate, get_candidates, get_all_candidates, insert_ml
 from validation import is_valid_username, is_valid_password
 import bcrypt
 import logging
@@ -12,6 +12,7 @@ from get_google_client_id import get_google_client_id
 from generate_random_password import generate_random_password
 from read_pdf import read_pdf
 from openai_eval import evaluate_ml
+from convert_to_dict import convert_to_dict
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -251,14 +252,26 @@ def add_ml():
     if 'username' not in session:
         return redirect('/')
     if request.method == 'POST':
+        cand_id = request.form['candidate']
         ml = request.files['ml']
         if ml.content_type == 'application/pdf' and len(ml.read()) < 2 * 1024 * 1024:
             ml.seek(0)
             # logger.info(len(ml.read()))
             contents = read_pdf(ml)
             # logger.info(contents)
+            word_count = len(contents.split())
+            logger.info(word_count)
             response = evaluate_ml(contents)
-            logger.info(response)
+            # logger.info(response)
+            # logger.info(response.choices[0].text.strip())
+            response_dict = convert_to_dict(response)
+            logger.info(response_dict)
+            try:
+                insert_ml(cand_id, response_dict['Motivation level'], response_dict['Overall sentiment'], response_dict['Tone'], word_count, response_dict['Grammar and language usage'])
+            except DatabaseError as error:
+                logger.error(f"{type(error)}\n{error}")
+                candidates = get_all_candidates()
+                return render_template('add_ml.html', error=True, candidates=candidates, avatar=session['avatar'])
         else:
             candidates = get_all_candidates()
             return render_template('add_ml.html', invalid=True, candidates=candidates, avatar=session['avatar'])

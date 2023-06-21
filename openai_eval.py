@@ -14,17 +14,14 @@ def evaluate_ml(text):
     core_prompt2 = """Analyze the given letter and provide feedback on the following aspects using keywords:
 1. Motivation level (scale of 1 to 10)
 2. Overall sentiment (positive, negative, neutral)
-3. Tone (e.g., formal, enthusiastic, professional)
-4. Word count
-5. Grammar and language usage (errors or improvements)
+3. Tone (can have up to 3 words)
+4. Grammar and language usage (errors or improvements in 1 short sentence)
 """
     response = openai.Completion.create(
         engine="text-davinci-003",
         prompt=text + core_prompt2,
-        # prompt = core_prompt + text
-        # prompt = "Say this is a test"
         max_tokens=200
     )
     
-    # return response.choices[0].text.strip()
-    return response
+    return response.choices[0].text.strip()
+    # return response

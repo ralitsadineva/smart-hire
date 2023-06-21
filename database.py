@@ -84,7 +84,7 @@ def create_tables():
             ml_id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
             cand_id UUID NOT NULL REFERENCES candidates (cand_id),
             motivation_lvl INTEGER CHECK (motivation_lvl > 0 AND motivation_lvl <= 10),
-            sentiment VARCHAR(255) CHECK (sentiment IN ('positive', 'negative', 'neutral')),
+            sentiment VARCHAR(255) CHECK (sentiment IN ('Positive', 'Negative', 'Neutral')),
             tone VARCHAR(255),
             length INTEGER,
             grammar VARCHAR(255),
@@ -283,5 +283,19 @@ def get_all_candidates():
     try:
         cursor.execute("SELECT * FROM candidates;")
         return cursor.fetchall()
+    finally:
+        close_connection(conn, cursor)
+
+def insert_ml(cand_id, motivation_lvl, sentiment, tone, length, grammar):
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("""
+            INSERT INTO mls (cand_id, motivation_lvl, sentiment, tone, length, grammar)
+            VALUES (%s, %s, %s, %s, %s, %s);
+            """, (cand_id, motivation_lvl, sentiment, tone, length, grammar))
+        conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        conn.rollback()
+        raise DatabaseError(error)
     finally:
         close_connection(conn, cursor)
