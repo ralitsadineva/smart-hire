@@ -286,6 +286,22 @@ def get_all_candidates():
     finally:
         close_connection(conn, cursor)
 
+def get_cv(cand_id):
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("SELECT * FROM cvs WHERE cand_id = %s;", (cand_id, ))
+        return cursor.fetchone()
+    finally:
+        close_connection(conn, cursor)
+
+def del_cv(cand_id):
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("DELETE FROM cvs WHERE cand_id = %s;", (cand_id, ))
+        conn.commit()
+    finally:
+        close_connection(conn, cursor)
+
 def insert_ml(cand_id, motivation_lvl, sentiment, tone, length, grammar):
     conn, cursor = get_connection()
     try:
@@ -297,5 +313,21 @@ def insert_ml(cand_id, motivation_lvl, sentiment, tone, length, grammar):
     except (Exception, psycopg2.DatabaseError) as error:
         conn.rollback()
         raise DatabaseError(error)
+    finally:
+        close_connection(conn, cursor)
+
+def get_ml(cand_id):
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("SELECT * FROM mls WHERE cand_id = %s;", (cand_id, ))
+        return cursor.fetchone()
+    finally:
+        close_connection(conn, cursor)
+
+def del_ml(cand_id):
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("DELETE FROM mls WHERE cand_id = %s;", (cand_id, ))
+        conn.commit()
     finally:
         close_connection(conn, cursor)

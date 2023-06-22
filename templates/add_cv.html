@@ -11,6 +11,16 @@
             Not a pdf file or too big! Only pdf files less than 2MB are allowed.
         </div>
     {% endif %}
+    {% if exist %}
+        <div class="alert alert-danger text-center" role="alert">
+            A CV for this candidate has already been uploaded.<br>If you want to change it, please delete the old one first.
+        </div>
+    {% endif %}
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            Something went wrong. Please try again.
+        </div>
+    {% endif %}
 </div>
 <!-- <div class="d-flex justify-content-center">
     {% if error %}
@@ -23,7 +33,7 @@
     <form class="ms-3 col-sm-3" method="POST" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="inputTitle" class="form-label">For candidate:</label>
-            <select class="form-select" aria-label="Candidate">
+            <select class="form-select" aria-label="Candidate" name="candidate">
                 <option selected>Choose candidate</option>
                 {% for candidate in candidates %}
                     <option value="{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</option>

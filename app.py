@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session
-from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, insert_candidate, get_candidate, get_candidates, get_all_candidates, insert_ml
+from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, insert_candidate, get_candidate, get_candidates, get_all_candidates, get_cv, del_cv, insert_ml, get_ml, del_ml
 from validation import is_valid_username, is_valid_password
 import bcrypt
 import logging
@@ -226,13 +226,19 @@ def candidate(position_id, candidate_id):
     if 'username' not in session:
         return redirect('/')
     candidate = get_candidate(candidate_id)
-    return render_template('candidate.html', candidate=candidate, avatar=session['avatar'])
+    cv = get_cv(candidate_id)
+    ml = get_ml(candidate_id)
+    return render_template('candidate.html', candidate=candidate, cv=cv, ml=ml, avatar=session['avatar'])
 
 @app.route('/add_cv', methods=['GET', 'POST'])
 def add_cv():
     if 'username' not in session:
         return redirect('/')
     if request.method == 'POST':
+        cand_id = request.form['candidate']
+        if get_cv(cand_id) is not None:
+            candidates = get_all_candidates()
+            return render_template('add_cv.html', exist=True, candidates=candidates, avatar=session['avatar'])
         cv = request.files['cv']
         if cv.content_type == 'application/pdf' and len(cv.read()) < 2 * 1024 * 1024:
             cv.seek(0)
@@ -242,7 +248,7 @@ def add_cv():
         else:
             candidates = get_all_candidates()
             return render_template('add_cv.html', invalid=True, candidates=candidates, avatar=session['avatar'])
-        return redirect('/add_cv')
+        return redirect('/add_cv') # f'/positions/{get_candidate(cand_id)[1]}/{cand_id}'
     else:
         candidates = get_all_candidates()
         return render_template('add_cv.html', candidates=candidates, avatar=session['avatar'])
@@ -253,6 +259,9 @@ def add_ml():
         return redirect('/')
     if request.method == 'POST':
         cand_id = request.form['candidate']
+        if get_ml(cand_id) is not None:
+            candidates = get_all_candidates()
+            return render_template('add_ml.html', exist=True, candidates=candidates, avatar=session['avatar'])
         ml = request.files['ml']
         if ml.content_type == 'application/pdf' and len(ml.read()) < 2 * 1024 * 1024:
             ml.seek(0)
@@ -275,10 +284,20 @@ def add_ml():
         else:
             candidates = get_all_candidates()
             return render_template('add_ml.html', invalid=True, candidates=candidates, avatar=session['avatar'])
-        return redirect('/add_ml')
+        return redirect(f'/positions/{get_candidate(cand_id)[1]}/{cand_id}')
     else:
         candidates = get_all_candidates()
         return render_template('add_ml.html', candidates=candidates, avatar=session['avatar'])
+
+@app.route('/positions/<string:position_id>/<string:candidate_id>/del_cv')
+def delete_cv(position_id, candidate_id):
+    del_cv(candidate_id)
+    return redirect(f'/positions/{position_id}/{candidate_id}')
+
+@app.route('/positions/<string:position_id>/<string:candidate_id>/del_ml')
+def delete_ml(position_id, candidate_id):
+    del_ml(candidate_id)
+    return redirect(f'/positions/{position_id}/{candidate_id}')
 
 if __name__ == '__main__':
     create_tables()

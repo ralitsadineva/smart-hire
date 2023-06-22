@@ -11,6 +11,16 @@
             Not a pdf file or too big! Only pdf files less than 2MB are allowed.
         </div>
     {% endif %}
+    {% if exist %}
+        <div class="alert alert-danger text-center" role="alert">
+            A motivational letter for this candidate has already been uploaded.<br>If you want to change it, please delete the old one first.
+        </div>
+    {% endif %}
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            Something went wrong. Please try again.
+        </div>
+    {% endif %}
 </div>
 <!-- <div class="d-flex justify-content-center">
     {% if error %}
