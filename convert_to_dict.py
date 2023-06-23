@@ -1,8 +1,7 @@
 def convert_to_dict(response):
-    response_string = response #.strip('{}') #.choices[0].text.strip()
     response_dict = {}
 
-    for line in response_string.split('\n'):
+    for line in response.split('\n'):
         line = line.strip().strip(',')
         
         if line == '':

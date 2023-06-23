@@ -72,6 +72,12 @@ def create_tables():
             cv_id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
             cand_id UUID NOT NULL REFERENCES candidates (cand_id),
             score INTEGER CHECK (score >= 0 AND score <= 100),
+            structure INTEGER CHECK (structure > 0 AND structure <= 5),
+            contact_info INTEGER CHECK (contact_info > 0 AND contact_info <= 5),
+            work_experience INTEGER CHECK (work_experience > 0 AND work_experience <= 10),
+            education INTEGER CHECK (education > 0 AND education <= 10),
+            skills INTEGER CHECK (skills > 0 AND skills <= 10),
+            languages INTEGER CHECK (languages > 0 AND languages <= 10),
             length INTEGER,
             created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -283,6 +289,20 @@ def get_all_candidates():
     try:
         cursor.execute("SELECT * FROM candidates;")
         return cursor.fetchall()
+    finally:
+        close_connection(conn, cursor)
+
+def insert_cv(cand_id, score, structure, contact_info, work_experience, education, skills, languages, length):
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("""
+            INSERT INTO cvs (cand_id, score, structure, contact_info, work_experience, education, skills, languages, length)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+            """, (cand_id, score, structure, contact_info, work_experience, education, skills, languages, length))
+        conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        conn.rollback()
+        raise DatabaseError(error)
     finally:
         close_connection(conn, cursor)
 

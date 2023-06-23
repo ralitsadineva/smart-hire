@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session
-from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, insert_candidate, get_candidate, get_candidates, get_all_candidates, get_cv, del_cv, insert_ml, get_ml, del_ml
+from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, insert_candidate, get_candidate, get_candidates, get_all_candidates, insert_cv, get_cv, del_cv, insert_ml, get_ml, del_ml
 from validation import is_valid_username, is_valid_password
 import bcrypt
 import logging
@@ -10,8 +10,8 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 from get_google_client_id import get_google_client_id
 from generate_random_password import generate_random_password
-from read_pdf import read_pdf
-from openai_eval import evaluate_ml
+from read_pdf import read_pdf, page_count
+from openai_eval import extract_cv, evaluate_cv, evaluate_ml
 from convert_to_dict import convert_to_dict
 
 logging.basicConfig(
@@ -242,13 +242,23 @@ def add_cv():
         cv = request.files['cv']
         if cv.content_type == 'application/pdf' and len(cv.read()) < 2 * 1024 * 1024:
             cv.seek(0)
-            # logger.info(len(cv.read()))
             contents = read_pdf(cv)
-            # logger.info(contents)
+            length = page_count(cv)
+            # candidate_info = extract_cv(contents)
+            # logger.info(candidate_info)
+            response = evaluate_cv(contents)
+            response_dict = convert_to_dict(response)
+            score = sum(response_dict.values())
+            try:
+                insert_cv(cand_id, score, response_dict['Structure and organization'], response_dict['Contact information'], response_dict['Work experience'], response_dict['Education'], response_dict['Skills'], response_dict['Languages'], length)
+            except DatabaseError as error:
+                logger.error(f"{type(error)}\n{error}")
+                candidates = get_all_candidates()
+                return render_template('add_cv.html', error=True, candidates=candidates, avatar=session['avatar'])
         else:
             candidates = get_all_candidates()
             return render_template('add_cv.html', invalid=True, candidates=candidates, avatar=session['avatar'])
-        return redirect('/add_cv') # f'/positions/{get_candidate(cand_id)[1]}/{cand_id}'
+        return redirect(f'/positions/{get_candidate(cand_id)[1]}/{cand_id}')
     else:
         candidates = get_all_candidates()
         return render_template('add_cv.html', candidates=candidates, avatar=session['avatar'])
@@ -265,14 +275,10 @@ def add_ml():
         ml = request.files['ml']
         if ml.content_type == 'application/pdf' and len(ml.read()) < 2 * 1024 * 1024:
             ml.seek(0)
-            # logger.info(len(ml.read()))
             contents = read_pdf(ml)
-            # logger.info(contents)
             word_count = len(contents.split())
             logger.info(word_count)
             response = evaluate_ml(contents)
-            # logger.info(response)
-            # logger.info(response.choices[0].text.strip())
             response_dict = convert_to_dict(response)
             logger.info(response_dict)
             try:
