@@ -292,6 +292,21 @@ def get_all_candidates():
     finally:
         close_connection(conn, cursor)
 
+def update_candidate(cand_id, email, phone_number, address, postal_code, city, country, date_of_birth):
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("""
+            UPDATE candidates
+            SET email = %s, phone_number = %s, address = %s, postal_code = %s, city = %s, country = %s, date_of_birth = %s
+            WHERE cand_id = %s;
+            """, (email, phone_number, address, postal_code, city, country, date_of_birth, cand_id))
+        conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        conn.rollback()
+        raise DatabaseError(error)
+    finally:
+        close_connection(conn, cursor)
+
 def insert_cv(cand_id, score, structure, contact_info, work_experience, education, skills, languages, length):
     conn, cursor = get_connection()
     try:

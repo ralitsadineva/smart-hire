@@ -22,15 +22,8 @@
         </div>
     {% endif %}
 </div>
-<!-- <div class="d-flex justify-content-center">
-    {% if error %}
-        <div class="alert alert-danger" role="alert">
-            Something went wrong. Please try again.
-        </div>
-    {% endif %}
-</div> -->
 <div class="d-flex justify-content-center">
-    <form class="ms-3 col-sm-3" method="POST" enctype="multipart/form-data">
+    <form class="ms-3 col-sm-3" method="POST" enctype="multipart/form-data" onsubmit="document.getElementById('spinner').style.display = 'block';">
         <div class="mb-3">
             <label for="inputTitle" class="form-label">For candidate:</label>
             <select class="form-select" aria-label="Candidate" name="candidate">
@@ -44,6 +37,7 @@
             <input class="form-control" type="file" id="formFile" name= "ml" required>
         </div>
         <button type="submit" class="btn btn-success">Add</button>
+        {% include 'spinner.html' %}
     </form>
 </div>
 {% endblock %}

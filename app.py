@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session
-from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, insert_candidate, get_candidate, get_candidates, get_all_candidates, insert_cv, get_cv, del_cv, insert_ml, get_ml, del_ml
+from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, insert_candidate, get_candidate, get_candidates, get_all_candidates, update_candidate, insert_cv, get_cv, del_cv, insert_ml, get_ml, del_ml
 from validation import is_valid_username, is_valid_password
 import bcrypt
 import logging
@@ -12,7 +12,8 @@ from get_google_client_id import get_google_client_id
 from generate_random_password import generate_random_password
 from read_pdf import read_pdf, page_count
 from openai_eval import extract_cv, evaluate_cv, evaluate_ml
-from convert_to_dict import convert_to_dict
+from convert_to_dict import convert_to_dict, convert_to_dict_extracted
+from check_empty import check_empty
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -235,30 +236,64 @@ def add_cv():
     if 'username' not in session:
         return redirect('/')
     if request.method == 'POST':
-        cand_id = request.form['candidate']
-        if get_cv(cand_id) is not None:
-            candidates = get_all_candidates()
-            return render_template('add_cv.html', exist=True, candidates=candidates, avatar=session['avatar'])
-        cv = request.files['cv']
-        if cv.content_type == 'application/pdf' and len(cv.read()) < 2 * 1024 * 1024:
-            cv.seek(0)
-            contents = read_pdf(cv)
-            length = page_count(cv)
-            # candidate_info = extract_cv(contents)
-            # logger.info(candidate_info)
-            response = evaluate_cv(contents)
-            response_dict = convert_to_dict(response)
-            score = sum(response_dict.values())
+        if 'cv' in request.files:
+            cand_id = request.form['candidate']
+            if get_cv(cand_id) is not None:
+                candidates = get_all_candidates()
+                return render_template('add_cv.html', exist=True, candidates=candidates, avatar=session['avatar'])
+            cv = request.files['cv']
+            if cv.content_type == 'application/pdf' and len(cv.read()) < 2 * 1024 * 1024:
+                cv.seek(0)
+                contents = read_pdf(cv)
+                length = page_count(cv)
+                candidate_info = extract_cv(contents)
+                logger.info(candidate_info)
+                try:
+                    cand_info = convert_to_dict_extracted(candidate_info)
+                except:
+                    logger.error(f"{type(error)}\n{error}")
+                    candidates = get_all_candidates()
+                    return render_template('add_cv.html', error=True, candidates=candidates, avatar=session['avatar'])
+                # logger.info(cand_info)
+                response = evaluate_cv(contents)
+                logger.info(response)
+                try:
+                    response_dict = convert_to_dict(response)
+                except:
+                    logger.error(f"{type(error)}\n{error}")
+                    candidates = get_all_candidates()
+                    return render_template('add_cv.html', error=True, candidates=candidates, avatar=session['avatar'])
+                score = sum(response_dict.values())
+                try:
+                    insert_cv(cand_id, score, response_dict['Structure and organization'], response_dict['Contact information'], response_dict['Work experience'], response_dict['Education'], response_dict['Skills'], response_dict['Languages'], length)
+                except DatabaseError as error:
+                    logger.error(f"{type(error)}\n{error}")
+                    candidates = get_all_candidates()
+                    return render_template('add_cv.html', error=True, candidates=candidates, avatar=session['avatar'])
+            else:
+                candidates = get_all_candidates()
+                return render_template('add_cv.html', invalid=True, candidates=candidates, avatar=session['avatar'])
+            candidate = get_candidate(cand_id)
+            return render_template('add_cv.html', cand_info=cand_info, candidate=candidate, avatar=session['avatar'])
+        else:
+            cand_id = request.form['candidate']
+            email = request.form['email']
+            if email == '':
+                email = get_candidate(cand_id)[4]
+            phone = check_empty(request.form['phone'])
+            address = check_empty(request.form['address'])
+            postal_code = check_empty(request.form['postal_code'])
+            city = check_empty(request.form['city'])
+            country = check_empty(request.form['country'])
+            birthdate = check_empty(request.form['birthdate'])
             try:
-                insert_cv(cand_id, score, response_dict['Structure and organization'], response_dict['Contact information'], response_dict['Work experience'], response_dict['Education'], response_dict['Skills'], response_dict['Languages'], length)
+                update_candidate(cand_id, email, phone, address, postal_code, city, country, birthdate)
             except DatabaseError as error:
                 logger.error(f"{type(error)}\n{error}")
+                del_cv(cand_id)
                 candidates = get_all_candidates()
                 return render_template('add_cv.html', error=True, candidates=candidates, avatar=session['avatar'])
-        else:
-            candidates = get_all_candidates()
-            return render_template('add_cv.html', invalid=True, candidates=candidates, avatar=session['avatar'])
-        return redirect(f'/positions/{get_candidate(cand_id)[1]}/{cand_id}')
+            return redirect(f'/positions/{get_candidate(cand_id)[1]}/{cand_id}')
     else:
         candidates = get_all_candidates()
         return render_template('add_cv.html', candidates=candidates, avatar=session['avatar'])
@@ -277,9 +312,14 @@ def add_ml():
             ml.seek(0)
             contents = read_pdf(ml)
             word_count = len(contents.split())
-            logger.info(word_count)
+            # logger.info(word_count)
             response = evaluate_ml(contents)
-            response_dict = convert_to_dict(response)
+            try:
+                response_dict = convert_to_dict(response)
+            except:
+                logger.error(f"{type(error)}\n{error}")
+                candidates = get_all_candidates()
+                return render_template('add_ml.html', error=True, candidates=candidates, avatar=session['avatar'])
             logger.info(response_dict)
             try:
                 insert_ml(cand_id, response_dict['Motivation level'], response_dict['Overall sentiment'], response_dict['Tone'], word_count, response_dict['Grammar and language usage'])
