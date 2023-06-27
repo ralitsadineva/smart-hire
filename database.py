@@ -297,7 +297,7 @@ def update_candidate(cand_id, email, phone_number, address, postal_code, city, c
     try:
         cursor.execute("""
             UPDATE candidates
-            SET email = %s, phone_number = %s, address = %s, postal_code = %s, city = %s, country = %s, date_of_birth = %s
+            SET email = %s, phone_number = %s, address = %s, postal_code = %s, city = %s, country = %s, date_of_birth = %s, last_updated = CURRENT_TIMESTAMP
             WHERE cand_id = %s;
             """, (email, phone_number, address, postal_code, city, country, date_of_birth, cand_id))
         conn.commit()

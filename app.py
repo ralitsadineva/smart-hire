@@ -14,6 +14,7 @@ from read_pdf import read_pdf, page_count
 from openai_eval import extract_cv, evaluate_cv, evaluate_ml
 from convert_to_dict import convert_to_dict, convert_to_dict_extracted
 from check_empty import check_empty
+from get_greeting import get_greeting
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -136,7 +137,8 @@ def change_password():
 def home():
     if 'username' not in session:
         return redirect('/')
-    return render_template('home.html', avatar=session['avatar'])
+    random_greeting = get_greeting()
+    return render_template('home.html', greeting = random_greeting, avatar=session['avatar'])
 
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
@@ -250,23 +252,27 @@ def add_cv():
                 logger.info(candidate_info)
                 try:
                     cand_info = convert_to_dict_extracted(candidate_info)
-                except:
+                except Exception as error:
                     logger.error(f"{type(error)}\n{error}")
                     candidates = get_all_candidates()
                     return render_template('add_cv.html', error=True, candidates=candidates, avatar=session['avatar'])
                 # logger.info(cand_info)
+                if get_candidate(cand_id)[2] != cand_info['First name'] or get_candidate(cand_id)[3] != cand_info['Last name']:
+                    different_names = True
+                else:
+                    different_names = False
                 response = evaluate_cv(contents)
                 logger.info(response)
                 try:
                     response_dict = convert_to_dict(response)
-                except:
+                except Exception as error:
                     logger.error(f"{type(error)}\n{error}")
                     candidates = get_all_candidates()
                     return render_template('add_cv.html', error=True, candidates=candidates, avatar=session['avatar'])
                 score = sum(response_dict.values())
                 try:
                     insert_cv(cand_id, score, response_dict['Structure and organization'], response_dict['Contact information'], response_dict['Work experience'], response_dict['Education'], response_dict['Skills'], response_dict['Languages'], length)
-                except DatabaseError as error:
+                except (DatabaseError, Exception) as error:
                     logger.error(f"{type(error)}\n{error}")
                     candidates = get_all_candidates()
                     return render_template('add_cv.html', error=True, candidates=candidates, avatar=session['avatar'])
@@ -274,7 +280,7 @@ def add_cv():
                 candidates = get_all_candidates()
                 return render_template('add_cv.html', invalid=True, candidates=candidates, avatar=session['avatar'])
             candidate = get_candidate(cand_id)
-            return render_template('add_cv.html', cand_info=cand_info, candidate=candidate, avatar=session['avatar'])
+            return render_template('add_cv.html', cand_info=cand_info, candidate=candidate, different_names=different_names, avatar=session['avatar'])
         else:
             cand_id = request.form['candidate']
             email = request.form['email']
@@ -314,6 +320,7 @@ def add_ml():
             word_count = len(contents.split())
             # logger.info(word_count)
             response = evaluate_ml(contents)
+            logger.info(response)
             try:
                 response_dict = convert_to_dict(response)
             except:
@@ -337,11 +344,15 @@ def add_ml():
 
 @app.route('/positions/<string:position_id>/<string:candidate_id>/del_cv')
 def delete_cv(position_id, candidate_id):
+    if 'username' not in session:
+        return redirect('/')
     del_cv(candidate_id)
     return redirect(f'/positions/{position_id}/{candidate_id}')
 
 @app.route('/positions/<string:position_id>/<string:candidate_id>/del_ml')
 def delete_ml(position_id, candidate_id):
+    if 'username' not in session:
+        return redirect('/')
     del_ml(candidate_id)
     return redirect(f'/positions/{position_id}/{candidate_id}')
 
