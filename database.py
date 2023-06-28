@@ -80,7 +80,8 @@ def create_tables():
             languages INTEGER CHECK (languages > 0 AND languages <= 10),
             length INTEGER,
             created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+            last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            file VARCHAR(255) NOT NULL
         );
         """)
     conn.commit()
@@ -95,7 +96,8 @@ def create_tables():
             length INTEGER,
             grammar VARCHAR(255),
             created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+            last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            file VARCHAR(255) NOT NULL
         );
         """)
     conn.commit()
@@ -254,6 +256,54 @@ def update_position(pos_id, title, description):
     finally:
         close_connection(conn, cursor)
 
+def last_added_positions():
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("""
+            SELECT positions.*, COUNT(candidates.cand_id) AS candidates_count
+            FROM positions
+            LEFT JOIN candidates ON positions.pos_id = candidates.pos_id
+            WHERE positions.active = TRUE
+            GROUP BY positions.pos_id
+            ORDER BY positions.created DESC
+            LIMIT 5;
+            """)
+        return cursor.fetchall()
+    finally:
+        close_connection(conn, cursor)
+
+def last_updated_positions():
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("""
+            SELECT positions.*, COUNT(candidates.cand_id) AS candidates_count
+            FROM positions
+            LEFT JOIN candidates ON positions.pos_id = candidates.pos_id
+            WHERE positions.active = TRUE
+            GROUP BY positions.pos_id
+            ORDER BY positions.last_updated DESC
+            LIMIT 5;
+            """)
+        return cursor.fetchall()
+    finally:
+        close_connection(conn, cursor)
+
+def positions_with_most_candidates():
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("""
+            SELECT positions.*, COUNT(candidates.cand_id) AS candidates_count
+            FROM positions
+            LEFT JOIN candidates ON positions.pos_id = candidates.pos_id
+            WHERE positions.active = TRUE
+            GROUP BY positions.pos_id
+            ORDER BY candidates_count DESC
+            LIMIT 5;
+            """)
+        return cursor.fetchall()
+    finally:
+        close_connection(conn, cursor)
+
 def insert_candidate(pos_id, first_name, last_name, email):
     conn, cursor = get_connection()
     try:
@@ -304,6 +354,70 @@ def update_candidate(cand_id, email, phone_number, address, postal_code, city, c
     except (Exception, psycopg2.DatabaseError) as error:
         conn.rollback()
         raise DatabaseError(error)
+    finally:
+        close_connection(conn, cursor)
+
+def last_added_candidates():
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("""
+            SELECT candidates.*, positions.title, cvs.score, mls.motivation_lvl
+            FROM candidates
+            LEFT JOIN positions ON candidates.pos_id = positions.pos_id
+            LEFT JOIN cvs ON candidates.cand_id = cvs.cand_id
+            LEFT JOIN mls ON candidates.cand_id = mls.cand_id
+            ORDER BY created DESC
+            LIMIT 5;
+            """)
+        return cursor.fetchall()
+    finally:
+        close_connection(conn, cursor)
+
+def last_updated_candidates():
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("""
+            SELECT candidates.*, positions.title, cvs.score, mls.motivation_lvl
+            FROM candidates
+            LEFT JOIN positions ON candidates.pos_id = positions.pos_id
+            LEFT JOIN cvs ON candidates.cand_id = cvs.cand_id
+            LEFT JOIN mls ON candidates.cand_id = mls.cand_id
+            ORDER BY candidates.last_updated DESC
+            LIMIT 5;
+            """)
+        return cursor.fetchall()
+    finally:
+        close_connection(conn, cursor)
+
+def candidates_with_highest_cv_score():
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("""
+            SELECT candidates.*, positions.title, cvs.score, mls.motivation_lvl
+            FROM candidates
+            LEFT JOIN positions ON candidates.pos_id = positions.pos_id
+            JOIN cvs ON candidates.cand_id = cvs.cand_id
+            LEFT JOIN mls ON candidates.cand_id = mls.cand_id
+            ORDER BY cvs.score DESC
+            LIMIT 5;
+            """)
+        return cursor.fetchall()
+    finally:
+        close_connection(conn, cursor)
+
+def candidates_with_highest_motivation_lvl():
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("""
+            SELECT candidates.*, positions.title, cvs.score, mls.motivation_lvl
+            FROM candidates
+            LEFT JOIN positions ON candidates.pos_id = positions.pos_id
+            LEFT JOIN cvs ON candidates.cand_id = cvs.cand_id
+            JOIN mls ON candidates.cand_id = mls.cand_id
+            ORDER BY mls.motivation_lvl DESC
+            LIMIT 5;
+            """)
+        return cursor.fetchall()
     finally:
         close_connection(conn, cursor)
 

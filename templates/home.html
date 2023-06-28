@@ -5,7 +5,176 @@
 
 {% block main %}
 <p class="text-center mt-5 fs-4 fw-semibold">{{ greeting }}</p>
-<div class="d-flex justify-content-center">
-
+<div class="mx-3 mt-4 row">
+    <div class="col-6 border-bottom border-success-subtle">
+        <p class="mt-4 fs-5 fw-semibold">Last updated positions</p>
+        <table class="table table-success table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Title</th>
+                    <th scope="col" class="text-end">Number of candidates applied</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for position in last_updated_pos %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position[0] }}">{{ position[2] }}</a></td>
+                        <td class="text-end">{{ position[7] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-6 border-start border-bottom border-success-subtle">
+        <p class="mt-4 fs-5 fw-semibold">Last updated candidates</p>
+        <table class="table table-success table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Names</th>
+                    <th scope="col">Position</th>
+                    <th scope="col" class="text-end">CV score</th>
+                    <th scope="col" class="text-end">Motivation level</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for candidate in last_updated_cand %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</a></td>
+                        <td>{{ candidate[13] }}</td>
+                        <td class="text-end">{% if candidate[14]==None %}-{% else %}{{ candidate[14] }}{% endif %}</td>
+                        <td class="text-end">{% if candidate[15]==None %}-{% else %}{{ candidate[15] }}{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="mx-3 mt-3 row">
+    <div class="col-6 border-bottom border-success-subtle">
+        <p class="mt-4 fs-5 fw-semibold">Last added positions</p>
+        <table class="table table-success table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Title</th>
+                    <th scope="col" class="text-end">Number of candidates applied</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for position in last_added_pos %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position[0] }}">{{ position[2] }}</a></td>
+                        <td class="text-end">{{ position[7] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-6 border-start border-bottom border-success-subtle">
+        <p class="mt-4 fs-5 fw-semibold">Last added candidates</p>
+        <table class="table table-success table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Names</th>
+                    <th scope="col">Position</th>
+                    <th scope="col" class="text-end">CV score</th>
+                    <th scope="col" class="text-end">Motivation level</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for candidate in last_added_cand %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</a></td>
+                        <td>{{ candidate[13] }}</td>
+                        <td class="text-end">{% if candidate[14]==None %}-{% else %}{{ candidate[14] }}{% endif %}</td>
+                        <td class="text-end">{% if candidate[15]==None %}-{% else %}{{ candidate[15] }}{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="mx-3 mt-3 row">
+    <div class="col-6 border-bottom border-success-subtle">
+        <p class="mt-4 fs-5 fw-semibold">Most applied positions</p>
+        <table class="table table-success table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Title</th>
+                    <th scope="col" class="text-end">Number of candidates applied</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for position in most_applied_pos %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position[0] }}">{{ position[2] }}</a></td>
+                        <td class="text-end">{{ position[7] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-6 border-start border-bottom border-success-subtle">
+        <p class="mt-4 fs-5 fw-semibold">Candidates with highest CV score</p>
+        <table class="table table-success table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Names</th>
+                    <th scope="col">Position</th>
+                    <th scope="col" class="text-end">CV score</th>
+                    <th scope="col" class="text-end">Motivation level</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for candidate in cand_highest_cv_score %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</a></td>
+                        <td>{{ candidate[13] }}</td>
+                        <td class="text-end">{% if candidate[14]==None %}-{% else %}{{ candidate[14] }}{% endif %}</td>
+                        <td class="text-end">{% if candidate[15]==None %}-{% else %}{{ candidate[15] }}{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="mx-3 mt-3 row">
+    <div class="col-6"></div>
+    <div class="col-6 border-start border-bottom border-success-subtle">
+        <p class="mt-4 fs-5 fw-semibold">Candidates with highest motivation level</p>
+        <table class="table table-success table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Names</th>
+                    <th scope="col">Position</th>
+                    <th scope="col" class="text-end">CV score</th>
+                    <th scope="col" class="text-end">Motivation level</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for candidate in cand_highest_motivation_lvl %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</a></td>
+                        <td>{{ candidate[13] }}</td>
+                        <td class="text-end">{% if candidate[14]==None %}-{% else %}{{ candidate[14] }}{% endif %}</td>
+                        <td class="text-end">{% if candidate[15]==None %}-{% else %}{{ candidate[15] }}{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

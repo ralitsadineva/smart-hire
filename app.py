@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session
-from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, insert_candidate, get_candidate, get_candidates, get_all_candidates, update_candidate, insert_cv, get_cv, del_cv, insert_ml, get_ml, del_ml
+from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, last_added_positions, last_updated_positions, positions_with_most_candidates, insert_candidate, get_candidate, get_candidates, get_all_candidates, update_candidate, last_added_candidates, last_updated_candidates, candidates_with_highest_cv_score, candidates_with_highest_motivation_lvl, insert_cv, get_cv, del_cv, insert_ml, get_ml, del_ml
 from validation import is_valid_username, is_valid_password
 import bcrypt
 import logging
@@ -137,8 +137,17 @@ def change_password():
 def home():
     if 'username' not in session:
         return redirect('/')
-    random_greeting = get_greeting()
-    return render_template('home.html', greeting = random_greeting, avatar=session['avatar'])
+    parameters = {
+        'greeting': get_greeting(),
+        'last_added_pos': last_added_positions(),
+        'last_updated_pos': last_updated_positions(),
+        'last_added_cand': last_added_candidates(),
+        'last_updated_cand': last_updated_candidates(),
+        'most_applied_pos': positions_with_most_candidates(),
+        'cand_highest_cv_score': candidates_with_highest_cv_score(),
+        'cand_highest_motivation_lvl': candidates_with_highest_motivation_lvl()
+    }
+    return render_template('home.html', **parameters, avatar=session['avatar'])
 
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
