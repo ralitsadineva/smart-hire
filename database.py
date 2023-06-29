@@ -80,8 +80,7 @@ def create_tables():
             languages INTEGER CHECK (languages > 0 AND languages <= 10),
             length INTEGER,
             created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            file VARCHAR(255) NOT NULL
+            last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
         );
         """)
     conn.commit()
@@ -96,8 +95,7 @@ def create_tables():
             length INTEGER,
             grammar VARCHAR(255),
             created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            file VARCHAR(255) NOT NULL
+            last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
         );
         """)
     conn.commit()
@@ -195,10 +193,15 @@ def insert_position(user_id, title, description):
     finally:
         close_connection(conn, cursor)
 
-def get_positions(user_id):
+def get_positions():
     conn, cursor = get_connection()
     try:
-        cursor.execute("SELECT * FROM positions WHERE user_id = %s;", (user_id, ))
+        cursor.execute("""
+            SELECT positions.*, COUNT(candidates.cand_id) AS candidates_count
+            FROM positions
+            LEFT JOIN candidates ON positions.pos_id = candidates.pos_id
+            GROUP BY positions.pos_id;
+            """)
         return cursor.fetchall()
     finally:
         close_connection(conn, cursor)
@@ -329,7 +332,12 @@ def get_candidate(cand_id):
 def get_candidates(pos_id):
     conn, cursor = get_connection()
     try:
-        cursor.execute("SELECT * FROM candidates WHERE pos_id = %s;", (pos_id, ))
+        cursor.execute("""
+            SELECT candidates.*, cvs.score
+            FROM candidates
+            LEFT JOIN cvs ON candidates.cand_id = cvs.cand_id
+            WHERE candidates.pos_id = %s;
+            """, (pos_id, ))
         return cursor.fetchall()
     finally:
         close_connection(conn, cursor)

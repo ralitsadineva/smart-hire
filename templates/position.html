@@ -28,7 +28,10 @@
 {% endif %}
 <div class="list-group list-group-numbered list-group-flush ms-4 col-sm-4">
     {% for candidate in candidates %}
-        <a href="{{ base_url }}positions/{{ position[0] }}/{{ candidate[0] }}" class="list-group-item list-group-item-action list-group-item-success">{{ candidate[2] }} {{ candidate[3] }}</a>
+        <a href="{{ base_url }}positions/{{ position[0] }}/{{ candidate[0] }}" class="list-group-item list-group-item-action list-group-item-success">
+            {{ candidate[2] }} {{ candidate[3] }}
+            <span class="badge bg-success rounded-pill" style="float: right;">{% if candidate[13] %}{{ candidate[13] }}{% endif %}</span>
+        </a>
     {% endfor %}
 </div>
 {% endblock %}

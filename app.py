@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, send_from_directory
 from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, last_added_positions, last_updated_positions, positions_with_most_candidates, insert_candidate, get_candidate, get_candidates, get_all_candidates, update_candidate, last_added_candidates, last_updated_candidates, candidates_with_highest_cv_score, candidates_with_highest_motivation_lvl, insert_cv, get_cv, del_cv, insert_ml, get_ml, del_ml
 from validation import is_valid_username, is_valid_password
 import bcrypt
@@ -137,8 +137,13 @@ def change_password():
 def home():
     if 'username' not in session:
         return redirect('/')
+    if get_user(session['username'])[5]=='0':
+        name = session['username']
+    else:
+        name = session['email'].split('@')[0]
     parameters = {
         'greeting': get_greeting(),
+        'username': name,
         'last_added_pos': last_added_positions(),
         'last_updated_pos': last_updated_positions(),
         'last_added_cand': last_added_candidates(),
@@ -179,7 +184,7 @@ def profile():
 def positions():
     if 'username' not in session:
         return redirect('/')
-    positions = get_positions(session['user_id'])
+    positions = get_positions()
     return render_template('positions.html', positions=positions, avatar=session['avatar'])
 
 @app.route('/positions/add', methods=['GET', 'POST'])
@@ -285,6 +290,11 @@ def add_cv():
                     logger.error(f"{type(error)}\n{error}")
                     candidates = get_all_candidates()
                     return render_template('add_cv.html', error=True, candidates=candidates, avatar=session['avatar'])
+                filename = f"{get_candidate(cand_id)[3]}-cv.pdf"
+                if not os.path.exists(f"uploads/{get_candidate(cand_id)[1]}/{cand_id}"):
+                    os.makedirs(f"uploads/{get_candidate(cand_id)[1]}/{cand_id}")
+                cv.seek(0)
+                cv.save(f"uploads/{get_candidate(cand_id)[1]}/{cand_id}/{filename}")
             else:
                 candidates = get_all_candidates()
                 return render_template('add_cv.html', invalid=True, candidates=candidates, avatar=session['avatar'])
@@ -305,6 +315,11 @@ def add_cv():
                 update_candidate(cand_id, email, phone, address, postal_code, city, country, birthdate)
             except DatabaseError as error:
                 logger.error(f"{type(error)}\n{error}")
+                if os.path.exists(f"uploads/{get_candidate(cand_id)[1]}/{cand_id}/{get_candidate(cand_id)[3]}-letter.pdf"):
+                    try:
+                        os.remove(f"uploads/{get_candidate(cand_id)[1]}/{cand_id}/{get_candidate(cand_id)[3]}-letter.pdf")
+                    except OSError as error:
+                        logger.error(f"{type(error)}\n{error}")
                 del_cv(cand_id)
                 candidates = get_all_candidates()
                 return render_template('add_cv.html', error=True, candidates=candidates, avatar=session['avatar'])
@@ -343,6 +358,11 @@ def add_ml():
                 logger.error(f"{type(error)}\n{error}")
                 candidates = get_all_candidates()
                 return render_template('add_ml.html', error=True, candidates=candidates, avatar=session['avatar'])
+            filename = f"{get_candidate(cand_id)[3]}-letter.pdf"
+            if not os.path.exists(f"uploads/{get_candidate(cand_id)[1]}/{cand_id}"):
+                os.makedirs(f"uploads/{get_candidate(cand_id)[1]}/{cand_id}")
+            ml.seek(0)
+            ml.save(f"uploads/{get_candidate(cand_id)[1]}/{cand_id}/{filename}")
         else:
             candidates = get_all_candidates()
             return render_template('add_ml.html', invalid=True, candidates=candidates, avatar=session['avatar'])
@@ -351,10 +371,33 @@ def add_ml():
         candidates = get_all_candidates()
         return render_template('add_ml.html', candidates=candidates, avatar=session['avatar'])
 
+@app.route('/positions/<string:position_id>/<string:candidate_id>/view_cv')
+def view_cv(position_id, candidate_id):
+    if 'username' not in session:
+        return redirect('/')
+    if os.path.exists(f"uploads/{position_id}/{candidate_id}/{get_candidate(candidate_id)[3]}-cv.pdf"):
+        return send_from_directory(f"uploads/{position_id}/{candidate_id}", f"{get_candidate(candidate_id)[3]}-cv.pdf")
+    else:
+        return redirect(f'/positions/{position_id}/{candidate_id}')
+
+@app.route('/positions/<string:position_id>/<string:candidate_id>/view_ml')
+def view_ml(position_id, candidate_id):
+    if 'username' not in session:
+        return redirect('/')
+    if os.path.exists(f"uploads/{position_id}/{candidate_id}/{get_candidate(candidate_id)[3]}-letter.pdf"):
+        return send_from_directory(f"uploads/{position_id}/{candidate_id}", f"{get_candidate(candidate_id)[3]}-letter.pdf")
+    else:
+        return redirect(f'/positions/{position_id}/{candidate_id}')
+
 @app.route('/positions/<string:position_id>/<string:candidate_id>/del_cv')
 def delete_cv(position_id, candidate_id):
     if 'username' not in session:
         return redirect('/')
+    if os.path.exists(f"uploads/{position_id}/{candidate_id}/{get_candidate(candidate_id)[3]}-cv.pdf"):
+        try:
+            os.remove(f"uploads/{position_id}/{candidate_id}/{get_candidate(candidate_id)[3]}-cv.pdf")
+        except OSError as error:
+            logger.error(f"{type(error)}\n{error}")
     del_cv(candidate_id)
     return redirect(f'/positions/{position_id}/{candidate_id}')
 
@@ -362,6 +405,11 @@ def delete_cv(position_id, candidate_id):
 def delete_ml(position_id, candidate_id):
     if 'username' not in session:
         return redirect('/')
+    if os.path.exists(f"uploads/{position_id}/{candidate_id}/{get_candidate(candidate_id)[3]}-letter.pdf"):
+        try:
+            os.remove(f"uploads/{position_id}/{candidate_id}/{get_candidate(candidate_id)[3]}-letter.pdf")
+        except OSError as error:
+            logger.error(f"{type(error)}\n{error}")
     del_ml(candidate_id)
     return redirect(f'/positions/{position_id}/{candidate_id}')
 

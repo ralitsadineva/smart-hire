@@ -170,3 +170,10 @@ client_secret.json
 
 # OpenAI Key
 opaikey.txt
+
+# user avatars
+static/images/*
+!static/images/user.png
+
+# uploaded pdf files
+uploads/
