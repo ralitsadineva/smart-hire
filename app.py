@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session, send_from_directory
-from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password,update_avatar, get_positions, insert_position, get_position, update_position, last_added_positions, last_updated_positions, positions_with_most_candidates, insert_candidate, get_candidate, get_candidates, get_all_candidates, update_candidate, last_added_candidates, last_updated_candidates, candidates_with_highest_cv_score, candidates_with_highest_motivation_lvl, insert_cv, get_cv, del_cv, insert_ml, get_ml, del_ml
+from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password, update_avatar, get_positions, get_inactive_positions, insert_position, get_position, update_position, make_position_inactive, make_position_active, last_added_positions, last_updated_positions, positions_with_most_candidates, insert_candidate, get_candidate, get_candidates, get_all_candidates, update_candidate, last_added_candidates, last_updated_candidates, candidates_with_highest_cv_score, candidates_with_highest_motivation_lvl, insert_cv, get_cv, del_cv, insert_ml, get_ml, del_ml
 from validation import is_valid_username, is_valid_password
 import bcrypt
 import logging
@@ -201,6 +201,13 @@ def add_position():
     else:
         return render_template('add_position.html', avatar=session['avatar'])
 
+@app.route('/positions/history')
+def positions_history():
+    if 'username' not in session:
+        return redirect('/')
+    positions = get_inactive_positions()
+    return render_template('positions_history.html', positions=positions, avatar=session['avatar'])
+
 @app.route('/positions/<string:position_id>')
 def position(position_id):
     if 'username' not in session:
@@ -223,6 +230,20 @@ def edit_position(position_id):
     else:
         position = get_position(position_id)
         return render_template('edit_position.html', position=position, avatar=session['avatar'])
+
+@app.route('/positions/<string:position_id>/archive')
+def archive_position(position_id):
+    if 'username' not in session:
+        return redirect('/')
+    make_position_inactive(position_id)
+    return redirect('/positions')
+
+@app.route('/positions/<string:position_id>/activate')
+def activate_position(position_id):
+    if 'username' not in session:
+        return redirect('/')
+    make_position_active(position_id)
+    return redirect('/positions')
 
 @app.route('/positions/<string:position_id>/add_candidate', methods=['GET', 'POST'])
 def add_candidate(position_id):

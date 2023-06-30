@@ -200,6 +200,21 @@ def get_positions():
             SELECT positions.*, COUNT(candidates.cand_id) AS candidates_count
             FROM positions
             LEFT JOIN candidates ON positions.pos_id = candidates.pos_id
+            WHERE active = TRUE
+            GROUP BY positions.pos_id;
+            """)
+        return cursor.fetchall()
+    finally:
+        close_connection(conn, cursor)
+
+def get_inactive_positions():
+    conn, cursor = get_connection()
+    try:
+        cursor.execute("""
+            SELECT positions.*, COUNT(candidates.cand_id) AS candidates_count
+            FROM positions
+            LEFT JOIN candidates ON positions.pos_id = candidates.pos_id
+            WHERE active = FALSE
             GROUP BY positions.pos_id;
             """)
         return cursor.fetchall()
@@ -374,6 +389,7 @@ def last_added_candidates():
             LEFT JOIN positions ON candidates.pos_id = positions.pos_id
             LEFT JOIN cvs ON candidates.cand_id = cvs.cand_id
             LEFT JOIN mls ON candidates.cand_id = mls.cand_id
+            WHERE positions.active = TRUE
             ORDER BY created DESC
             LIMIT 5;
             """)
@@ -390,6 +406,7 @@ def last_updated_candidates():
             LEFT JOIN positions ON candidates.pos_id = positions.pos_id
             LEFT JOIN cvs ON candidates.cand_id = cvs.cand_id
             LEFT JOIN mls ON candidates.cand_id = mls.cand_id
+            WHERE positions.active = TRUE
             ORDER BY candidates.last_updated DESC
             LIMIT 5;
             """)
@@ -406,6 +423,7 @@ def candidates_with_highest_cv_score():
             LEFT JOIN positions ON candidates.pos_id = positions.pos_id
             JOIN cvs ON candidates.cand_id = cvs.cand_id
             LEFT JOIN mls ON candidates.cand_id = mls.cand_id
+            WHERE positions.active = TRUE
             ORDER BY cvs.score DESC
             LIMIT 5;
             """)
@@ -422,6 +440,7 @@ def candidates_with_highest_motivation_lvl():
             LEFT JOIN positions ON candidates.pos_id = positions.pos_id
             LEFT JOIN cvs ON candidates.cand_id = cvs.cand_id
             JOIN mls ON candidates.cand_id = mls.cand_id
+            WHERE positions.active = TRUE
             ORDER BY mls.motivation_lvl DESC
             LIMIT 5;
             """)

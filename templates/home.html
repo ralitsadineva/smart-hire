@@ -6,14 +6,14 @@
 {% block main %}
 <p class="text-center mt-5 fs-4 fw-semibold">{{ greeting }}, {{ username }}!</p>
 <div class="mx-3 mt-4 row">
-    <div class="col-6 border-bottom border-success-subtle">
+    <div class="col-md-6 border-bottom border-success-subtle">
         <p class="mt-4 fs-5 fw-semibold">Last updated positions</p>
         <table class="table table-success table-striped">
             <thead>
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Title</th>
-                    <th scope="col" class="text-end">Number of candidates applied</th>
+                    <th scope="col">Number of candidates applied</th>
                 </tr>
             </thead>
             <tbody class="table-group-divider">
@@ -21,13 +21,20 @@
                     <tr>
                         <th scope="row">{{ loop.index }}</th>
                         <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position[0] }}">{{ position[2] }}</a></td>
-                        <td class="text-end">{{ position[7] }}</td>
+                        <td>
+                            <div class="row">
+                                <div class="col-md-7 text-end">
+                                    {{ position[7] }}
+                                </div>
+                                <div class="col-md-5"></div>
+                            </div>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-    <div class="col-6 border-start border-bottom border-success-subtle">
+    <div class="col-md-6 border-start border-bottom border-success-subtle">
         <p class="mt-4 fs-5 fw-semibold">Last updated candidates</p>
         <table class="table table-success table-striped">
             <thead>
@@ -54,14 +61,14 @@
     </div>
 </div>
 <div class="mx-3 mt-3 row">
-    <div class="col-6 border-bottom border-success-subtle">
+    <div class="col-md-6 border-bottom border-success-subtle">
         <p class="mt-4 fs-5 fw-semibold">Last added positions</p>
         <table class="table table-success table-striped">
             <thead>
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Title</th>
-                    <th scope="col" class="text-end">Number of candidates applied</th>
+                    <th scope="col">Number of candidates applied</th>
                 </tr>
             </thead>
             <tbody class="table-group-divider">
@@ -69,13 +76,20 @@
                     <tr>
                         <th scope="row">{{ loop.index }}</th>
                         <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position[0] }}">{{ position[2] }}</a></td>
-                        <td class="text-end">{{ position[7] }}</td>
+                        <td>
+                            <div class="row">
+                                <div class="col-md-2 text-end">
+                                    {{ position[7] }}
+                                </div>
+                                <div class="col-md-10"></div>
+                            </div>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-    <div class="col-6 border-start border-bottom border-success-subtle">
+    <div class="col-md-6 border-start border-bottom border-success-subtle">
         <p class="mt-4 fs-5 fw-semibold">Last added candidates</p>
         <table class="table table-success table-striped">
             <thead>
@@ -102,7 +116,7 @@
     </div>
 </div>
 <div class="mx-3 mt-3 row">
-    <div class="col-6 border-bottom border-success-subtle">
+    <div class="col-md-6 border-bottom border-success-subtle">
         <p class="mt-4 fs-5 fw-semibold">Most applied positions</p>
         <table class="table table-success table-striped">
             <thead>
@@ -123,7 +137,7 @@
             </tbody>
         </table>
     </div>
-    <div class="col-6 border-start border-bottom border-success-subtle">
+    <div class="col-md-6 border-start border-bottom border-success-subtle">
         <p class="mt-4 fs-5 fw-semibold">Candidates with highest CV score</p>
         <table class="table table-success table-striped">
             <thead>
@@ -150,8 +164,8 @@
     </div>
 </div>
 <div class="mx-3 mt-3 row">
-    <div class="col-6"></div>
-    <div class="col-6 border-start border-bottom border-success-subtle">
+    <div class="col-md-6"></div>
+    <div class="col-md-6 border-start border-bottom border-success-subtle">
         <p class="mt-4 fs-5 fw-semibold">Candidates with highest motivation level</p>
         <table class="table table-success table-striped">
             <thead>

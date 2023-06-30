@@ -13,7 +13,14 @@
     </div>
 </div>
 <p class="ms-4 mt-4 fs-5 fw-semibold">{{ position[3] }}</p>
-<p class="ms-4 mt-5 fw-semibold">Created on: {{ position[5].replace(microsecond=0) }}   Last updated on: {{ position[6].replace(microsecond=0) }}</p>
+<div class="row me-3">
+    <div class="col-11">
+        <p class="ms-4 mt-5 fw-semibold">Created on: {{ position[5].replace(microsecond=0) }}   Last updated on: {{ position[6].replace(microsecond=0) }}</p>
+    </div>
+    <div class="col-1 d-flex justify-content-end align-self-end">
+        <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ position[0] }}/{% if position[4] %}archive{% else %}activate{% endif %}">{% if position[4] %}Archive{% else %}Activate{% endif %}</a>
+    </div>
+</div>
 <!-- candidates for this position (* candidates with this pos_id) -->
 <div class="row mx-3">
     <div class="col-11">

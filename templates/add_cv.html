@@ -1,6 +1,9 @@
 {% extends "base_logged_in.html" %}
 
-{% set title = 'Add a CV{% if cand_info %} - Verify information{% endif %}' %}
+{% set title = 'Add a CV' %}
+{% if cand_info %}
+    {% set title = title + ' - Verify information' %}
+{% endif %}
 {% set active_class = 'add_cv' %}
 
 {% block main %}
