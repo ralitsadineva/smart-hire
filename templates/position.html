@@ -12,7 +12,14 @@
         <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ position[0] }}/edit">Edit</a>
     </div>
 </div>
-<p class="ms-4 mt-4 fs-5 fw-semibold">{{ position[3] }}</p>
+<div class="row me-3">
+    <div class="col-11">
+        <p class="ms-4 mt-4 fs-5 fw-semibold">{{ position[3] }}</p>
+    </div>
+    <div class="col-1 d-flex justify-content-end align-self-end">
+        <a role="button" class="btn btn-success" href="{{ base_url }}positions/add/{{ position[0] }}">Duplicate</a>
+    </div>
+</div>
 <div class="row me-3">
     <div class="col-11">
         <p class="ms-4 mt-5 fw-semibold">Created on: {{ position[5].replace(microsecond=0) }}   Last updated on: {{ position[6].replace(microsecond=0) }}</p>

@@ -18,7 +18,7 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Title</th>
-                <th scope="col">Number of candidates applied</th>
+                <th scope="col" class="text-end pe-5" title="Number of candidates applied">Candidates</th>
                 <th scope="col">Created</th>
                 <th scope="col">Updated</th>
             </tr>
@@ -28,14 +28,7 @@
                 <tr>
                     <th scope="row">{{ loop.index }}</th>
                     <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position[0] }}">{{ position[2] }}</a></td>
-                    <td class="col-md-2">
-                        <div class="row">
-                            <div class="col-md-9 text-end">
-                                {{ position[7] }}
-                            </div>
-                            <div class="col-md-3"></div>
-                        </div>
-                    </td>
+                    <td class="col-md-2 text-end pe-5">{{ position[7] }}</td>
                     <td class="col-md-2">{{ position[5].replace(microsecond=0) }}</td>
                     <td class="col-md-2">{{ position[6].replace(microsecond=0) }}</td>
                 </tr>

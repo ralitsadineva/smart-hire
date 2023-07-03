@@ -13,7 +13,8 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Title</th>
-                    <th scope="col">Number of candidates applied</th>
+                    <th scope="col" class="text-end pe-5" title="Number of candidates applied">Candidates</th>
+                    <th scope="col">Created</th>
                 </tr>
             </thead>
             <tbody class="table-group-divider">
@@ -21,14 +22,8 @@
                     <tr>
                         <th scope="row">{{ loop.index }}</th>
                         <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position[0] }}">{{ position[2] }}</a></td>
-                        <td>
-                            <div class="row">
-                                <div class="col-md-7 text-end">
-                                    {{ position[7] }}
-                                </div>
-                                <div class="col-md-5"></div>
-                            </div>
-                        </td>
+                        <td class="text-end pe-5">{{ position[7] }}</td>
+                        <td class="col-md-2">{{ position[5].date() }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -68,7 +63,8 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Title</th>
-                    <th scope="col">Number of candidates applied</th>
+                    <th scope="col" class="text-end pe-5" title="Number of candidates applied">Candidates</th>
+                    <th scope="col">Created</th>
                 </tr>
             </thead>
             <tbody class="table-group-divider">
@@ -76,14 +72,8 @@
                     <tr>
                         <th scope="row">{{ loop.index }}</th>
                         <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position[0] }}">{{ position[2] }}</a></td>
-                        <td>
-                            <div class="row">
-                                <div class="col-md-2 text-end">
-                                    {{ position[7] }}
-                                </div>
-                                <div class="col-md-10"></div>
-                            </div>
-                        </td>
+                        <td  class="text-end pe-5">{{ position[7] }}</td>
+                        <td class="col-md-2">{{ position[5].date() }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -123,7 +113,8 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Title</th>
-                    <th scope="col" class="text-end">Number of candidates applied</th>
+                    <th scope="col" class="text-end pe-5" title="Number of candidates applied">Candidates</th>
+                    <th scope="col">Created</th>
                 </tr>
             </thead>
             <tbody class="table-group-divider">
@@ -131,7 +122,8 @@
                     <tr>
                         <th scope="row">{{ loop.index }}</th>
                         <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position[0] }}">{{ position[2] }}</a></td>
-                        <td class="text-end">{{ position[7] }}</td>
+                        <td class="text-end pe-5">{{ position[7] }}</td>
+                        <td class="col-md-2">{{ position[5].date() }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

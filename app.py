@@ -201,6 +201,22 @@ def add_position():
     else:
         return render_template('add_position.html', avatar=session['avatar'])
 
+@app.route('/positions/add/<string:position_id>', methods=['GET', 'POST'])
+def duplicate_position(position_id):
+    if 'username' not in session:
+        return redirect('/')
+    if request.method == 'POST':
+        try:
+            insert_position(session['user_id'], request.form['title'], request.form['description'])
+            return redirect('/positions')
+        except DatabaseError as error:
+            logger.error(f"{type(error)}\n{error}")
+            position = get_position(position_id)[2:4]
+            return render_template('add_position.html', position=position, error=True, avatar=session['avatar'])
+    else:
+        position = get_position(position_id)[2:4]
+        return render_template('add_position.html', position=position, avatar=session['avatar'])
+
 @app.route('/positions/history')
 def positions_history():
     if 'username' not in session:
