@@ -1,0 +1,179 @@
+{% extends "base_logged_in.html" %}
+
+{% set title = candidate[2] ~ ' ' ~ candidate[3] %}
+{% set active_class = 'positions' %}
+
+{% block main %}
+<p class="text-center mt-5 fs-4 fw-semibold">{{ candidate[2] }} {{ candidate[3] }}</p>
+<div class="mx-4">
+    <div class="mb-3 row">
+        <label for="staticEmail" class="col-sm-2 col-form-label fw-semibold">Email</label>
+        <div class="col-sm-10">
+            <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="{{ candidate[4] }}">
+        </div>
+    </div>
+</div>
+<div class="mx-4">
+    <div class="mb-3 row">
+        <label for="staticPhone" class="col-sm-2 col-form-label fw-semibold">Phone number</label>
+        <div class="col-sm-10">
+            <input type="text" readonly class="form-control-plaintext" id="staticPhone" value="{% if candidate[5] %}{{ candidate[5] }}{% else %}-{% endif %}">
+        </div>
+    </div>
+</div>
+<div class="mx-4">
+    <div class="mb-3 row">
+        <label for="staticBirthDate" class="col-sm-2 col-form-label fw-semibold">Date of birth</label>
+        <div class="col-sm-10">
+            <input type="text" readonly class="form-control-plaintext" id="staticBirthDate" value="{% if candidate[10] %}{{ candidate[10] }}{% else %}-{% endif %}">
+        </div>
+    </div>
+</div>
+<div class="mx-4">
+    <div class="mb-3 border-bottom border-success-subtle row">
+        <label for="staticAddress" class="col-sm-2 col-form-label fw-semibold">Address</label>
+        <div class="col-sm-10">
+            <textarea readonly class="form-control-plaintext" id="staticAddress" rows="3" style="resize:none">{% if candidate[6] or candidate[7] or candidate[8] or candidate[9] %}{% if candidate[6] %}{{ candidate[6] }}{% else %}{% endif %}
+{% if candidate[7] %}{{ candidate[7] }} {% else %}{% endif %}{% if candidate[8] %}{{ candidate[8] }}{% else %}{% endif %}
+{% if candidate[9] %}{{ candidate[9] }}{% else %}{% endif %}{% else %}-{% endif %}</textarea>
+        </div>
+    </div>
+</div>
+<!-- information about documents -->
+<div class="mx-3 row">
+    {% if cv %}
+        <div class="col-6 border-start border-end border-success-subtle">
+            <div class="row">
+                <div class="col-sm-1">
+                    <p class="fs-5 fw-semibold">CV</p>
+                </div>
+                <div class="col-sm-9">
+                    <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/view_cv">View</a>
+                </div>
+                <div class="col-sm-2">
+                    <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/del_cv">Delete</a>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticScore" class="col-sm-4 col-form-label fw-semibold">Overall score</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext" id="staticScore" value="{{ cv[2] }}/50">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticStructure" class="col-sm-4 col-form-label fw-semibold">Structure and organization</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext" id="staticStructure" value="{{ cv[3] }}/5">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticContactInfo" class="col-sm-4 col-form-label fw-semibold">Contact information</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext" id="staticContactInfo" value="{{ cv[4] }}/5">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticWork" class="col-sm-4 col-form-label fw-semibold">Work experience</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext" id="staticWork" value="{{ cv[5] }}/10">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticEducation" class="col-sm-4 col-form-label fw-semibold">Education</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext" id="staticEducation" value="{{ cv[6] }}/10">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticSkills" class="col-sm-4 col-form-label fw-semibold">Skills</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext" id="staticSkills" value="{{ cv[7] }}/10">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticLanguages" class="col-sm-4 col-form-label fw-semibold">Languages</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext" id="staticLanguages" value="{{ cv[8] }}/10">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticLength" class="col-sm-4 col-form-label fw-semibold">Length</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext" id="staticLength" value="{{ cv[9] }} pages">
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if ml %}
+        <div class="col-6 border-start border-end border-success-subtle">
+            <div class="row">
+                <div class="col-sm-3">
+                    <p class="fs-5 fw-semibold">Motivational letter</p>
+                </div>
+                <div class="col-sm-7">
+                    <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/view_ml">View</a>
+                </div>
+                <div class="col-sm-2">
+                    <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/del_ml">Delete</a>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticMotivationLvl" class="col-sm-4 col-form-label fw-semibold">Motivation level</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext" id="staticMotivationLvl" value="{{ ml[2] }}/10">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticSentiment" class="col-sm-4 col-form-label fw-semibold">Overall sentiment</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext" id="staticSentiment" value="{{ ml[3] }}">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticTone" class="col-sm-4 col-form-label fw-semibold">Tone</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext" id="staticTone" value="{{ ml[4] }}">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticLength" class="col-sm-4 col-form-label fw-semibold">Length</label>
+                    <div class="col-sm-8">
+                        <input type="text" readonly class="form-control-plaintext" id="staticLength" value="{{ ml[5] }} words">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticGrammar" class="col-sm-4 col-form-label fw-semibold">Grammar and language usage</label>
+                    <div class="col-sm-8">
+                        <textarea readonly class="form-control-plaintext" id="staticGrammar" rows="3" style="resize:none">{{ ml[6] }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

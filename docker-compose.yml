@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+
+  web:
+    build:
+        context: .
+        dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: $PWD
+        target: /mnt/app
+    working_dir: /mnt/app
+    ports:
+      - 5000:5000
+
+  postgres:
+    image: postgres:13.8-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+volumes:
+  pg_data:

@@ -1,0 +1,115 @@
+{% extends "base_logged_in.html" %}
+
+{% set title = 'Add a CV' %}
+{% if cand_info %}
+    {% set title = title + ' - Verify information' %}
+{% endif %}
+{% set active_class = 'add_cv' %}
+
+{% block main %}
+<p class="text-center mt-5 fs-4 fw-semibold">Add a new CV</p>
+<div class="d-flex justify-content-center">
+    {% if invalid %}
+        <div class="alert alert-danger" role="alert">
+            Not a pdf file or too big! Only pdf files less than 2MB are allowed.
+        </div>
+    {% endif %}
+    {% if exist %}
+        <div class="alert alert-danger text-center" role="alert">
+            A CV for this candidate has already been uploaded.<br>If you want to change it, please delete the old one first.
+        </div>
+    {% endif %}
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            Something went wrong. Please try again.
+        </div>
+    {% endif %}
+</div>
+<div class="d-flex justify-content-center">
+    <form class="ms-3 col-sm-3" method="POST" enctype="multipart/form-data" onsubmit="document.getElementById('spinner').style.display = 'block';">
+        <div class="mb-3">
+            <label for="inputTitle" class="form-label">For candidate:</label>
+            <select class="form-select" aria-label="Candidate" name="candidate" {% if cand_info %}disabled{% endif %}>
+                {% if cand_info %}
+                    <option value="{{ candidate[0] }}" selected>{{ candidate[2] }} {{ candidate[3] }}</option>
+                {% else %}
+                    <option selected>Choose candidate</option>
+                    {% for candidate in candidates %}
+                        <option value="{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</option>
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <input class="form-control" type="file" id="formFile" name= "cv" required {% if cand_info %}disabled{% endif %}>
+        </div>
+        <button type="submit" class="btn btn-success" {% if cand_info %}disabled{% endif %}>Add</button>
+        {% include 'spinner.html' %}
+    </form>
+</div>
+<!-- verify -->
+{% if cand_info %}
+<div class="mt-4 d-flex justify-content-center">
+    {% if different_names %}
+        <div class="alert alert-warning text-center" role="alert">
+            The names found in the CV differ from the candidate's names. Are you sure you want to add this CV?<br>Candidate's names: {{ candidate[2] }} {{ candidate[3] }}&emsp;Names found in the CV: {{ cand_info['First name'] }} {{ cand_info['Last name'] }}
+        </div>
+    {% endif %}
+</div>
+<form class="mt-4 d-flex justify-content-center row" method="POST" onsubmit="document.getElementById('spinner').style.display = 'block';">
+    <div class="col-4">
+        <input type="text" class="form-control" name="candidate" value="{{ candidate[0] }}" hidden>
+        <div class="mb-3 row">
+            <label for="staticEmail" class="col-sm-3 col-form-label fw-semibold">Email</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="staticEmail" name="email" value="{{ cand_info['Email'] }}">
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label for="staticPhone" class="col-sm-3 col-form-label fw-semibold">Phone number</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="staticPhone" name="phone" value="{{ cand_info['Phone number'] }}">
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label for="staticBirthDate" class="col-sm-3 col-form-label fw-semibold">Date of birth</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="staticBirthDate" name="birthdate" aria-describedby="dateHelp" value="{{ cand_info['Date of birth'] }}">
+                <div id="dateHelp" class="form-text">Should be a date or empty.</div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success">Confirm</button>
+        {% include 'spinner.html' %}
+    </div>
+    <div class="col-4">
+        <div class="mb-3 row">
+            <label for="staticAddress" class="col-sm-3 col-form-label fw-semibold">Address</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="staticAddress" name="address" value="{{ cand_info['Address'] }}">
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label for="staticPostalCode" class="col-sm-3 col-form-label fw-semibold">Postal code</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="staticPostalCode" name="postal_code" value="{{ cand_info['Postal code'] }}">
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label for="staticCity" class="col-sm-3 col-form-label fw-semibold">City</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="staticCity" name="city" value="{{ cand_info['City'] }}">
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label for="staticCountry" class="col-sm-3 col-form-label fw-semibold">Country</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="staticCountry" name="country" value="{{ cand_info['Country'] }}">
+            </div>
+        </div>
+        <div class="d-flex justify-content-end">
+            <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/del_cv">Cancel</a>
+        </div>
+    </div>
+</form>
+{% endif %}
+{% endblock %}
