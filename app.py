@@ -12,8 +12,7 @@ from get_google_client_id import get_google_client_id
 from generate_random_password import generate_random_password
 from read_pdf import read_pdf, page_count
 from openai_eval import extract_cv, evaluate_cv, evaluate_ml
-from convert_to_dict import convert_to_dict, convert_to_dict_extracted
-from check_empty import check_empty
+from utils import check_empty, convert_to_dict, convert_to_dict_extracted
 from get_greeting import get_greeting
 
 logging.basicConfig(
@@ -27,6 +26,13 @@ client_id = get_google_client_id()
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
+
+EXCLUDED_ROUTES = ['/', '/login', '/signup', '/signin-google', '/logout']
+
+@app.before_request
+def check_session():
+    if request.path not in EXCLUDED_ROUTES and 'username' not in session and not request.path.startswith('/static'):
+        return redirect('/')
 
 @app.route('/')
 def index():
@@ -112,8 +118,6 @@ def logout():
 
 @app.route('/change_password', methods=['GET', 'POST'])
 def change_password():
-    if 'username' not in session:
-        return redirect('/')
     if request.method == 'POST':
         old_password = request.form['old_password']
         new_password = request.form['new_password']
@@ -135,8 +139,6 @@ def change_password():
 
 @app.route('/home')
 def home():
-    if 'username' not in session:
-        return redirect('/')
     if get_user(session['username'])[5]=='0':
         name = session['username']
     else:
@@ -156,8 +158,6 @@ def home():
 
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
-    if 'username' not in session:
-        return redirect('/')
     if request.method == 'POST':
         avatar = request.files['avatar']
         filename = f"{session['user_id']}/{datetime.now().strftime('%Y%m%d%H%M%S')}{os.path.splitext(avatar.filename)[1]}"
@@ -182,15 +182,11 @@ def profile():
 
 @app.route('/positions')
 def positions():
-    if 'username' not in session:
-        return redirect('/')
     positions = get_positions()
     return render_template('positions.html', positions=positions, avatar=session['avatar'])
 
 @app.route('/positions/add', methods=['GET', 'POST'])
 def add_position():
-    if 'username' not in session:
-        return redirect('/')
     if request.method == 'POST':
         try:
             insert_position(session['user_id'], request.form['title'], request.form['description'])
@@ -203,8 +199,6 @@ def add_position():
 
 @app.route('/positions/add/<string:position_id>', methods=['GET', 'POST'])
 def duplicate_position(position_id):
-    if 'username' not in session:
-        return redirect('/')
     if request.method == 'POST':
         try:
             insert_position(session['user_id'], request.form['title'], request.form['description'])
@@ -219,23 +213,17 @@ def duplicate_position(position_id):
 
 @app.route('/positions/history')
 def positions_history():
-    if 'username' not in session:
-        return redirect('/')
     positions = get_inactive_positions()
     return render_template('positions_history.html', positions=positions, avatar=session['avatar'])
 
 @app.route('/positions/<string:position_id>')
 def position(position_id):
-    if 'username' not in session:
-        return redirect('/')
     position = get_position(position_id)
     candidates = get_candidates(position_id)
     return render_template('position.html', position=position, candidates=candidates, avatar=session['avatar'])
 
 @app.route('/positions/<string:position_id>/edit', methods=['GET', 'POST'])
 def edit_position(position_id):
-    if 'username' not in session:
-        return redirect('/')
     if request.method == 'POST':
         try:
             update_position(position_id, request.form['title'], request.form['description'])
@@ -249,22 +237,16 @@ def edit_position(position_id):
 
 @app.route('/positions/<string:position_id>/archive')
 def archive_position(position_id):
-    if 'username' not in session:
-        return redirect('/')
     make_position_inactive(position_id)
     return redirect('/positions')
 
 @app.route('/positions/<string:position_id>/activate')
 def activate_position(position_id):
-    if 'username' not in session:
-        return redirect('/')
     make_position_active(position_id)
     return redirect('/positions')
 
 @app.route('/positions/<string:position_id>/add_candidate', methods=['GET', 'POST'])
 def add_candidate(position_id):
-    if 'username' not in session:
-        return redirect('/')
     if request.method == 'POST':
         try:
             insert_candidate(position_id, request.form['first_name'], request.form['last_name'], request.form['email'])
@@ -277,8 +259,6 @@ def add_candidate(position_id):
 
 @app.route('/positions/<string:position_id>/<string:candidate_id>')
 def candidate(position_id, candidate_id):
-    if 'username' not in session:
-        return redirect('/')
     candidate = get_candidate(candidate_id)
     cv = get_cv(candidate_id)
     ml = get_ml(candidate_id)
@@ -286,8 +266,6 @@ def candidate(position_id, candidate_id):
 
 @app.route('/add_cv', methods=['GET', 'POST'])
 def add_cv():
-    if 'username' not in session:
-        return redirect('/')
     if request.method == 'POST':
         if 'cv' in request.files:
             cand_id = request.form['candidate']
@@ -367,8 +345,6 @@ def add_cv():
 
 @app.route('/add_ml', methods=['GET', 'POST'])
 def add_ml():
-    if 'username' not in session:
-        return redirect('/')
     if request.method == 'POST':
         cand_id = request.form['candidate']
         if get_ml(cand_id) is not None:
@@ -410,8 +386,6 @@ def add_ml():
 
 @app.route('/positions/<string:position_id>/<string:candidate_id>/view_cv')
 def view_cv(position_id, candidate_id):
-    if 'username' not in session:
-        return redirect('/')
     if os.path.exists(f"uploads/{position_id}/{candidate_id}/{get_candidate(candidate_id)[3]}-cv.pdf"):
         return send_from_directory(f"uploads/{position_id}/{candidate_id}", f"{get_candidate(candidate_id)[3]}-cv.pdf")
     else:
@@ -419,8 +393,6 @@ def view_cv(position_id, candidate_id):
 
 @app.route('/positions/<string:position_id>/<string:candidate_id>/view_ml')
 def view_ml(position_id, candidate_id):
-    if 'username' not in session:
-        return redirect('/')
     if os.path.exists(f"uploads/{position_id}/{candidate_id}/{get_candidate(candidate_id)[3]}-letter.pdf"):
         return send_from_directory(f"uploads/{position_id}/{candidate_id}", f"{get_candidate(candidate_id)[3]}-letter.pdf")
     else:
@@ -428,8 +400,6 @@ def view_ml(position_id, candidate_id):
 
 @app.route('/positions/<string:position_id>/<string:candidate_id>/del_cv')
 def delete_cv(position_id, candidate_id):
-    if 'username' not in session:
-        return redirect('/')
     if os.path.exists(f"uploads/{position_id}/{candidate_id}/{get_candidate(candidate_id)[3]}-cv.pdf"):
         try:
             os.remove(f"uploads/{position_id}/{candidate_id}/{get_candidate(candidate_id)[3]}-cv.pdf")
@@ -440,8 +410,6 @@ def delete_cv(position_id, candidate_id):
 
 @app.route('/positions/<string:position_id>/<string:candidate_id>/del_ml')
 def delete_ml(position_id, candidate_id):
-    if 'username' not in session:
-        return redirect('/')
     if os.path.exists(f"uploads/{position_id}/{candidate_id}/{get_candidate(candidate_id)[3]}-letter.pdf"):
         try:
             os.remove(f"uploads/{position_id}/{candidate_id}/{get_candidate(candidate_id)[3]}-letter.pdf")

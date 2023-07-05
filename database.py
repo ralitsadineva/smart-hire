@@ -1,12 +1,7 @@
 import psycopg2
 from psycopg2 import pool
 from config import get_database_params
-
-class DatabaseError(Exception):
-    pass
-
-class UniqueViolationError(DatabaseError):
-    pass
+from exceptions import DatabaseError, UniqueViolationError
 
 params = get_database_params()
 connection_pool = pool.SimpleConnectionPool(1, 10, **params)
