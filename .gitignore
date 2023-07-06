@@ -177,3 +177,6 @@ static/images/*
 
 # uploaded pdf files
 uploads/
+
+# files that are not used anymore
+old_files/
