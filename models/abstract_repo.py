@@ -1,6 +1,8 @@
 from abc import ABC
 from config import get_database_params
 from psycopg2 import pool
+import psycopg2
+from exceptions import DatabaseError, UniqueViolationError
 
 class AbstractRepository(ABC):
     params = get_database_params()
@@ -28,6 +30,23 @@ class AbstractRepository(ABC):
 
     table_name = None
     pk_name = None
+
+    @connection_wrapper
+    def insert(self, *args, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
+        try:
+            cursor.execute(f"""
+                INSERT INTO {self.table_name} {self.insert_columns}
+                VALUES {self.insert_values};
+                """, args)
+            conn.commit()
+        except psycopg2.errors.UniqueViolation as e:
+            conn.rollback()
+            raise UniqueViolationError(e)
+        except (Exception, psycopg2.DatabaseError) as error:
+            conn.rollback()
+            raise DatabaseError(error)
 
     @connection_wrapper
     def get(self, id, **kwargs):

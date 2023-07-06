@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, redirect, session, send_from_directory
-# from database import create_tables, UniqueViolationError, DatabaseError, insert_user, insert_google_user, get_user, get_user_by_email, update_password, update_avatar, get_positions, get_inactive_positions, insert_position, get_position, update_position, make_position_inactive, make_position_active, last_added_positions, last_updated_positions, positions_with_most_candidates, insert_candidate, get_candidate, get_candidates, get_all_candidates, update_candidate, last_added_candidates, last_updated_candidates, candidates_with_highest_cv_score, candidates_with_highest_motivation_lvl, insert_cv, get_cv, del_cv, insert_ml, get_ml, del_ml
 from models.user_repo import UserRepository
 from models.position_repo import PositionRepository
 from models.candidate_repo import CandidateRepository
@@ -78,7 +77,7 @@ def signup():
             if is_valid_password(password):
                 hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
                 try:
-                    users_db.insert(email, username, hashed_password)
+                    users_db.insert(email, username, hashed_password, '0')
                     return redirect('/login')
                 except UniqueViolationError as e:
                     logger.error(f"{type(e)}\n{e}")
@@ -110,7 +109,7 @@ def googleCallback():
         password = generate_random_password()
         hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
         try:
-            users_db.insert_google(email, idinfo['sub'], hashed_password)
+            users_db.insert(email, idinfo['sub'], hashed_password, '1')
             user = users_db.get_by_email(email)
         except DatabaseError as error:
             logger.error(f"{type(error)}\n{error}")

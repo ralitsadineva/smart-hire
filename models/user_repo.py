@@ -1,41 +1,12 @@
 import psycopg2
 from models.abstract_repo import AbstractRepository
-from exceptions import DatabaseError, UniqueViolationError
+from exceptions import DatabaseError
 
 class UserRepository(AbstractRepository):
     table_name = 'users'
     pk_name = 'id'
-
-    @AbstractRepository.connection_wrapper
-    def insert(self, email, username, password, **kwargs):
-        cursor = kwargs.get('cursor')
-        conn = kwargs.get('conn')
-        try:
-            cursor.execute("""
-                INSERT INTO users (email, username, password)
-                VALUES (%s, %s, %s);
-                """, (email, username, password))
-            conn.commit()
-        except psycopg2.errors.UniqueViolation as e:
-            conn.rollback()
-            raise UniqueViolationError(e)
-        except (Exception, psycopg2.DatabaseError) as error:
-            conn.rollback()
-            raise DatabaseError(error)
-    
-    @AbstractRepository.connection_wrapper
-    def insert_google(self, email, username, password, **kwargs):
-        cursor = kwargs.get('cursor')
-        conn = kwargs.get('conn')
-        try:
-            cursor.execute("""
-                INSERT INTO users (email, username, password, type)
-                VALUES (%s, %s, %s, '1');
-                """, (email, username, password))
-            conn.commit()
-        except (Exception, psycopg2.DatabaseError) as error:
-            conn.rollback()
-            raise DatabaseError(error)
+    insert_columns = '(email, username, password, type)'
+    insert_values = '(%s, %s, %s, %s)'
     
     @AbstractRepository.connection_wrapper
     def get_by_username(self, username, **kwargs):

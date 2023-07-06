@@ -5,20 +5,8 @@ from exceptions import DatabaseError
 class CandidateRepository(AbstractRepository):
     table_name = 'candidates'
     pk_name = 'cand_id'
-
-    @AbstractRepository.connection_wrapper
-    def insert(self, pos_id, first_name, last_name, email, **kwargs):
-        cursor = kwargs.get('cursor')
-        conn = kwargs.get('conn')
-        try:
-            cursor.execute("""
-                INSERT INTO candidates (pos_id, first_name, last_name, email)
-                VALUES (%s, %s, %s, %s);
-                """, (pos_id, first_name, last_name, email))
-            conn.commit()
-        except (Exception, psycopg2.DatabaseError) as error:
-            conn.rollback()
-            raise DatabaseError(error)
+    insert_columns = '(pos_id, first_name, last_name, email)'
+    insert_values = '(%s, %s, %s, %s)'
 
     @AbstractRepository.connection_wrapper
     def get_all_for_pos(self, pos_id, **kwargs):
