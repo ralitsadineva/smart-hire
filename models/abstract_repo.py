@@ -3,7 +3,6 @@ from config import get_database_params
 from psycopg2 import pool
 
 class AbstractRepository(ABC):
-
     params = get_database_params()
     connection_pool = pool.SimpleConnectionPool(1, 10, **params)
 
@@ -16,19 +15,22 @@ class AbstractRepository(ABC):
         cursor.close()
         self.connection_pool.putconn(conn)
     
-    def connection_wrapper(self, func):
-        def wrapper(self, conn, cursor, *args, **kwargs):
-            conn, cursor = self.get_connection()
+    @staticmethod
+    def connection_wrapper(func):
+        def wrapper(*args, **kwargs):
+            kwargs['conn'], kwargs['cursor'] = args[0].get_connection()
             try:
-                return func(self, conn, cursor, *args, **kwargs)
+                result =  func(*args, **kwargs)
             finally:
-                self.close_connection(conn, cursor)
+                args[0].close_connection(kwargs['conn'], kwargs['cursor'])
+            return result
         return wrapper
 
     table_name = None
     pk_name = None
 
     @connection_wrapper
-    def get(self, conn, cursor, id):
+    def get(self, id, **kwargs):
+        cursor = kwargs.get('cursor')
         cursor.execute(f"SELECT * FROM {self.table_name} WHERE {self.pk_name} = %s;", (id, ))
         return cursor.fetchone()

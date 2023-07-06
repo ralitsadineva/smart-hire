@@ -1,13 +1,15 @@
 import psycopg2
-from models.abstract_repo import AbstractRepository, connection_wrapper
+from models.abstract_repo import AbstractRepository
 from exceptions import DatabaseError
 
 class PositionRepository(AbstractRepository):
     table_name = 'positions'
     pk_name = 'pos_id'
 
-    @connection_wrapper
-    def insert(self, conn, cursor, user_id, title, description):
+    @AbstractRepository.connection_wrapper
+    def insert(self, user_id, title, description, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
         try:
             cursor.execute("""
                 INSERT INTO positions (user_id, title, description)
@@ -18,8 +20,9 @@ class PositionRepository(AbstractRepository):
             conn.rollback()
             raise DatabaseError(error)
 
-    @connection_wrapper
-    def get_all_active(self, conn, cursor):
+    @AbstractRepository.connection_wrapper
+    def get_all_active(self, **kwargs):
+        cursor = kwargs.get('cursor')
         cursor.execute("""
             SELECT positions.*, COUNT(candidates.cand_id) AS candidates_count
             FROM positions
@@ -29,8 +32,9 @@ class PositionRepository(AbstractRepository):
             """)
         return cursor.fetchall()
 
-    @connection_wrapper
-    def get_all_inactive(self, conn, cursor):
+    @AbstractRepository.connection_wrapper
+    def get_all_inactive(self, **kwargs):
+        cursor = kwargs.get('cursor')
         cursor.execute("""
             SELECT positions.*, COUNT(candidates.cand_id) AS candidates_count
             FROM positions
@@ -40,8 +44,10 @@ class PositionRepository(AbstractRepository):
             """)
         return cursor.fetchall()
 
-    @connection_wrapper
-    def make_inactive(self, conn, cursor, pos_id):
+    @AbstractRepository.connection_wrapper
+    def make_inactive(self, pos_id, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
         try:
             cursor.execute("""
                 UPDATE positions
@@ -53,8 +59,10 @@ class PositionRepository(AbstractRepository):
             conn.rollback()
             raise DatabaseError(error)
 
-    @connection_wrapper
-    def make_active(self, conn, cursor, pos_id):
+    @AbstractRepository.connection_wrapper
+    def make_active(self, pos_id, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
         try:
             cursor.execute("""
                 UPDATE positions
@@ -66,8 +74,10 @@ class PositionRepository(AbstractRepository):
             conn.rollback()
             raise DatabaseError(error)
 
-    @connection_wrapper
-    def update(self, conn, cursor, pos_id, title, description):
+    @AbstractRepository.connection_wrapper
+    def update(self, pos_id, title, description, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
         try:
             cursor.execute("""
                 UPDATE positions
@@ -79,8 +89,9 @@ class PositionRepository(AbstractRepository):
             conn.rollback()
             raise DatabaseError(error)
 
-    @connection_wrapper
-    def last_added(self, conn, cursor):
+    @AbstractRepository.connection_wrapper
+    def last_added(self, **kwargs):
+        cursor = kwargs.get('cursor')
         cursor.execute("""
             SELECT positions.*, COUNT(candidates.cand_id) AS candidates_count
             FROM positions
@@ -92,8 +103,9 @@ class PositionRepository(AbstractRepository):
             """)
         return cursor.fetchall()
 
-    @connection_wrapper
-    def last_updated(self, conn, cursor):
+    @AbstractRepository.connection_wrapper
+    def last_updated(self, **kwargs):
+        cursor = kwargs.get('cursor')
         cursor.execute("""
             SELECT positions.*, COUNT(candidates.cand_id) AS candidates_count
             FROM positions
@@ -105,8 +117,9 @@ class PositionRepository(AbstractRepository):
             """)
         return cursor.fetchall()
 
-    @connection_wrapper
-    def with_most_candidates(self, conn, cursor):
+    @AbstractRepository.connection_wrapper
+    def with_most_candidates(self, **kwargs):
+        cursor = kwargs.get('cursor')
         cursor.execute("""
             SELECT positions.*, COUNT(candidates.cand_id) AS candidates_count
             FROM positions

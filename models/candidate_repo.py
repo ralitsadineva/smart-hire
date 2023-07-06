@@ -1,13 +1,15 @@
 import psycopg2
-from models.abstract_repo import AbstractRepository, connection_wrapper
+from models.abstract_repo import AbstractRepository
 from exceptions import DatabaseError
 
 class CandidateRepository(AbstractRepository):
     table_name = 'candidates'
     pk_name = 'cand_id'
 
-    @connection_wrapper
-    def insert(self, conn, cursor, pos_id, first_name, last_name, email):
+    @AbstractRepository.connection_wrapper
+    def insert(self, pos_id, first_name, last_name, email, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
         try:
             cursor.execute("""
                 INSERT INTO candidates (pos_id, first_name, last_name, email)
@@ -18,8 +20,9 @@ class CandidateRepository(AbstractRepository):
             conn.rollback()
             raise DatabaseError(error)
 
-    @connection_wrapper
-    def get_all_for_pos(self, conn, cursor, pos_id):
+    @AbstractRepository.connection_wrapper
+    def get_all_for_pos(self, pos_id, **kwargs):
+        cursor = kwargs.get('cursor')
         cursor.execute("""
             SELECT candidates.*, cvs.score
             FROM candidates
@@ -28,13 +31,16 @@ class CandidateRepository(AbstractRepository):
             """, (pos_id, ))
         return cursor.fetchall()
 
-    @connection_wrapper
-    def get_all(self, conn, cursor):
+    @AbstractRepository.connection_wrapper
+    def get_all(self, **kwargs):
+        cursor = kwargs.get('cursor')
         cursor.execute("SELECT * FROM candidates;")
         return cursor.fetchall()
 
-    @connection_wrapper
-    def update(self, conn, cursor, cand_id, email, phone_number, address, postal_code, city, country, date_of_birth):
+    @AbstractRepository.connection_wrapper
+    def update(self, cand_id, email, phone_number, address, postal_code, city, country, date_of_birth, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
         try:
             cursor.execute("""
                 UPDATE candidates
@@ -46,8 +52,9 @@ class CandidateRepository(AbstractRepository):
             conn.rollback()
             raise DatabaseError(error)
 
-    @connection_wrapper
-    def last_added(self, conn, cursor):
+    @AbstractRepository.connection_wrapper
+    def last_added(self, **kwargs):
+        cursor = kwargs.get('cursor')
         cursor.execute("""
             SELECT candidates.*, positions.title, cvs.score, mls.motivation_lvl
             FROM candidates
@@ -60,8 +67,9 @@ class CandidateRepository(AbstractRepository):
             """)
         return cursor.fetchall()
 
-    @connection_wrapper
-    def last_updated(self, conn, cursor):
+    @AbstractRepository.connection_wrapper
+    def last_updated(self, **kwargs):
+        cursor = kwargs.get('cursor')
         cursor.execute("""
             SELECT candidates.*, positions.title, cvs.score, mls.motivation_lvl
             FROM candidates
@@ -74,8 +82,9 @@ class CandidateRepository(AbstractRepository):
             """)
         return cursor.fetchall()
 
-    @connection_wrapper
-    def with_highest_cv_score(self, conn, cursor):
+    @AbstractRepository.connection_wrapper
+    def with_highest_cv_score(self, **kwargs):
+        cursor = kwargs.get('cursor')
         cursor.execute("""
             SELECT candidates.*, positions.title, cvs.score, mls.motivation_lvl
             FROM candidates
@@ -88,8 +97,9 @@ class CandidateRepository(AbstractRepository):
             """)
         return cursor.fetchall()
 
-    @connection_wrapper
-    def with_highest_motivation_lvl(self, conn, cursor):
+    @AbstractRepository.connection_wrapper
+    def with_highest_motivation_lvl(self, **kwargs):
+        cursor = kwargs.get('cursor')
         cursor.execute("""
             SELECT candidates.*, positions.title, cvs.score, mls.motivation_lvl
             FROM candidates

@@ -1,13 +1,15 @@
 import psycopg2
-from models.abstract_repo import AbstractRepository, connection_wrapper
+from models.abstract_repo import AbstractRepository
 from exceptions import DatabaseError
 
 class MLRepository(AbstractRepository):
     table_name = 'mls'
     pk_name = 'ml_id'
 
-    @connection_wrapper
-    def insert(self, conn, cursor, cand_id, motivation_lvl, sentiment, tone, length, grammar):
+    @AbstractRepository.connection_wrapper
+    def insert(self, cand_id, motivation_lvl, sentiment, tone, length, grammar, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
         try:
             cursor.execute("""
                 INSERT INTO mls (cand_id, motivation_lvl, sentiment, tone, length, grammar)
@@ -18,12 +20,15 @@ class MLRepository(AbstractRepository):
             conn.rollback()
             raise DatabaseError(error)
 
-    @connection_wrapper
-    def get(self, conn, cursor, cand_id):
+    @AbstractRepository.connection_wrapper
+    def get(self, cand_id, **kwargs):
+        cursor = kwargs.get('cursor')
         cursor.execute("SELECT * FROM mls WHERE cand_id = %s;", (cand_id, ))
         return cursor.fetchone()
 
-    @connection_wrapper
-    def delete(self, conn, cursor, cand_id):
+    @AbstractRepository.connection_wrapper
+    def delete(self, cand_id, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
         cursor.execute("DELETE FROM mls WHERE cand_id = %s;", (cand_id, ))
         conn.commit()

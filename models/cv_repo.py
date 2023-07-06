@@ -1,13 +1,15 @@
 import psycopg2
-from models.abstract_repo import AbstractRepository, connection_wrapper
+from models.abstract_repo import AbstractRepository
 from exceptions import DatabaseError
 
 class CVRepository(AbstractRepository):
     table_name = 'cvs'
     pk_name = 'cv_id'
 
-    @connection_wrapper
-    def insert(self, conn, cursor, cand_id, score, structure, contact_info, work_experience, education, skills, languages, length):
+    @AbstractRepository.connection_wrapper
+    def insert(self, cand_id, score, structure, contact_info, work_experience, education, skills, languages, length, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
         try:
             cursor.execute("""
                 INSERT INTO cvs (cand_id, score, structure, contact_info, work_experience, education, skills, languages, length)
@@ -18,12 +20,15 @@ class CVRepository(AbstractRepository):
             conn.rollback()
             raise DatabaseError(error)
         
-    @connection_wrapper
-    def get(self, conn, cursor, cand_id):
+    @AbstractRepository.connection_wrapper
+    def get(self, cand_id, **kwargs):
+        cursor = kwargs.get('cursor')
         cursor.execute("SELECT * FROM cvs WHERE cand_id = %s;", (cand_id, ))
         return cursor.fetchone()
     
-    @connection_wrapper
-    def delete(self, conn, cursor, cand_id):
+    @AbstractRepository.connection_wrapper
+    def delete(self, cand_id, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
         cursor.execute("DELETE FROM cvs WHERE cand_id = %s;", (cand_id, ))
         conn.commit()

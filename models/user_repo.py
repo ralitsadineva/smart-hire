@@ -1,13 +1,15 @@
 import psycopg2
-from models.abstract_repo import AbstractRepository, connection_wrapper
+from models.abstract_repo import AbstractRepository
 from exceptions import DatabaseError, UniqueViolationError
 
 class UserRepository(AbstractRepository):
     table_name = 'users'
     pk_name = 'id'
 
-    @connection_wrapper
-    def insert(self, conn, cursor, email, username, password):
+    @AbstractRepository.connection_wrapper
+    def insert(self, email, username, password, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
         try:
             cursor.execute("""
                 INSERT INTO users (email, username, password)
@@ -21,8 +23,10 @@ class UserRepository(AbstractRepository):
             conn.rollback()
             raise DatabaseError(error)
     
-    @connection_wrapper
-    def insert_google(self, conn, cursor, email, username, password):
+    @AbstractRepository.connection_wrapper
+    def insert_google(self, email, username, password, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
         try:
             cursor.execute("""
                 INSERT INTO users (email, username, password, type)
@@ -33,18 +37,22 @@ class UserRepository(AbstractRepository):
             conn.rollback()
             raise DatabaseError(error)
     
-    @connection_wrapper
-    def get_by_username(self, conn, cursor, username):
+    @AbstractRepository.connection_wrapper
+    def get_by_username(self, username, **kwargs):
+        cursor = kwargs.get('cursor')
         cursor.execute("SELECT * FROM users WHERE username = %s;", (username, ))
         return cursor.fetchone()
 
-    @connection_wrapper
-    def get_by_email(self, conn, cursor, email):
+    @AbstractRepository.connection_wrapper
+    def get_by_email(self, email, **kwargs):
+        cursor = kwargs.get('cursor')
         cursor.execute("SELECT * FROM users WHERE email = %s;", (email, ))
         return cursor.fetchone()
 
-    @connection_wrapper
-    def update_password(self, conn, cursor, password, username):
+    @AbstractRepository.connection_wrapper
+    def update_password(self, password, username, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
         try:
             cursor.execute("""
                 UPDATE users
@@ -56,8 +64,10 @@ class UserRepository(AbstractRepository):
             conn.rollback()
             raise DatabaseError(error)
 
-    @connection_wrapper
-    def update_avatar(self, conn, cursor, avatar, username):
+    @AbstractRepository.connection_wrapper
+    def update_avatar(self, avatar, username, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
         try:
             cursor.execute("""
                 UPDATE users
