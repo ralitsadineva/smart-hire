@@ -1,24 +1,20 @@
 from flask import Flask, render_template, request, redirect, session, send_from_directory
 from models.user_repo import UserRepository
+import services.users as user_service
+import services.positions as position_service
+import services.candidates as candidate_service
 from models.position_repo import PositionRepository
 from models.candidate_repo import CandidateRepository
 from models.cv_repo import CVRepository
 from models.ml_repo import MLRepository
 from exceptions import DatabaseError, UniqueViolationError
-from validation import is_valid_username, is_valid_password
-import bcrypt
 import logging
 import secrets
 import os
-from datetime import datetime
-from google.oauth2 import id_token
-from google.auth.transport import requests
 from get_google_client_id import get_google_client_id
-from generate_random_password import generate_random_password
 from read_pdf import read_pdf, page_count
 from openai_eval import extract_cv, evaluate_cv, evaluate_ml
 from utils import check_empty, convert_to_dict, convert_to_dict_extracted
-from get_greeting import get_greeting
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -55,14 +51,15 @@ def login():
         username = request.form['username']
         password = request.form['password']
         #check if in database
-        user = users_db.get_by_username(username)
-        if user is None or not bcrypt.checkpw(password.encode(), bytes(user[3])):
-            return render_template('login.html', invalid=True)
-        session['username'] = username
-        session['user_id'] = user[0]
-        session['email'] = user[1]
-        session['avatar'] = user[4]
-        return redirect('/home')
+        result = user_service.login(username, password)
+        if result['success']:
+            session['username'] = username
+            session['user_id'] = result['user'][0]
+            session['email'] = result['user'][1]
+            session['avatar'] = result['user'][4]
+            return redirect('/home')
+        else:
+            return render_template('login.html', client_id=client_id, **result['error'])
     else:
         return render_template('login.html', client_id=client_id)
 
@@ -73,22 +70,11 @@ def signup():
         username = request.form['username']
         password = request.form['password']
         #check if valid according to rules
-        if is_valid_username(username):
-            if is_valid_password(password):
-                hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-                try:
-                    users_db.insert(email, username, hashed_password, '0')
-                    return redirect('/login')
-                except UniqueViolationError as e:
-                    logger.error(f"{type(e)}\n{e}")
-                    return render_template('signup.html', exist=True) 
-                except DatabaseError as error:
-                    logger.error(f"{type(error)}\n{error}")
-                    return render_template('signup.html', error=True)
-            else:
-                return render_template('signup.html', invalid_password=True)
+        result = user_service.signup(email, username, password)
+        if result['success']:
+            return redirect('/login')
         else:
-            return render_template('signup.html', invalid_username=True)
+            return render_template('signup.html', client_id=client_id, **result['error'])
     else:
         return render_template('signup.html', client_id=client_id)
 
@@ -96,31 +82,15 @@ def signup():
 def googleCallback():
     # Get authorization code Google sent back to you
     credential = request.form.get('credential')
-    logger.info(f"{credential}")
-    try:
-        idinfo = id_token.verify_oauth2_token(credential, requests.Request(), client_id)
-        logger.info(f"{idinfo}")
-    except ValueError:
-        logger.error("Invalid token")
-    email = idinfo['email']
-    logger.info(f"{email}")
-    user = users_db.get_by_email(email)
-    if user is None:
-        password = generate_random_password()
-        hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-        try:
-            users_db.insert(email, idinfo['sub'], hashed_password, '1')
-            user = users_db.get_by_email(email)
-        except DatabaseError as error:
-            logger.error(f"{type(error)}\n{error}")
-            return render_template('signup.html', error=True)
-    elif user[5] == '0': # check if google user, if not ...
-        return render_template('login.html', exist=True)
-    session['username'] = user[2]
-    session['user_id'] = user[0]
-    session['email'] = email
-    session['avatar'] = user[4]
-    return redirect('/home')
+    result = user_service.signin_google(credential, client_id)
+    if result['success']:
+        session['username'] = result['user'][2]
+        session['user_id'] = result['user'][0]
+        session['email'] = result['user'][1]
+        session['avatar'] = result['user'][4]
+        return redirect('/home')
+    else:
+        return render_template('signup.html', client_id=client_id, **result['error'])
 
 @app.route('/logout')
 def logout():
@@ -132,148 +102,110 @@ def change_password():
     if request.method == 'POST':
         old_password = request.form['old_password']
         new_password = request.form['new_password']
-        user = users_db.get(session['user_id'])
-        if not bcrypt.checkpw(old_password.encode(), bytes(user[3])):
-            return render_template('change_password.html', invalid=True, avatar=session['avatar'])
-        if is_valid_password(new_password):
-            hashed_password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
-            try:
-                users_db.update_password(hashed_password, session['username'])
-                return redirect('/login')
-            except DatabaseError as error:
-                logger.error(f"{type(error)}\n{error}")
-                return render_template('change_password.html', error=True, avatar=session['avatar'])
+        result = user_service.change_password(session['user_id'], old_password, new_password)
+        if result['success']:
+            session.pop('username', None)
+            return redirect('/login')
         else:
-            return render_template('change_password.html', invalid_password=True, avatar=session['avatar'])
+            return render_template('change_password.html', **result['error'], avatar=session['avatar'])
     else:
         return render_template('change_password.html', avatar=session['avatar'])
 
 @app.route('/home')
 def home():
-    if users_db.get(session['user_id'])[5]=='0':
-        name = session['username']
-    else:
-        name = session['email'].split('@')[0]
-    parameters = {
-        'greeting': get_greeting(),
-        'username': name,
-        'last_added_pos': positions_db.last_added(),
-        'last_updated_pos': positions_db.last_updated(),
-        'last_added_cand': candidates_db.last_added(),
-        'last_updated_cand': candidates_db.last_updated(),
-        'most_applied_pos': positions_db.with_most_candidates(),
-        'cand_highest_cv_score': candidates_db.with_highest_cv_score(),
-        'cand_highest_motivation_lvl': candidates_db.with_highest_motivation_lvl()
-    }
+    parameters = user_service.get_home(session['user_id'])
     return render_template('home.html', **parameters, avatar=session['avatar'])
 
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
     if request.method == 'POST':
         avatar = request.files['avatar']
-        filename = f"{session['user_id']}/{datetime.now().strftime('%Y%m%d%H%M%S')}{os.path.splitext(avatar.filename)[1]}"
-        if avatar.content_type.startswith('image/') and len(avatar.read()) < 2 * 1024 * 1024:
-            if not os.path.exists(f"static/images/{session['user_id']}"):
-                os.makedirs(f"static/images/{session['user_id']}")
-            avatar.seek(0)
-            avatar.save(f"static/images/{filename}")
-            users_db.update_avatar(filename, session['username'])
-            if session['avatar'] != 'user.png':
-                if os.path.exists(f"static/images/{session['avatar']}"):
-                    try:
-                        os.remove(f"static/images/{session['avatar']}")
-                    except OSError as error:
-                        logger.error(f"{type(error)}\n{error}")
-            session['avatar'] = filename
+        result = user_service.update_avatar(session['user_id'], avatar)
+        if result['success']:
+            session['avatar'] = result['avatar']
+            return redirect('/profile')
         else:
-            return render_template('profile.html', invalid=True, username=session['username'], email=session['email'], avatar=session['avatar'])
-        return redirect('/profile')
+            return render_template('profile.html', **result['error'], username=session['username'], email=session['email'], avatar=session['avatar'])
+        
     else:
         return render_template('profile.html', username=session['username'], email=session['email'], avatar=session['avatar'])
 
 @app.route('/positions')
 def positions():
-    positions = positions_db.get_all_active()
+    positions = position_service.get_all()
     return render_template('positions.html', positions=positions, avatar=session['avatar'])
 
 @app.route('/positions/add', methods=['GET', 'POST'])
 def add_position():
     if request.method == 'POST':
-        try:
-            positions_db.insert(session['user_id'], request.form['title'], request.form['description'])
+        result = position_service.add(session['user_id'], request.form['title'], request.form['description'])
+        if result['success']:
             return redirect('/positions')
-        except DatabaseError as error:
-            logger.error(f"{type(error)}\n{error}")
-            return render_template('add_position.html', error=True, avatar=session['avatar'])
+        else:
+            return render_template('add_position.html', **result['error'], avatar=session['avatar'])
     else:
         return render_template('add_position.html', avatar=session['avatar'])
 
 @app.route('/positions/add/<string:position_id>', methods=['GET', 'POST'])
 def duplicate_position(position_id):
     if request.method == 'POST':
-        try:
-            positions_db.insert(session['user_id'], request.form['title'], request.form['description'])
+        result = position_service.add(session['user_id'], request.form['title'], request.form['description'])
+        if result['success']:
             return redirect('/positions')
-        except DatabaseError as error:
-            logger.error(f"{type(error)}\n{error}")
-            position = positions_db.get(position_id)[2:4]
-            return render_template('add_position.html', position=position, error=True, avatar=session['avatar'])
+        else:
+            position = position_service.duplicate(position_id)
+            return render_template('add_position.html', position=position, **result['error'], avatar=session['avatar'])
     else:
-        position = positions_db.get(position_id)[2:4]
+        position = position_service.duplicate(position_id)
         return render_template('add_position.html', position=position, avatar=session['avatar'])
 
 @app.route('/positions/history')
 def positions_history():
-    positions = positions_db.get_all_inactive()
+    positions = position_service.history()
     return render_template('positions_history.html', positions=positions, avatar=session['avatar'])
 
 @app.route('/positions/<string:position_id>')
 def position(position_id):
-    position = positions_db.get(position_id)
-    candidates = candidates_db.get_all_for_pos(position_id)
-    return render_template('position.html', position=position, candidates=candidates, avatar=session['avatar'])
+    result = position_service.get(position_id)
+    return render_template('position.html', **result, avatar=session['avatar'])
 
 @app.route('/positions/<string:position_id>/edit', methods=['GET', 'POST'])
 def edit_position(position_id):
     if request.method == 'POST':
-        try:
-            positions_db.update(position_id, request.form['title'], request.form['description'])
+        result = position_service.edit(position_id, request.form['title'], request.form['description'])
+        if result['success']:
             return redirect('/positions')
-        except DatabaseError as error:
-            logger.error(f"{type(error)}\n{error}")
-            return render_template('edit_position.html', error=True, position=position, avatar=session['avatar'])
+        else:
+            return render_template('edit_position.html', **result['error'], position=result['position'], avatar=session['avatar'])
     else:
-        position = positions_db.get(position_id)
+        position = position_service.get(position_id)['position']
         return render_template('edit_position.html', position=position, avatar=session['avatar'])
 
 @app.route('/positions/<string:position_id>/archive')
 def archive_position(position_id):
-    positions_db.make_inactive(position_id)
+    position_service.archive(position_id)
     return redirect('/positions')
 
 @app.route('/positions/<string:position_id>/activate')
 def activate_position(position_id):
-    positions_db.make_active(position_id)
+    position_service.activate(position_id)
     return redirect('/positions')
 
 @app.route('/positions/<string:position_id>/add_candidate', methods=['GET', 'POST'])
 def add_candidate(position_id):
     if request.method == 'POST':
-        try:
-            candidates_db.insert(position_id, request.form['first_name'], request.form['last_name'], request.form['email'])
+        result = candidate_service.add(position_id, request.form['first_name'], request.form['last_name'], request.form['email'])
+        if result['success']:
             return redirect(f'/positions/{position_id}')
-        except DatabaseError as error:
-            logger.error(f"{type(error)}\n{error}")
-            return render_template('add_candidate.html', error=True, position_id=position_id, avatar=session['avatar'])
+        else:
+            return render_template('add_candidate.html', **result['error'], avatar=session['avatar'])
     else:
-        return render_template('add_candidate.html', position_id=position_id, avatar=session['avatar'])
+        return render_template('add_candidate.html', avatar=session['avatar'])
 
 @app.route('/positions/<string:position_id>/<string:candidate_id>')
 def candidate(position_id, candidate_id):
-    candidate = candidates_db.get(candidate_id)
-    cv = cvs_db.get(candidate_id)
-    ml = mls_db.get(candidate_id)
-    return render_template('candidate.html', candidate=candidate, cv=cv, ml=ml, avatar=session['avatar'])
+    result = candidate_service.get(candidate_id)
+    return render_template('candidate.html', **result, avatar=session['avatar'])
 
 @app.route('/add_cv', methods=['GET', 'POST'])
 def add_cv():
