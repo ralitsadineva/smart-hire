@@ -45,7 +45,7 @@ def edit(id, title, description):
         return {'success': False, 'error': {'error': True}, 'position': position}
 
 def archive(id):
-    return positions_db.make_inactive(id)
+    positions_db.make_inactive(id)
 
 def activate(id):
-    return positions_db.make_active(id)
+    positions_db.make_active(id)

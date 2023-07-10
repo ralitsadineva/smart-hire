@@ -1,38 +1,11 @@
 from flask import Flask, render_template, request, redirect, session, send_from_directory
-from models.user_repo import UserRepository
 import services.users as user_service
 import services.positions as position_service
 import services.candidates as candidate_service
-from models.position_repo import PositionRepository
-from models.candidate_repo import CandidateRepository
-from models.cv_repo import CVRepository
-from models.ml_repo import MLRepository
-from exceptions import DatabaseError, UniqueViolationError
-import logging
 import secrets
-import os
-from get_google_client_id import get_google_client_id
-from read_pdf import read_pdf, page_count
-from openai_eval import extract_cv, evaluate_cv, evaluate_ml
-from utils import check_empty, convert_to_dict, convert_to_dict_extracted
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s [%(name)s] %(levelname)s: %(message)s',
-    # datefmt='%Y-%m-%d %H:%M:%S',
-)
-logger = logging.getLogger(__name__)
-
-client_id = get_google_client_id()
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
-
-users_db = UserRepository()
-positions_db = PositionRepository()
-candidates_db = CandidateRepository()
-cvs_db = CVRepository()
-mls_db = MLRepository()
 
 EXCLUDED_ROUTES = ['/', '/login', '/signup', '/signin-google', '/logout']
 
@@ -59,9 +32,9 @@ def login():
             session['avatar'] = result['user'][4]
             return redirect('/home')
         else:
-            return render_template('login.html', client_id=client_id, **result['error'])
+            return render_template('login.html', client_id=user_service.client_id(), **result['error'])
     else:
-        return render_template('login.html', client_id=client_id)
+        return render_template('login.html', client_id=user_service.client_id())
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -74,15 +47,15 @@ def signup():
         if result['success']:
             return redirect('/login')
         else:
-            return render_template('signup.html', client_id=client_id, **result['error'])
+            return render_template('signup.html', client_id=user_service.client_id(), **result['error'])
     else:
-        return render_template('signup.html', client_id=client_id)
+        return render_template('signup.html', client_id=user_service.client_id())
 
 @app.route('/signin-google', methods=['POST'])
 def googleCallback():
     # Get authorization code Google sent back to you
     credential = request.form.get('credential')
-    result = user_service.signin_google(credential, client_id)
+    result = user_service.signin_google(credential)
     if result['success']:
         session['username'] = result['user'][2]
         session['user_id'] = result['user'][0]
@@ -90,7 +63,7 @@ def googleCallback():
         session['avatar'] = result['user'][4]
         return redirect('/home')
     else:
-        return render_template('signup.html', client_id=client_id, **result['error'])
+        return render_template('signup.html', client_id=user_service.client_id(), **result['error'])
 
 @app.route('/logout')
 def logout():
@@ -210,155 +183,63 @@ def candidate(position_id, candidate_id):
 @app.route('/add_cv', methods=['GET', 'POST'])
 def add_cv():
     if request.method == 'POST':
+        cand_id = request.form['candidate']
         if 'cv' in request.files:
-            cand_id = request.form['candidate']
-            if cvs_db.get(cand_id) is not None:
-                candidates = candidates_db.get_all()
-                return render_template('add_cv.html', exist=True, candidates=candidates, avatar=session['avatar'])
-            cv = request.files['cv']
-            if cv.content_type == 'application/pdf' and len(cv.read()) < 2 * 1024 * 1024:
-                cv.seek(0)
-                contents = read_pdf(cv)
-                length = page_count(cv)
-                candidate_info = extract_cv(contents)
-                logger.info(candidate_info)
-                try:
-                    cand_info = convert_to_dict_extracted(candidate_info)
-                except Exception as error:
-                    logger.error(f"{type(error)}\n{error}")
-                    candidates = candidates_db.get_all()
-                    return render_template('add_cv.html', error=True, candidates=candidates, avatar=session['avatar'])
-                # logger.info(cand_info)
-                if candidates_db.get(cand_id)[2] != cand_info['First name'] or candidates_db.get(cand_id)[3] != cand_info['Last name']:
-                    different_names = True
-                else:
-                    different_names = False
-                response = evaluate_cv(contents)
-                logger.info(response)
-                try:
-                    response_dict = convert_to_dict(response)
-                except Exception as error:
-                    logger.error(f"{type(error)}\n{error}")
-                    candidates = candidates_db.get_all()
-                    return render_template('add_cv.html', error=True, candidates=candidates, avatar=session['avatar'])
-                score = sum(response_dict.values())
-                try:
-                    cvs_db.insert(cand_id, score, response_dict['Structure and organization'], response_dict['Contact information'], response_dict['Work experience'], response_dict['Education'], response_dict['Skills'], response_dict['Languages'], length)
-                except (DatabaseError, Exception) as error:
-                    logger.error(f"{type(error)}\n{error}")
-                    candidates = candidates_db.get_all()
-                    return render_template('add_cv.html', error=True, candidates=candidates, avatar=session['avatar'])
-                filename = f"{candidates_db.get(cand_id)[3]}-cv.pdf"
-                if not os.path.exists(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}"):
-                    os.makedirs(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}")
-                cv.seek(0)
-                cv.save(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}/{filename}")
-            else:
-                candidates = candidates_db.get_all()
-                return render_template('add_cv.html', invalid=True, candidates=candidates, avatar=session['avatar'])
-            candidate = candidates_db.get(cand_id)
-            return render_template('add_cv.html', cand_info=cand_info, candidate=candidate, different_names=different_names, avatar=session['avatar'])
+            result = candidate_service.add_cv(cand_id, request.files['cv'])
+            if result['success']:
+                return render_template('add_cv.html', **result['arguments'], avatar=session['avatar'])
+            # else:
+            #     candidates = candidate_service.get_all()
+            #     return render_template('add_cv.html', **result['error'], candidates=candidates, avatar=session['avatar'])
         else:
-            cand_id = request.form['candidate']
-            email = request.form['email']
-            if email == '':
-                email = candidates_db.get(cand_id)[4]
-            phone = check_empty(request.form['phone'])
-            address = check_empty(request.form['address'])
-            postal_code = check_empty(request.form['postal_code'])
-            city = check_empty(request.form['city'])
-            country = check_empty(request.form['country'])
-            birthdate = check_empty(request.form['birthdate'])
-            try:
-                candidates_db.update(cand_id, email, phone, address, postal_code, city, country, birthdate)
-            except DatabaseError as error:
-                logger.error(f"{type(error)}\n{error}")
-                if os.path.exists(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}/{candidates_db.get(cand_id)[3]}-letter.pdf"):
-                    try:
-                        os.remove(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}/{candidates_db.get(cand_id)[3]}-letter.pdf")
-                    except OSError as error:
-                        logger.error(f"{type(error)}\n{error}")
-                cvs_db.delete(cand_id)
-                candidates = candidates_db.get_all()
-                return render_template('add_cv.html', error=True, candidates=candidates, avatar=session['avatar'])
-            return redirect(f'/positions/{candidates_db.get(cand_id)[1]}/{cand_id}')
+            result = candidate_service.update(cand_id, request.form['email'], request.form['phone'], request.form['address'], request.form['postal_code'], request.form['city'], request.form['country'], request.form['birthdate'])
+            if result['success']:
+                return redirect(f'/positions/{result["pos_id"]}/{cand_id}')
+            # else:
+        candidates = candidate_service.get_all()
+        return render_template('add_cv.html', **result['error'], candidates=candidates, avatar=session['avatar'])
     else:
-        candidates = candidates_db.get_all()
+        candidates = candidate_service.get_all()
         return render_template('add_cv.html', candidates=candidates, avatar=session['avatar'])
 
 @app.route('/add_ml', methods=['GET', 'POST'])
 def add_ml():
     if request.method == 'POST':
         cand_id = request.form['candidate']
-        if mls_db.get(cand_id) is not None:
-            candidates = candidates_db.get_all()
-            return render_template('add_ml.html', exist=True, candidates=candidates, avatar=session['avatar'])
-        ml = request.files['ml']
-        if ml.content_type == 'application/pdf' and len(ml.read()) < 2 * 1024 * 1024:
-            ml.seek(0)
-            contents = read_pdf(ml)
-            word_count = len(contents.split())
-            # logger.info(word_count)
-            response = evaluate_ml(contents)
-            logger.info(response)
-            try:
-                response_dict = convert_to_dict(response)
-            except:
-                logger.error(f"{type(error)}\n{error}")
-                candidates = candidates_db.get_all()
-                return render_template('add_ml.html', error=True, candidates=candidates, avatar=session['avatar'])
-            logger.info(response_dict)
-            try:
-                mls_db.insert(cand_id, response_dict['Motivation level'], response_dict['Overall sentiment'], response_dict['Tone'], word_count, response_dict['Grammar and language usage'])
-            except DatabaseError as error:
-                logger.error(f"{type(error)}\n{error}")
-                candidates = candidates_db.get_all()
-                return render_template('add_ml.html', error=True, candidates=candidates, avatar=session['avatar'])
-            filename = f"{candidates_db.get(cand_id)[3]}-letter.pdf"
-            if not os.path.exists(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}"):
-                os.makedirs(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}")
-            ml.seek(0)
-            ml.save(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}/{filename}")
+        result = candidate_service.add_ml(cand_id, request.files['ml'])
+        if result['success']:
+            return redirect(f'/positions/{result["pos_id"]}/{cand_id}')
         else:
-            candidates = candidates_db.get_all()
-            return render_template('add_ml.html', invalid=True, candidates=candidates, avatar=session['avatar'])
-        return redirect(f'/positions/{candidates_db.get(cand_id)[1]}/{cand_id}')
+            candidates = candidate_service.get_all()
+            return render_template('add_ml.html', **result['error'], candidates=candidates, avatar=session['avatar'])
     else:
-        candidates = candidates_db.get_all()
+        candidates = candidate_service.get_all()
         return render_template('add_ml.html', candidates=candidates, avatar=session['avatar'])
 
 @app.route('/positions/<string:position_id>/<string:candidate_id>/view_cv')
 def view_cv(position_id, candidate_id):
-    if os.path.exists(f"uploads/{position_id}/{candidate_id}/{candidates_db.get(candidate_id)[3]}-cv.pdf"):
-        return send_from_directory(f"uploads/{position_id}/{candidate_id}", f"{candidates_db.get(candidate_id)[3]}-cv.pdf")
+    result = candidate_service.view_cv(position_id, candidate_id)
+    if result['success']:
+        return send_from_directory(f"uploads/{position_id}/{candidate_id}", result['filename'])
     else:
         return redirect(f'/positions/{position_id}/{candidate_id}')
 
 @app.route('/positions/<string:position_id>/<string:candidate_id>/view_ml')
 def view_ml(position_id, candidate_id):
-    if os.path.exists(f"uploads/{position_id}/{candidate_id}/{candidates_db.get(candidate_id)[3]}-letter.pdf"):
-        return send_from_directory(f"uploads/{position_id}/{candidate_id}", f"{candidates_db.get(candidate_id)[3]}-letter.pdf")
+    result = candidate_service.view_ml(position_id, candidate_id)
+    if result['success']:
+        return send_from_directory(f"uploads/{position_id}/{candidate_id}", result['filename'])
     else:
         return redirect(f'/positions/{position_id}/{candidate_id}')
 
 @app.route('/positions/<string:position_id>/<string:candidate_id>/del_cv')
 def delete_cv(position_id, candidate_id):
-    if os.path.exists(f"uploads/{position_id}/{candidate_id}/{candidates_db.get(candidate_id)[3]}-cv.pdf"):
-        try:
-            os.remove(f"uploads/{position_id}/{candidate_id}/{candidates_db.get(candidate_id)[3]}-cv.pdf")
-        except OSError as error:
-            logger.error(f"{type(error)}\n{error}")
-    cvs_db.delete(candidate_id)
+    candidate_service.delete_cv(position_id, candidate_id)
     return redirect(f'/positions/{position_id}/{candidate_id}')
 
 @app.route('/positions/<string:position_id>/<string:candidate_id>/del_ml')
 def delete_ml(position_id, candidate_id):
-    if os.path.exists(f"uploads/{position_id}/{candidate_id}/{candidates_db.get(candidate_id)[3]}-letter.pdf"):
-        try:
-            os.remove(f"uploads/{position_id}/{candidate_id}/{candidates_db.get(candidate_id)[3]}-letter.pdf")
-        except OSError as error:
-            logger.error(f"{type(error)}\n{error}")
-    mls_db.delete(candidate_id)
+    candidate_service.delete_ml(position_id, candidate_id)
     return redirect(f'/positions/{position_id}/{candidate_id}')
 
 if __name__ == '__main__':

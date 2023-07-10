@@ -1,10 +1,10 @@
 from models.user_repo import UserRepository
 from models.position_repo import PositionRepository
 from models.candidate_repo import CandidateRepository
-from validation import is_valid_username, is_valid_password
 from exceptions import DatabaseError, UniqueViolationError
-from generate_random_password import generate_random_password
+from validation import is_valid_username, is_valid_password
 from utils import get_greeting, get_name
+from google_service import get_google_client_id, generate_random_password
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from datetime import datetime
@@ -22,6 +22,9 @@ logger = logging.getLogger(__name__)
 users_db = UserRepository()
 positions_db = PositionRepository()
 candidates_db = CandidateRepository()
+
+def client_id():
+    return get_google_client_id()
 
 def login(username, password):
     user = users_db.get_by_username(username)
@@ -47,8 +50,9 @@ def signup(email, username, password):
     else:
         return {'success': False, 'error': {'invalid_username': True}}
 
-def signin_google(credential, client_id):
+def signin_google(credential):
     try:
+        client_id = get_google_client_id()
         idinfo = id_token.verify_oauth2_token(credential, requests.Request(), client_id)
     except ValueError:
         logger.error("Invalid token")
@@ -103,7 +107,11 @@ def update_avatar(id, avatar):
         avatar.seek(0)
         avatar.save(f"static/images/{filename}")
         user = users_db.get(id)
-        users_db.update_avatar(filename, user[2])
+        try:
+            users_db.update_avatar(filename, user[2])
+        except DatabaseError as error:
+            logger.error(f"{type(error)}\n{error}")
+            return {'success': False, 'error': {'error': True}}
         if user[4] != 'user.png':
             if os.path.exists(f"static/images/{user[4]}"):
                 try:
