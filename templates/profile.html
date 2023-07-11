@@ -10,6 +10,11 @@
             Not an image file or too big! Only image files less than 2MB are allowed.
         </div>
     {% endif %}
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            Something went wrong. Please try again.
+        </div>
+    {% endif %}
 </div>
 <div class="mx-4">
     <form class="mb-3 row" method="POST" enctype="multipart/form-data">

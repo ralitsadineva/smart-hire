@@ -1,3 +1,36 @@
+import random
+from datetime import datetime
+from constants import LOGIN_TYPE_PASSWORD
+
+def memoize(func):
+    cache = {}
+    
+    def wrapper():
+        if 'result' not in cache:
+            cache['result'] = func()
+        return cache['result']
+    
+    return wrapper
+
+def get_name(user):
+    if user[5]==LOGIN_TYPE_PASSWORD:
+        return user[2]
+    else:
+        return user[1].split('@')[0]
+
+def get_greeting():
+    greetings = ["Hello", "Welcome back"]
+    current_hour = datetime.now().hour
+
+    if 0<= current_hour < 12:
+        greetings.append("Good morning")
+    elif 12 <= current_hour < 18:
+        greetings.append("Good afternoon")
+    else:
+        greetings.append("Good evening")
+
+    return random.choice(greetings)
+
 def check_empty(str):
     if str == '':
         return None
