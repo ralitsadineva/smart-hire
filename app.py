@@ -5,14 +5,14 @@ from controllers.candidates import add_candidate, candidate, add_cv, add_ml, vie
 import secrets
 import logging
 
-app = Flask(__name__)
-app.secret_key = secrets.token_hex(16)
-
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s [%(name)s] %(levelname)s: %(message)s',
     # datefmt='%Y-%m-%d %H:%M:%S',
 )
+
+app = Flask(__name__)
+app.secret_key = secrets.token_hex(16)
 
 EXCLUDED_ROUTES = ['/', '/login', '/signup', '/signin-google', '/logout']
 
