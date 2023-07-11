@@ -1,8 +1,19 @@
 import random
 from datetime import datetime
+from constants import LOGIN_TYPE_PASSWORD
+
+def memoize(func):
+    cache = {}
+    
+    def wrapper():
+        if 'result' not in cache:
+            cache['result'] = func()
+        return cache['result']
+    
+    return wrapper
 
 def get_name(user):
-    if user[5]=='0':
+    if user[5]==LOGIN_TYPE_PASSWORD:
         return user[2]
     else:
         return user[1].split('@')[0]

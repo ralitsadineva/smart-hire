@@ -4,6 +4,7 @@ from models.candidate_repo import CandidateRepository
 from exceptions import DatabaseError, UniqueViolationError
 from validation import is_valid_username, is_valid_password
 from utils import get_greeting, get_name
+from constants import LOGIN_TYPE_PASSWORD, LOGIN_TYPE_GOOGLE, DEFAULT_AVATAR
 from google_service import get_google_client_id, generate_random_password
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -12,19 +13,11 @@ import os
 import bcrypt
 import logging
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s [%(name)s] %(levelname)s: %(message)s',
-    # datefmt='%Y-%m-%d %H:%M:%S',
-)
 logger = logging.getLogger(__name__)
 
 users_db = UserRepository()
 positions_db = PositionRepository()
 candidates_db = CandidateRepository()
-
-def client_id():
-    return get_google_client_id()
 
 def login(username, password):
     user = users_db.get_by_username(username)
@@ -37,7 +30,7 @@ def signup(email, username, password):
         if is_valid_password(password):
             hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
             try:
-                users_db.insert(email, username, hashed_password, '0')
+                users_db.insert(email, username, hashed_password, LOGIN_TYPE_PASSWORD)
                 return {'success': True}
             except UniqueViolationError as e:
                 logger.error(f"{type(e)}\n{e}")
@@ -62,12 +55,12 @@ def signin_google(credential):
         password = generate_random_password()
         hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
         try:
-            users_db.insert(email, idinfo['sub'], hashed_password, '1')
+            users_db.insert(email, idinfo['sub'], hashed_password, LOGIN_TYPE_GOOGLE)
             user = users_db.get_by_email(email)
         except DatabaseError as error:
             logger.error(f"{type(error)}\n{error}")
             return {'success': False, 'error': {'error': True}}
-    elif user[5] == '0': # check if google user, if not ...
+    elif user[5] == LOGIN_TYPE_PASSWORD:
         return {'success': False, 'error': {'exist': True}}
     return {'success': True, 'user': user}
 
@@ -112,7 +105,7 @@ def update_avatar(id, avatar):
         except DatabaseError as error:
             logger.error(f"{type(error)}\n{error}")
             return {'success': False, 'error': {'error': True}}
-        if user[4] != 'user.png':
+        if user[4] != DEFAULT_AVATAR:
             if os.path.exists(f"static/images/{user[4]}"):
                 try:
                     os.remove(f"static/images/{user[4]}")

@@ -1,7 +1,9 @@
+from utils import memoize
 import json
 import secrets
 import string
 
+@memoize
 def get_google_client_id():
     client_secret = json.load(open('client_secret.json'))
     return client_secret['web']['client_id']

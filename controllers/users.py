@@ -1,4 +1,5 @@
 from flask import render_template, request, redirect, session
+from google_service import get_google_client_id
 import services.users as user_service
 
 def login():
@@ -14,9 +15,9 @@ def login():
             session['avatar'] = result['user'][4]
             return redirect('/home')
         else:
-            return render_template('login.html', client_id=user_service.client_id(), **result['error'])
+            return render_template('login.html', client_id=get_google_client_id(), **result['error'])
     else:
-        return render_template('login.html', client_id=user_service.client_id())
+        return render_template('login.html', client_id=get_google_client_id())
 
 def signup():
     if request.method == 'POST':
@@ -28,9 +29,9 @@ def signup():
         if result['success']:
             return redirect('/login')
         else:
-            return render_template('signup.html', client_id=user_service.client_id(), **result['error'])
+            return render_template('signup.html', client_id=get_google_client_id(), **result['error'])
     else:
-        return render_template('signup.html', client_id=user_service.client_id())
+        return render_template('signup.html', client_id=get_google_client_id())
 
 def googleCallback():
     # Get authorization code Google sent back to you
@@ -43,7 +44,7 @@ def googleCallback():
         session['avatar'] = result['user'][4]
         return redirect('/home')
     else:
-        return render_template('signup.html', client_id=user_service.client_id(), **result['error'])
+        return render_template('signup.html', client_id=get_google_client_id(), **result['error'])
 
 def logout():
     session.pop('username', None)

@@ -3,9 +3,16 @@ from controllers.users import login, signup, googleCallback, logout, change_pass
 from controllers.positions import positions, add_position, duplicate_position, positions_history, position, edit_position, archive_position, activate_position
 from controllers.candidates import add_candidate, candidate, add_cv, add_ml, view_cv, view_ml, delete_cv, delete_ml
 import secrets
+import logging
 
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s [%(name)s] %(levelname)s: %(message)s',
+    # datefmt='%Y-%m-%d %H:%M:%S',
+)
 
 EXCLUDED_ROUTES = ['/', '/login', '/signup', '/signin-google', '/logout']
 
