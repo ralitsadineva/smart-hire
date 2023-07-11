@@ -12,9 +12,10 @@ class CandidateRepository(AbstractRepository):
     def get_all_for_pos(self, pos_id, **kwargs):
         cursor = kwargs.get('cursor')
         cursor.execute("""
-            SELECT candidates.*, cvs.score
+            SELECT candidates.*, cvs.score, cvs.structure, cvs.contact_info, cvs.work_experience, cvs.education, cvs.skills, cvs.languages, mls.motivation_lvl
             FROM candidates
             LEFT JOIN cvs ON candidates.cand_id = cvs.cand_id
+            LEFT JOIN mls ON candidates.cand_id = mls.cand_id
             WHERE candidates.pos_id = %s;
             """, (pos_id, ))
         return cursor.fetchall()
