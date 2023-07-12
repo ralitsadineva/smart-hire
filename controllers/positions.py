@@ -32,7 +32,7 @@ def positions_history():
     return render_template('positions_history.html', positions=positions, avatar=session['avatar'])
 
 def position(position_id):
-    result = position_service.get(position_id)
+    result = position_service.get_with_cand(position_id, request.args.get('sort_column', 'candidates.first_name'))
     return render_template('position.html', **result, avatar=session['avatar'])
 
 def edit_position(position_id):
@@ -43,7 +43,7 @@ def edit_position(position_id):
         else:
             return render_template('edit_position.html', **result['error'], position=result['position'], avatar=session['avatar'])
     else:
-        position = position_service.get(position_id)['position']
+        position = position_service.get(position_id)
         return render_template('edit_position.html', position=position, avatar=session['avatar'])
 
 def archive_position(position_id):

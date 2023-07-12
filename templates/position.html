@@ -40,20 +40,20 @@
 {% if candidates == [] %}
     <p class="ms-4 mt-3 fw-semibold">No candidates have applied for this position yet.</p>
 {% else %}
-    <div class="ms-4 me-4">
+    <div class="ms-4 me-4 table-responsive-sm">
         <table class="table table-success table-striped">
             <thead>
                 <tr>
                     <th scope="col">#</th>
-                    <th scope="col">Names</th>
-                    <th scope="col" class="text-end">CV score</th>
-                    <th scope="col" class="text-end">Structure</th>
-                    <th scope="col" class="text-end">Contact info</th>
-                    <th scope="col" class="text-end">Work exp</th>
-                    <th scope="col" class="text-end">Education</th>
-                    <th scope="col" class="text-end">Skills</th>
-                    <th scope="col" class="text-end">Languages</th>
-                    <th scope="col" class="text-end">Motivation level</th>
+                    <th scope="col"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=candidates.first_name">Names</a></th>
+                    <th scope="col" class="text-end"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=cvs.score">CV score</a></th>
+                    <th scope="col" class="text-end"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=cvs.structure">Structure</a></th>
+                    <th scope="col" class="text-end"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=cvs.contact_info">Contact info</a></th>
+                    <th scope="col" class="text-end"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=cvs.work_experience">Work exp</a></th>
+                    <th scope="col" class="text-end"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=cvs.education">Education</a></th>
+                    <th scope="col" class="text-end"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=cvs.skills">Skills</a></th>
+                    <th scope="col" class="text-end"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=cvs.languages">Languages</a></th>
+                    <th scope="col" class="text-end"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=mls.motivation_lvl">Motivation level</a></th>
                 </tr>
             </thead>
             <tbody class="table-group-divider">
@@ -61,14 +61,14 @@
                     <tr>
                         <th scope="row">{{ loop.index }}</th>
                         <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position[0] }}/{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</a></td>
-                        <td class="text-end col-1">{% if candidate[13]==None %}-{% else %}{{ candidate[13] }}{% endif %}</td>
-                        <td class="text-end col-1">{% if candidate[14]==None %}-{% else %}{{ candidate[14] }}{% endif %}</td>
-                        <td class="text-end col-1">{% if candidate[15]==None %}-{% else %}{{ candidate[15] }}{% endif %}</td>
-                        <td class="text-end col-1">{% if candidate[16]==None %}-{% else %}{{ candidate[16] }}{% endif %}</td>
-                        <td class="text-end col-1">{% if candidate[17]==None %}-{% else %}{{ candidate[17] }}{% endif %}</td>
-                        <td class="text-end col-1">{% if candidate[18]==None %}-{% else %}{{ candidate[18] }}{% endif %}</td>
-                        <td class="text-end col-1">{% if candidate[19]==None %}-{% else %}{{ candidate[19] }}{% endif %}</td>
-                        <td class="text-end col-1">{% if candidate[20]==None %}-{% else %}{{ candidate[20] }}{% endif %}</td>
+                        <td class="text-end col-md-1">{% if candidate[13]==None %}-{% else %}{{ candidate[13] }}{% endif %}</td>
+                        <td class="text-end col-md-1">{% if candidate[14]==None %}-{% else %}{{ candidate[14] }}{% endif %}</td>
+                        <td class="text-end col-md-1">{% if candidate[15]==None %}-{% else %}{{ candidate[15] }}{% endif %}</td>
+                        <td class="text-end col-md-1">{% if candidate[16]==None %}-{% else %}{{ candidate[16] }}{% endif %}</td>
+                        <td class="text-end col-md-1">{% if candidate[17]==None %}-{% else %}{{ candidate[17] }}{% endif %}</td>
+                        <td class="text-end col-md-1">{% if candidate[18]==None %}-{% else %}{{ candidate[18] }}{% endif %}</td>
+                        <td class="text-end col-md-1">{% if candidate[19]==None %}-{% else %}{{ candidate[19] }}{% endif %}</td>
+                        <td class="text-end col-md-1">{% if candidate[20]==None %}-{% else %}{{ candidate[20] }}{% endif %}</td>
                     </tr>
                 {% endfor %}
             </tbody>
