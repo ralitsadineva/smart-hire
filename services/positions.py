@@ -25,10 +25,15 @@ def duplicate(id):
 def history():
     return positions_db.get_all_inactive()
 
-def get(id):
+def get_with_cand(id, sort_column):
+    if sort_column not in ['candidates.first_name', 'cvs.score', 'cvs.structure', 'cvs.contact_info', 'cvs.work_experience', 'cvs.education', 'cvs.skills', 'cvs.languages', 'mls.motivation_lvl']:
+        sort_column = 'candidates.first_name'
     position = positions_db.get(id)
-    candidates = candidates_db.get_all_for_pos(id)
+    candidates = candidates_db.get_all_for_pos(id, sort_column)
     return {'position': position, 'candidates': candidates}
+
+def get(id):
+    return positions_db.get(id)
 
 def edit(id, title, description):
     try:
