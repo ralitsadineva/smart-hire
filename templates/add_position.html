@@ -16,11 +16,11 @@
     <form class="ms-3 col-sm-3" method="POST">
         <div class="mb-3">
             <label for="inputTitle" class="form-label">Title</label>
-            <input type="text" class="form-control" id="inputTitle" name="title" {% if position %}value="{{ position[0] }}"{% endif %} required>
+            <input type="text" maxlength="100" class="form-control" id="inputTitle" name="title" {% if position %}value="{{ position[0] }}"{% endif %} required>
         </div>
         <div class="mb-3">
             <label for="inputDescription" class="form-label">Description</label>
-            <textarea class="form-control" id="inputDescription" name="description" rows="5" required>{% if position %}{{ position[1] }}{% endif %}</textarea>
+            <textarea maxlength="1000" class="form-control" id="inputDescription" name="description" rows="5" required>{% if position %}{{ position[1] }}{% endif %}</textarea>
         </div>
         <button type="submit" class="btn btn-success">Add</button>
     </form>
