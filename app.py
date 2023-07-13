@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, session
 from controllers.users import login, signup, googleCallback, logout, change_password, home, profile
 from controllers.positions import positions, add_position, duplicate_position, positions_history, position, edit_position, archive_position, activate_position
-from controllers.candidates import add_candidate, candidate, add_cv, add_ml, view_cv, view_ml, delete_cv, delete_ml
+from controllers.candidates import add_candidate, candidate, add_cv, add_ml, view_cv, view_ml, delete_cv, delete_ml, interview_invitation, rejection_email
 import secrets
 import logging
 
@@ -50,6 +50,8 @@ app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/view_cv'
 app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/view_ml', 'view_ml', view_ml)
 app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/del_cv', 'delete_cv', delete_cv)
 app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/del_ml', 'delete_ml', delete_ml)
+app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/invitation', 'interview_invitation', interview_invitation)
+app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/rejection', 'rejection_email', rejection_email)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

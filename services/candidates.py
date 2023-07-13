@@ -1,9 +1,10 @@
 from models.candidate_repo import CandidateRepository
 from models.cv_repo import CVRepository
 from models.ml_repo import MLRepository
+from models.position_repo import PositionRepository
 from exceptions import DatabaseError
 from read_pdf import read_pdf, page_count
-from openai_eval import extract_cv, evaluate_cv, evaluate_ml
+from openai_eval import extract_cv, evaluate_cv, evaluate_ml, response_positive, response_negative
 from utils import check_empty, convert_to_dict, convert_to_dict_extracted
 import logging
 import os
@@ -13,6 +14,7 @@ logger = logging.getLogger(__name__)
 candidates_db = CandidateRepository()
 cvs_db = CVRepository()
 mls_db = MLRepository()
+positions_db = PositionRepository()
 
 def add(id, first_name, last_name, email):
     try:
@@ -150,3 +152,17 @@ def delete_ml(pos_id, cand_id):
         except OSError as error:
             logger.error(f"{type(error)}\n{error}")
     mls_db.delete(cand_id)
+
+def interview_invitation(pos_id, cand_id):
+    candidate = candidates_db.get(cand_id)
+    position = positions_db.get(pos_id)
+    response = response_positive(candidate, position)
+    logger.info(response)
+    return {'candidate': candidate, 'response': response}
+
+def rejection_email(pos_id, cand_id):
+    candidate = candidates_db.get(cand_id)
+    position = positions_db.get(pos_id)
+    response = response_negative(candidate, position)
+    logger.info(response)
+    return {'candidate': candidate, 'response': response}
