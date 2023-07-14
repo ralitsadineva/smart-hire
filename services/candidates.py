@@ -4,7 +4,7 @@ from models.ml_repo import MLRepository
 from models.position_repo import PositionRepository
 from exceptions import DatabaseError
 from read_pdf import read_pdf, page_count
-from openai_eval import extract_cv, evaluate_cv, evaluate_ml, response_positive, response_negative
+from openai_eval import extract_cv, evaluate_cv, evaluate_ml, pros_cons, response_positive, response_negative
 from utils import check_empty, convert_to_dict, convert_to_dict_extracted
 from constants import RESPONSE_EMAIL_SUBJECT
 import logging
@@ -70,7 +70,8 @@ def add_cv(cand_id, cv):
         except Exception as error:
             logger.error(f"{type(error)}\n{error}")
             return {'success': False, 'error': {'error': True}}
-        if candidates_db.get(cand_id)[2] != cand_info['First name'] or candidates_db.get(cand_id)[3] != cand_info['Last name']:
+        candidate = candidates_db.get(cand_id)
+        if candidate[2] != cand_info['First name'] or candidate[3] != cand_info['Last name']:
             different_names = True
         else:
             different_names = False
@@ -87,12 +88,14 @@ def add_cv(cand_id, cv):
         except (DatabaseError, Exception) as error:
             logger.error(f"{type(error)}\n{error}")
             return {'success': False, 'error': {'error': True}}
-        filename = f"{candidates_db.get(cand_id)[3]}-cv.pdf"
-        if not os.path.exists(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}"):
-            os.makedirs(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}")
+        filename = f"{candidate[3]}-cv.pdf"
+        if not os.path.exists(f"uploads/{candidate[1]}/{cand_id}"):
+            os.makedirs(f"uploads/{candidate[1]}/{cand_id}")
         cv.seek(0)
-        cv.save(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}/{filename}")
-        candidate = candidates_db.get(cand_id)
+        cv.save(f"uploads/{candidate[1]}/{cand_id}/{filename}")
+        position = positions_db.get(candidate[1])
+        plus_minus = pros_cons(contents, position)
+        logger.info(plus_minus)
         return {'success': True, 'arguments': {'cand_info': cand_info, 'candidate': candidate, 'different_names': different_names}}
     else:
         return {'success': False, 'error': {'invalid': True}}
