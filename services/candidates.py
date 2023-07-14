@@ -6,6 +6,7 @@ from exceptions import DatabaseError
 from read_pdf import read_pdf, page_count
 from openai_eval import extract_cv, evaluate_cv, evaluate_ml, response_positive, response_negative
 from utils import check_empty, convert_to_dict, convert_to_dict_extracted
+from constants import RESPONSE_EMAIL_SUBJECT
 import logging
 import os
 
@@ -158,11 +159,11 @@ def interview_invitation(pos_id, cand_id):
     position = positions_db.get(pos_id)
     response = response_positive(candidate, position)
     logger.info(response)
-    return {'candidate': candidate, 'response': response}
+    return {'candidate': candidate, 'response': response, 'subject': RESPONSE_EMAIL_SUBJECT}
 
 def rejection_email(pos_id, cand_id):
     candidate = candidates_db.get(cand_id)
     position = positions_db.get(pos_id)
     response = response_negative(candidate, position)
     logger.info(response)
-    return {'candidate': candidate, 'response': response}
+    return {'candidate': candidate, 'response': response, 'subject': RESPONSE_EMAIL_SUBJECT}
