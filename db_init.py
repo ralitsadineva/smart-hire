@@ -83,4 +83,16 @@ class TableRepository(AbstractRepository):
             """)
         conn.commit()
 
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS pros_cons (
+                id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
+                cand_id UUID NOT NULL REFERENCES candidates (cand_id),
+                pros VARCHAR,
+                cons VARCHAR,
+                created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+            """)
+        conn.commit()
+
 TableRepository().create_tables()

@@ -49,7 +49,7 @@ def evaluate_ml(text):
     return response.choices[0].text.strip()
 
 def pros_cons(cv, pos):
-    core_prompt = f"""You work in HR. You have the CV of a candidate who has applied for a job at your company. Given the CV and the position's title and decription, write a list of up to three pros and cons of hiring the candidate (if any). The position they have applied for is {pos[2]}. The description of the position is {pos[3]}. The candidate's CV is {cv}"""
+    core_prompt = f"""You work in HR. You have the CV of a candidate who has applied for a job at your company. Given the CV and the position's title and decription, write a list of up to 3 pros and cons of hiring the candidate (if any). The position they have applied for is {pos[2]}. The description of the position is {pos[3]}. The candidate's CV is {cv}"""
 
     response = openai.Completion.create(
         engine="text-davinci-003",
@@ -71,8 +71,8 @@ def response_positive(cand, pos):
 
     return response.choices[0].text.strip()
 
-def response_negative(cand, pos):
-    core_prompt = f"""You work in HR. You are writing an email to a candidate who has applied for a job at your company. The candidate has been rejected. You want to inform the candidate about this and thank them for their time. The candidate's name is {cand[2]} {cand[3]} and the position they have applied for is {pos[2]}. The description of the position is {pos[3]}. Write the email without subject."""
+def response_negative(cand, pos, cons):
+    core_prompt = f"""You work in HR. You are writing an email to a candidate who has applied for a job at your company. The candidate has been rejected. You want to inform the candidate about this and thank them for their time. The candidate's name is {cand[2]} {cand[3]} and the position they have applied for is {pos[2]}. The description of the position is {pos[3]}. {f'You may subtly and softly inform them of the reasons for the rejection, without stating them directly. The reasons are the following: {cons} ' if cons is not None else ''}Write the email without subject."""
 
     response = openai.Completion.create(
         engine="text-davinci-003",

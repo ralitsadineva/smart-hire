@@ -85,3 +85,10 @@ def convert_to_dict_extracted(response):
         response_dict[key] = value
     
     return response_dict
+
+def convert_pros_cons(response):
+    split_response = [item for item in response.split('\n\n') if item.strip()]
+
+    pros = split_response[0].split('\n', 1)[1]
+    cons = split_response[1].split('\n', 1)[1]
+    return pros, cons
