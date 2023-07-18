@@ -1,0 +1,7 @@
+<script>
+    function updateCounter(inputId, counterId) {
+        const inputField = document.getElementById(inputId);
+        const counter = document.getElementById(counterId);
+        counter.textContent = inputField.value.length + ' / ' + inputField.maxLength;
+    }
+</script>

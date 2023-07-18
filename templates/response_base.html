@@ -9,13 +9,14 @@
     <div class="mt-5 d-flex justify-content-center">
         <div class="col-8">
             <div class="row">
-                <div class="col-6">
+                <div class="col-7">
                     <div class="input-group">
                         <span for="subject" class="input-group-text" id="label">Subject:</span>
-                        <input type="text" maxlength="100" class="form-control" id="subject" name="subject" value="{{ subject }}" aria-describedby="label" required>
+                        <input type="text" maxlength="100" class="form-control rounded-end" id="subject" name="subject" value="{{ subject }}" aria-describedby="label" oninput="updateCounter('subject', 'counterSubject')" required>
+                        <span class="badge text-bg-success ms-1 rounded-start align-self-end" id="counterSubject">{{ subject | length }} / 100</span>
                     </div>
                 </div>
-                <div class="col-4">
+                <div class="col-5">
                     <button type="button" class="btn btn-success" onclick="copyText('subject')">Copy subject</button>
                 </div>
             </div>
@@ -33,7 +34,7 @@
                     <button type="submit" class="btn btn-success">Send e-mail</button>
                 </div>
                 <div class="col-4 d-flex justify-content-end">
-                    <button type="button" class="btn btn-success" onclick="copyText('response')">Copy response</button>
+                    <button type="button" class="btn btn-success" onclick="copyText('response')">Copy body</button>
                 </div>
             </div>
         </div>
@@ -48,5 +49,6 @@
         window.open(link);
     }
 </script>
+{% include 'input_counter.html' %}
 {% include 'copy_text.html' %}
 {% endblock %}
