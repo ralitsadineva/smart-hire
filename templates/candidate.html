@@ -12,18 +12,18 @@
             <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="{{ candidate[4] }}">
         </div>
         <div class="col-sm-3">
-            <div class="mb-1 col-6">
+            <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/invitation" onclick="document.getElementById('spinner').style.display = 'block';">Generate an interview invitation</a>
+            <div class="mt-1 col-6">
                 {% include 'spinner.html' %}
             </div>
-            <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/invitation" onclick="document.getElementById('spinner').style.display = 'block';">Generate an interview invitation</a>
         </div>
         <div class="col-sm-4">
-            <div class="mb-1 col-4">
+            <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/rejection" onclick="document.getElementById('spinner2').style.display = 'block';">Generate a rejection e-mail</a>
+            <div class="mt-1 col-4">
                 {% with id='spinner2' %}
                     {% include 'spinner.html' %}
                 {% endwith %}
             </div>
-            <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/rejection" onclick="document.getElementById('spinner2').style.display = 'block';">Generate a rejection e-mail</a>
         </div>
     </div>
 </div>

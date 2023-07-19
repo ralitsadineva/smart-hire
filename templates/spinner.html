@@ -3,3 +3,8 @@
         <span class="visually-hidden">Loading...</span>
     </div>
 </div>
+<script>
+    window.addEventListener('unload', function(event) {
+        document.getElementById("{{ id|default('spinner') }}").style.display = 'none';
+    });
+</script>

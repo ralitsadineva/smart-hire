@@ -184,10 +184,18 @@ def interview_invitation(pos_id, cand_id):
 def rejection_email(pos_id, cand_id):
     candidate = candidates_db.get(cand_id)
     position = positions_db.get(pos_id)
+    cons = pros_cons_db.get(cand_id) is not None
+    response = response_negative(candidate, position, None)
+    logger.info(response)
+    return {'candidate': candidate, 'response': response, 'subject': RESPONSE_EMAIL_SUBJECT, 'cons': cons}
+
+def rejection_email_with_reasons(pos_id, cand_id):
+    candidate = candidates_db.get(cand_id)
+    position = positions_db.get(pos_id)
     if pros_cons_db.get(cand_id) is not None:
         cons = pros_cons_db.get(cand_id)[3]
     else:
         cons = None
     response = response_negative(candidate, position, cons)
     logger.info(response)
-    return {'candidate': candidate, 'response': response, 'subject': RESPONSE_EMAIL_SUBJECT}
+    return {'candidate': candidate, 'response': response, 'subject': RESPONSE_EMAIL_SUBJECT, 'cons': True, 'reasons': True}
