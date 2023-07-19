@@ -4,6 +4,6 @@
         element.select();
         navigator.clipboard.writeText(element.value);
         element.setSelectionRange(0, 0);
-        alert('Copied!');
+        toastr.success('Copied!');
     }
 </script>
