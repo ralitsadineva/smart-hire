@@ -16,13 +16,16 @@
     <form class="ms-3 col-sm-3" method="POST">
         <div class="mb-3">
             <label for="inputTitle" class="form-label">Title</label>
-            <input type="text" maxlength="100" class="form-control" id="inputTitle" name="title" value="{{ position[2] }}" required>
+            <input type="text" maxlength="100" class="form-control" id="inputTitle" name="title" oninput="updateCounter('inputTitle', 'counterTitle')" value="{{ position[2] }}" required>
+            <span class="badge text-bg-success float-end mt-1" id="counterTitle">{{ position[2] | length }} / 100</span>
         </div>
         <div class="mb-3">
             <label for="inputDescription" class="form-label">Description</label>
-            <textarea maxlength="1000" class="form-control" id="inputDescription" name="description" rows="5" required>{{ position[3] }}</textarea>
+            <textarea maxlength="1000" class="form-control" id="inputDescription" name="description" rows="5" oninput="updateCounter('inputDescription', 'counterDescription')" required>{{ position[3] }}</textarea>
+            <span class="badge text-bg-success float-end mt-1" id="counterDescription">{{ position[3] | length }} / 1000</span>
         </div>
         <button type="submit" class="btn btn-success">Submit</button>
     </form>
 </div>
+{% include 'input_counter.html' %}
 {% endblock %}

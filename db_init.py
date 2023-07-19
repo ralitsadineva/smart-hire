@@ -13,7 +13,9 @@ class TableRepository(AbstractRepository):
                 username VARCHAR(255) NOT NULL UNIQUE, 
                 password BYTEA NOT NULL,
                 avatar VARCHAR(255) DEFAULT 'user.png',
-                type CHAR NOT NULL DEFAULT '0' CHECK (type IN ('0', '1'))
+                type CHAR NOT NULL DEFAULT '0' CHECK (type IN ('0', '1')),
+                created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
             """)  # type 0 = default, 1 = Google
         conn.commit()
@@ -77,6 +79,18 @@ class TableRepository(AbstractRepository):
                 tone VARCHAR(255),
                 length INTEGER,
                 grammar VARCHAR(255),
+                created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+            """)
+        conn.commit()
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS pros_cons (
+                id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
+                cand_id UUID NOT NULL REFERENCES candidates (cand_id),
+                pros VARCHAR,
+                cons VARCHAR,
                 created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             );

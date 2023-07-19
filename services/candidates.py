@@ -1,10 +1,13 @@
 from models.candidate_repo import CandidateRepository
 from models.cv_repo import CVRepository
 from models.ml_repo import MLRepository
+from models.pros_cons_repo import ProsConsRepository
+from models.position_repo import PositionRepository
 from exceptions import DatabaseError
 from read_pdf import read_pdf, page_count
-from openai_eval import extract_cv, evaluate_cv, evaluate_ml
-from utils import check_empty, convert_to_dict, convert_to_dict_extracted
+from openai_eval import extract_cv, evaluate_cv, evaluate_ml, pros_cons, response_positive, response_negative
+from utils import check_empty, convert_to_dict, convert_to_dict_extracted, convert_pros_cons
+from constants import RESPONSE_EMAIL_SUBJECT
 import logging
 import os
 
@@ -13,6 +16,8 @@ logger = logging.getLogger(__name__)
 candidates_db = CandidateRepository()
 cvs_db = CVRepository()
 mls_db = MLRepository()
+pros_cons_db = ProsConsRepository()
+positions_db = PositionRepository()
 
 def add(id, first_name, last_name, email):
     try:
@@ -26,7 +31,12 @@ def get(id):
     candidate = candidates_db.get(id)
     cv = cvs_db.get(id)
     ml = mls_db.get(id)
-    return {'candidate': candidate, 'cv': cv, 'ml': ml}
+    plus_minus = pros_cons_db.get(id)
+    if plus_minus is not None:
+        pros, cons = plus_minus[2:4]
+    else:
+        pros, cons = None, None
+    return {'candidate': candidate, 'cv': cv, 'ml': ml, 'pros': pros, 'cons': cons}
 
 def get_all():
     return candidates_db.get_all()
@@ -51,6 +61,7 @@ def update(cand_id, email, phone, address, postal_code, city, country, birthdate
             except OSError as error:
                 logger.error(f"{type(error)}\n{error}")
         cvs_db.delete(cand_id)
+        pros_cons_db.delete(cand_id)
         return {'success': False, 'error': {'error': True}}
 
 def add_cv(cand_id, cv):
@@ -67,7 +78,8 @@ def add_cv(cand_id, cv):
         except Exception as error:
             logger.error(f"{type(error)}\n{error}")
             return {'success': False, 'error': {'error': True}}
-        if candidates_db.get(cand_id)[2] != cand_info['First name'] or candidates_db.get(cand_id)[3] != cand_info['Last name']:
+        candidate = candidates_db.get(cand_id)
+        if candidate[2] != cand_info['First name'] or candidate[3] != cand_info['Last name']:
             different_names = True
         else:
             different_names = False
@@ -84,12 +96,22 @@ def add_cv(cand_id, cv):
         except (DatabaseError, Exception) as error:
             logger.error(f"{type(error)}\n{error}")
             return {'success': False, 'error': {'error': True}}
-        filename = f"{candidates_db.get(cand_id)[3]}-cv.pdf"
-        if not os.path.exists(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}"):
-            os.makedirs(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}")
+        position = positions_db.get(candidate[1])
+        plus_minus = pros_cons(contents, position)
+        logger.info(plus_minus)
+        pros, cons = convert_pros_cons(plus_minus)
+        logger.info(f'Pros:\n{pros}\nCons:\n{cons}')
+        try:
+            pros_cons_db.insert(cand_id, pros, cons)
+        except (DatabaseError, Exception) as error:
+            logger.error(f"{type(error)}\n{error}")
+            cvs_db.delete(cand_id)
+            return {'success': False, 'error': {'error': True}}
+        filename = f"{candidate[3]}-cv.pdf"
+        if not os.path.exists(f"uploads/{candidate[1]}/{cand_id}"):
+            os.makedirs(f"uploads/{candidate[1]}/{cand_id}")
         cv.seek(0)
-        cv.save(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}/{filename}")
-        candidate = candidates_db.get(cand_id)
+        cv.save(f"uploads/{candidate[1]}/{cand_id}/{filename}")
         return {'success': True, 'arguments': {'cand_info': cand_info, 'candidate': candidate, 'different_names': different_names}}
     else:
         return {'success': False, 'error': {'invalid': True}}
@@ -142,6 +164,7 @@ def delete_cv(pos_id, cand_id):
         except OSError as error:
             logger.error(f"{type(error)}\n{error}")
     cvs_db.delete(cand_id)
+    pros_cons_db.delete(cand_id)
 
 def delete_ml(pos_id, cand_id):
     if os.path.exists(f"uploads/{pos_id}/{cand_id}/{candidates_db.get(cand_id)[3]}-letter.pdf"):
@@ -150,3 +173,29 @@ def delete_ml(pos_id, cand_id):
         except OSError as error:
             logger.error(f"{type(error)}\n{error}")
     mls_db.delete(cand_id)
+
+def interview_invitation(pos_id, cand_id):
+    candidate = candidates_db.get(cand_id)
+    position = positions_db.get(pos_id)
+    response = response_positive(candidate, position)
+    logger.info(response)
+    return {'candidate': candidate, 'response': response, 'subject': RESPONSE_EMAIL_SUBJECT}
+
+def rejection_email(pos_id, cand_id):
+    candidate = candidates_db.get(cand_id)
+    position = positions_db.get(pos_id)
+    cons = pros_cons_db.get(cand_id) is not None
+    response = response_negative(candidate, position, None)
+    logger.info(response)
+    return {'candidate': candidate, 'response': response, 'subject': RESPONSE_EMAIL_SUBJECT, 'cons': cons}
+
+def rejection_email_with_reasons(pos_id, cand_id):
+    candidate = candidates_db.get(cand_id)
+    position = positions_db.get(pos_id)
+    if pros_cons_db.get(cand_id) is not None:
+        cons = pros_cons_db.get(cand_id)[3]
+    else:
+        cons = None
+    response = response_negative(candidate, position, cons)
+    logger.info(response)
+    return {'candidate': candidate, 'response': response, 'subject': RESPONSE_EMAIL_SUBJECT, 'cons': True, 'reasons': True}
