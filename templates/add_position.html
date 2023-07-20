@@ -17,12 +17,12 @@
         <div class="mb-3">
             <label for="inputTitle" class="form-label">Title</label>
             <input type="text" maxlength="100" class="form-control" id="inputTitle" name="title" oninput="updateCounter('inputTitle', 'counterTitle')" {% if position %}value="{{ position[0] }}"{% endif %} required>
-            <span class="badge text-bg-success float-end mt-1" id="counterTitle">0 / 100</span>
+            <span class="badge text-bg-success float-end mt-1" id="counterTitle">{% if position %}{{ position[0] | length }}{% else %}0{% endif %} / 100</span>
         </div>
         <div class="mb-3">
             <label for="inputDescription" class="form-label">Description</label>
             <textarea maxlength="1000" class="form-control" id="inputDescription" name="description" rows="5" oninput="updateCounter('inputDescription', 'counterDescription')" required>{% if position %}{{ position[1] }}{% endif %}</textarea>
-            <span class="badge text-bg-success float-end mt-1" id="counterDescription">0 / 1000</span>
+            <span class="badge text-bg-success float-end mt-1" id="counterDescription">{% if position %}{{ position[1] | length }}{% else %}0{% endif %} / 1000</span>
         </div>
         <button type="submit" class="btn btn-success">Add</button>
     </form>
