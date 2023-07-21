@@ -30,7 +30,7 @@
         <div class="mb-3">
             <label for="inputTitle" class="form-label">For candidate:</label>
             <select class="form-select" aria-label="Candidate" name="candidate" {% if cand_info %}disabled{% endif %}>
-                {% if cand_info %}
+                {% if cand_info or candidate %}
                     <option value="{{ candidate[0] }}" selected>{{ candidate[2] }} {{ candidate[3] }}</option>
                 {% else %}
                     <option selected>Choose candidate</option>

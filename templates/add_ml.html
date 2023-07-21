@@ -27,11 +27,15 @@
         <div class="mb-3">
             <label for="inputTitle" class="form-label">For candidate:</label>
             <select class="form-select" aria-label="Candidate" name="candidate">
-                <option selected>Choose candidate</option>
-                {% for candidate in candidates %}
-                    <option value="{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</option>
-                {% endfor %}
-                </select>
+                {% if candidate %}
+                    <option value="{{ candidate[0] }}" selected>{{ candidate[2] }} {{ candidate[3] }}</option>
+                {% else %}
+                    <option selected>Choose candidate</option>
+                    {% for candidate in candidates %}
+                        <option value="{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</option>
+                    {% endfor %}
+                {% endif %}
+            </select>
         </div>
         <div class="mb-3">
             <input class="form-control" type="file" id="formFile" name= "ml" required>

@@ -29,8 +29,16 @@ def add_cv():
         candidates = candidate_service.get_all()
         return render_template('add_cv.html', **result['error'], candidates=candidates, avatar=session['avatar'])
     else:
-        candidates = candidate_service.get_all()
-        return render_template('add_cv.html', candidates=candidates, avatar=session['avatar'])
+        cand = request.args.get('cand')
+        if cand is None:
+            candidates = candidate_service.get_all()
+            return render_template('add_cv.html', candidates=candidates, avatar=session['avatar'])
+        else:
+            try:
+                candidate = candidate_service.get(cand)['candidate']
+            except:
+                return redirect('/add_cv')
+            return render_template('add_cv.html', candidate=candidate, avatar=session['avatar'])
 
 def add_ml():
     if request.method == 'POST':
@@ -42,8 +50,16 @@ def add_ml():
             candidates = candidate_service.get_all()
             return render_template('add_ml.html', **result['error'], candidates=candidates, avatar=session['avatar'])
     else:
-        candidates = candidate_service.get_all()
-        return render_template('add_ml.html', candidates=candidates, avatar=session['avatar'])
+        cand = request.args.get('cand')
+        if cand is None:
+            candidates = candidate_service.get_all()
+            return render_template('add_ml.html', candidates=candidates, avatar=session['avatar'])
+        else:
+            try:
+                candidate = candidate_service.get(cand)['candidate']
+            except:
+                return redirect('/add_ml')
+            return render_template('add_ml.html', candidate=candidate, avatar=session['avatar'])
 
 def view_cv(position_id, candidate_id):
     result = candidate_service.view_cv(position_id, candidate_id)
