@@ -60,8 +60,8 @@ def pros_cons(cv, pos):
 
     return response.choices[0].text.strip()
 
-def response_positive(cand, pos):
-    core_prompt = f"""You work in HR. You are writing an email to a candidate who has applied for a job at your company. The candidate has been selected for the next round of interviews. You want to inform the candidate about this and ask them to choose a time slot for the interview. The candidate's name is {cand[2]} {cand[3]} and the position they have applied for is {pos[2]}. The description of the position is {pos[3]}. Write the email without subject."""
+def response_positive(cand, pos, signature, company):
+    core_prompt = f"""You work in HR. You are writing an email to a candidate who has applied for a job at your company{f', {company}' if company else ''}. The candidate has been selected for the next round of interviews. You want to inform the candidate about this and ask them to choose a time slot for the interview. The candidate's name is {cand[2]} {cand[3]} and the position they have applied for is {pos[2]}. The description of the position is {pos[3]}. Write the email without subject.{f' Finish with my name/signature: {signature}' if signature else ''}"""
 
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -73,8 +73,8 @@ def response_positive(cand, pos):
 
     return response.choices[0].message.content.strip()
 
-def response_negative(cand, pos, cons):
-    core_prompt = f"""You work in HR. You are writing an email to a candidate who has applied for a job at your company. The candidate has been rejected. You want to inform the candidate about this and thank them for their time. The candidate's name is {cand[2]} {cand[3]} and the position they have applied for is {pos[2]}. The description of the position is {pos[3]}. {f'Subtly and softly inform them of the reasons for the rejection, which are the following: {cons} ' if cons is not None else ''}Write the email without subject."""
+def response_negative(cand, pos, cons, signature, company):
+    core_prompt = f"""You work in HR. You are writing an email to a candidate who has applied for a job at your company{f', {company}' if company else ''}. The candidate has been rejected. You want to inform the candidate about this and thank them for their time. The candidate's name is {cand[2]} {cand[3]} and the position they have applied for is {pos[2]}. The description of the position is {pos[3]}. {f'Subtly and softly inform them of the reasons for the rejection, which are the following: {cons} ' if cons is not None else ''}Write the email without subject.{f' Finish with my name/signature: {signature}' if signature else ''}"""
 
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",

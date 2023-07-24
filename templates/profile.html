@@ -27,7 +27,7 @@
             <input class="form-control" type="file" id="formFile" name= "avatar" required>
         </div>
         <div class="col-sm-2">
-            <button type="submit" class="btn btn-success">Upload</button>
+            <button type="submit" class="btn btn-success" name="form_avatar">Upload</button>
         </div>
     </form>
 </div>
@@ -51,24 +51,24 @@
     <a role="button" class="btn btn-success" href="{{ base_url }}change_password">Change password</a>
 </div>
 <div class="mx-4 mt-4 border-top border-success-subtle">
-    <form class="mt-4 mb-3 row">
+    <form class="mt-4 mb-3 row" method="POST">
         <label for="siganture" class="col-sm-2 col-form-label fw-semibold">E-mail signature</label>
         <div class="col-sm-2">
             <textarea maxlength="200" class="form-control" id="signature" name="signature" rows="4" oninput="updateCounter('signature', 'counterSignature')">{% if signature %}{{ signature }}{% endif %}</textarea>
             <span class="badge text-bg-success float-end mt-1" id="counterSignature">{% if siganture %}{{ signature | length }}{% else %}0{% endif %} / 200</span>
         </div>
         <div class="col-sm-1">
-            <button type="submit" class="btn btn-success">Update</button>
+            <button type="submit" class="btn btn-success" name="form_signature">Update</button>
         </div>
     </form>
-    <form class="mb-3 row">
+    <form class="mb-3 row" method="POST">
         <label for="company" class="col-sm-2 col-form-label fw-semibold">Company</label>
         <div class="col-sm-2">
             <input type="text" maxlength="50" class="form-control" id="company" name="company" oninput="updateCounter('company', 'counterCompany')" {% if company %}value="{{ company }}"{% endif %}>
             <span class="badge text-bg-success float-end mt-1" id="counterCompany">{% if company %}{{ company | length }}{% else %}0{% endif %} / 50</span>
         </div>
         <div class="col-sm-1">
-            <button type="submit" class="btn btn-success">Update</button>
+            <button type="submit" class="btn btn-success" name="form_company">Update</button>
         </div>
     </form>
 </div>

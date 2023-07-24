@@ -71,7 +71,7 @@ def change_password(id, old_password, new_password):
     if is_valid_password(new_password):
         hashed_password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
         try:
-            users_db.update_password(hashed_password, user[2])
+            users_db.update_password(hashed_password, id)
             return {'success': True}
         except DatabaseError as error:
             logger.error(f"{type(error)}\n{error}")
@@ -101,7 +101,7 @@ def update_avatar(id, avatar):
         avatar.save(f"static/images/{filename}")
         user = users_db.get(id)
         try:
-            users_db.update_avatar(filename, user[2])
+            users_db.update_avatar(filename, id)
         except DatabaseError as error:
             logger.error(f"{type(error)}\n{error}")
             return {'success': False, 'error': {'error': True}}
@@ -114,3 +114,23 @@ def update_avatar(id, avatar):
         return {'success': True, 'avatar': filename}
     else:
         return {'success': False, 'error': {'invalid': True}}
+
+def update_signature(id, signature):
+    try:
+        users_db.update_signature(signature, id)
+        return {'success': True}
+    except DatabaseError as error:
+        logger.error(f"{type(error)}\n{error}")
+        return {'success': False, 'error': {'error': True}}
+
+def update_company(id, company):
+    try:
+        users_db.update_company(company, id)
+        return {'success': True}
+    except DatabaseError as error:
+        logger.error(f"{type(error)}\n{error}")
+        return {'success': False, 'error': {'error': True}}
+
+def get_signature_company(id):
+    signature, company = users_db.get(id)[8:10]
+    return signature, company

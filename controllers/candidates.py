@@ -84,13 +84,13 @@ def delete_ml(position_id, candidate_id):
     return redirect(f'/positions/{position_id}/{candidate_id}')
 
 def interview_invitation(position_id, candidate_id):
-    result = candidate_service.interview_invitation(position_id, candidate_id)
+    result = candidate_service.interview_invitation(position_id, candidate_id, session['user_id'])
     return render_template('response_positive.html', **result, avatar=session['avatar'])
 
 def rejection_email(position_id, candidate_id):
-    result = candidate_service.rejection_email(position_id, candidate_id)
+    result = candidate_service.rejection_email(position_id, candidate_id, session['user_id'])
     return render_template('response_negative.html', **result, avatar=session['avatar'])
 
 def rejection_email_with_reasons(position_id, candidate_id):
-    result = candidate_service.rejection_email_with_reasons(position_id, candidate_id)
+    result = candidate_service.rejection_email_with_reasons(position_id, candidate_id, session['user_id'])
     return render_template('response_negative.html', **result, avatar=session['avatar'])

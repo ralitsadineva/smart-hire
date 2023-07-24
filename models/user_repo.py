@@ -21,30 +21,60 @@ class UserRepository(AbstractRepository):
         return cursor.fetchone()
 
     @AbstractRepository.connection_wrapper
-    def update_password(self, password, username, **kwargs):
+    def update_password(self, password, id, **kwargs):
         cursor = kwargs.get('cursor')
         conn = kwargs.get('conn')
         try:
             cursor.execute("""
                 UPDATE users
                 SET password = %s
-                WHERE username = %s;
-                """, (password, username))
+                WHERE id = %s;
+                """, (password, id))
             conn.commit()
         except (Exception, psycopg2.DatabaseError) as error:
             conn.rollback()
             raise DatabaseError(error)
 
     @AbstractRepository.connection_wrapper
-    def update_avatar(self, avatar, username, **kwargs):
+    def update_avatar(self, avatar, id, **kwargs):
         cursor = kwargs.get('cursor')
         conn = kwargs.get('conn')
         try:
             cursor.execute("""
                 UPDATE users
                 SET avatar = %s
-                WHERE username = %s;
-                """, (avatar, username))
+                WHERE id = %s;
+                """, (avatar, id))
+            conn.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            conn.rollback()
+            raise DatabaseError(error)
+    
+    @AbstractRepository.connection_wrapper
+    def update_signature(self, signature, id, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
+        try:
+            cursor.execute("""
+                UPDATE users
+                SET signature = %s
+                WHERE id = %s;
+                """, (signature, id))
+            conn.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            conn.rollback()
+            raise DatabaseError(error)
+    
+    @AbstractRepository.connection_wrapper
+    def update_company(self, company, id, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
+        try:
+            cursor.execute("""
+                UPDATE users
+                SET company = %s
+                WHERE id = %s;
+                """, (company, id))
             conn.commit()
         except (Exception, psycopg2.DatabaseError) as error:
             conn.rollback()
