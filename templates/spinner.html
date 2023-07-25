@@ -1,8 +1,6 @@
-
 <div id="{{ id|default('spinner') }}" class="spinner-grow text-success" role="status" style="display: none;">
     <span class="visually-hidden">Loading...</span>
 </div>
-
 <script>
     const spinner = document.getElementById("{{ id|default('spinner') }}");
     spinner.show = function() {
