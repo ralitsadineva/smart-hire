@@ -21,6 +21,13 @@ class TableRepository(AbstractRepository):
         conn.commit()
 
         cursor.execute("""
+            ALTER TABLE users
+            ADD COLUMN IF NOT EXISTS signature VARCHAR(255),
+            ADD COLUMN IF NOT EXISTS company VARCHAR(255)
+            """)
+        conn.commit()
+
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS positions (
                 pos_id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(), 
                 user_id UUID NOT NULL REFERENCES users (id), 

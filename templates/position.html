@@ -41,7 +41,7 @@
     <p class="ms-4 mt-3 fw-semibold">No candidates have applied for this position yet.</p>
 {% else %}
     <div class="ms-4 me-4 table-responsive-sm">
-        <table class="table table-success table-striped">
+        <table class="table table-success table-striped w-auto">
             <thead>
                 <tr>
                     <th scope="col">#</th>
@@ -54,6 +54,7 @@
                     <th scope="col" class="text-end"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=cvs.skills">Skills</a></th>
                     <th scope="col" class="text-end"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=cvs.languages">Languages</a></th>
                     <th scope="col" class="text-end"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=mls.motivation_lvl">Motivation level</a></th>
+                    <th scope="col" class="text-center" style="width: 125px;">Actions</th>
                 </tr>
             </thead>
             <tbody class="table-group-divider">
@@ -69,6 +70,12 @@
                         <td class="text-end col-md-1">{% if candidate[18]==None %}-{% else %}{{ candidate[18] }}{% endif %}</td>
                         <td class="text-end col-md-1">{% if candidate[19]==None %}-{% else %}{{ candidate[19] }}{% endif %}</td>
                         <td class="text-end col-md-1">{% if candidate[20]==None %}-{% else %}{{ candidate[20] }}{% endif %}</td>
+                        <td class="text-end">
+                            <a class="ms-2" href="{{ base_url }}add_cv?cand={{ candidate[0] }}" title="Add CV"><i class="fa-solid fa-file" style="color: #027e1b;"></i></a>
+                            <a class="ms-2" href="{{ base_url }}add_ml?cand={{ candidate[0] }}" title="Add motivational letter"><i class="fa-solid fa-file-lines" style="color: #027e1b;"></i></a>
+                            <a class="ms-2" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/invitation" onclick="spinner.show()" title="Send interview invitation"><i class="fa-solid fa-square-plus" style="color: #027e1b;"></i></a>
+                            <a class="ms-2" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/rejection" onclick="spinner.show()" title="Send rejection e-mail"><i class="fa-solid fa-square-minus" style="color: #027e1b;"></i></a>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>

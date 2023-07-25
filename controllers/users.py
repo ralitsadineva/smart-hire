@@ -69,13 +69,40 @@ def home():
 
 def profile():
     if request.method == 'POST':
-        avatar = request.files['avatar']
-        result = user_service.update_avatar(session['user_id'], avatar)
-        if result['success']:
-            session['avatar'] = result['avatar']
-            return redirect('/profile')
+        if 'form_avatar' in request.form:
+            avatar = request.files['avatar']
+            result = user_service.update_avatar(session['user_id'], avatar)
+            if result['success']:
+                session['avatar'] = result['avatar']
+                return redirect('/profile')
+        elif 'form_signature' in request.form:
+            signature = request.form['signature']
+            result = user_service.update_signature(session['user_id'], signature)
+            if result['success']:
+                return redirect('/profile')
+        elif 'form_company' in request.form:
+            company = request.form['company']
+            result = user_service.update_company(session['user_id'], company)
+            if result['success']:
+                return redirect('/profile')
         else:
-            return render_template('profile.html', **result['error'], username=session['username'], email=session['email'], avatar=session['avatar'])
-        
+            return redirect('/profile')
+        signature, company = user_service.get_signature_company(session['user_id'])
+        parameters = {
+            'username': session['username'],
+            'email': session['email'],
+            'avatar': session['avatar'],
+            'signature': signature,
+            'company': company
+            }
+        return render_template('profile.html', **result['error'], **parameters)
     else:
-        return render_template('profile.html', username=session['username'], email=session['email'], avatar=session['avatar'])
+        signature, company = user_service.get_signature_company(session['user_id'])
+        parameters = {
+            'username': session['username'],
+            'email': session['email'],
+            'avatar': session['avatar'],
+            'signature': signature,
+            'company': company
+            }
+        return render_template('profile.html', **parameters)

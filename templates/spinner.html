@@ -1,10 +1,15 @@
-<div class="d-flex justify-content-center">
-    <div id="{{ id|default('spinner') }}" class="spinner-grow text-success" role="status" style="display: none;">
-        <span class="visually-hidden">Loading...</span>
-    </div>
+<div id="{{ id|default('spinner') }}" class="spinner-grow text-success" role="status" style="display: none;">
+    <span class="visually-hidden">Loading...</span>
 </div>
 <script>
+    const spinner = document.getElementById("{{ id|default('spinner') }}");
+    spinner.show = function() {
+        this.style.display = 'block';
+    };
+    spinner.hide = function() {
+        this.style.display = 'none';
+    };
     window.addEventListener('unload', function(event) {
-        document.getElementById("{{ id|default('spinner') }}").style.display = 'none';
+        spinner.hide();
     });
 </script>

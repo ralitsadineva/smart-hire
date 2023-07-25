@@ -2,6 +2,15 @@ table.table td.text-end {
     padding-right: 1rem;
 }
 
+/** Spinner **/
+.spinner-grow {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    margin-left: -15px;
+}
+
+
 /** Custom scroll styles **/
 
 /* Mozilla */

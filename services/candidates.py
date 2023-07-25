@@ -3,11 +3,12 @@ from models.cv_repo import CVRepository
 from models.ml_repo import MLRepository
 from models.pros_cons_repo import ProsConsRepository
 from models.position_repo import PositionRepository
+from models.user_repo import UserRepository
 from exceptions import DatabaseError
 from read_pdf import read_pdf, page_count
 from openai_eval import extract_cv, evaluate_cv, evaluate_ml, pros_cons, response_positive, response_negative
 from utils import check_empty, convert_to_dict, convert_to_dict_extracted, convert_pros_cons
-from constants import RESPONSE_EMAIL_SUBJECT
+from constants import RESPONSE_EMAIL_SUBJECT, RESPONSE_EMAIL_SUBJECT_WITH_COMPANY
 import logging
 import os
 
@@ -18,6 +19,7 @@ cvs_db = CVRepository()
 mls_db = MLRepository()
 pros_cons_db = ProsConsRepository()
 positions_db = PositionRepository()
+users_db = UserRepository()
 
 def add(id, first_name, last_name, email):
     try:
@@ -174,28 +176,43 @@ def delete_ml(pos_id, cand_id):
             logger.error(f"{type(error)}\n{error}")
     mls_db.delete(cand_id)
 
-def interview_invitation(pos_id, cand_id):
+def interview_invitation(pos_id, cand_id, user_id):
     candidate = candidates_db.get(cand_id)
     position = positions_db.get(pos_id)
-    response = response_positive(candidate, position)
+    signature, company = users_db.get(user_id)[8:10]
+    response = response_positive(candidate, position, signature, company)
     logger.info(response)
-    return {'candidate': candidate, 'response': response, 'subject': RESPONSE_EMAIL_SUBJECT}
+    if company:
+        subject = RESPONSE_EMAIL_SUBJECT_WITH_COMPANY.format(company)
+    else:
+        subject = RESPONSE_EMAIL_SUBJECT
+    return {'candidate': candidate, 'response': response, 'subject': subject}
 
-def rejection_email(pos_id, cand_id):
+def rejection_email(pos_id, cand_id, user_id):
     candidate = candidates_db.get(cand_id)
     position = positions_db.get(pos_id)
     cons = pros_cons_db.get(cand_id) is not None
-    response = response_negative(candidate, position, None)
+    signature, company = users_db.get(user_id)[8:10]
+    response = response_negative(candidate, position, None, signature, company)
     logger.info(response)
-    return {'candidate': candidate, 'response': response, 'subject': RESPONSE_EMAIL_SUBJECT, 'cons': cons}
+    if company:
+        subject = RESPONSE_EMAIL_SUBJECT_WITH_COMPANY.format(company)
+    else:
+        subject = RESPONSE_EMAIL_SUBJECT
+    return {'candidate': candidate, 'response': response, 'subject': subject, 'cons': cons}
 
-def rejection_email_with_reasons(pos_id, cand_id):
+def rejection_email_with_reasons(pos_id, cand_id, user_id):
     candidate = candidates_db.get(cand_id)
     position = positions_db.get(pos_id)
     if pros_cons_db.get(cand_id) is not None:
         cons = pros_cons_db.get(cand_id)[3]
     else:
         cons = None
-    response = response_negative(candidate, position, cons)
+    signature, company = users_db.get(user_id)[8:10]
+    response = response_negative(candidate, position, cons, signature, company)
     logger.info(response)
-    return {'candidate': candidate, 'response': response, 'subject': RESPONSE_EMAIL_SUBJECT, 'cons': True, 'reasons': True}
+    if company:
+        subject = RESPONSE_EMAIL_SUBJECT_WITH_COMPANY.format(company)
+    else:
+        subject = RESPONSE_EMAIL_SUBJECT
+    return {'candidate': candidate, 'response': response, 'subject': subject, 'cons': True, 'reasons': True}
