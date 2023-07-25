@@ -52,85 +52,85 @@
 <!-- information about documents -->
 <div class="mx-3 row">
     {% if cv %}
-        <div class="col-6 border-start border-end border-success-subtle">
+        <div class="col-md-3 border-start border-end border-success-subtle">
             <div class="row">
-                <div class="col-sm-1">
+                <div class="col-sm-2">
                     <p class="fs-5 fw-semibold">CV</p>
                 </div>
-                <div class="col-sm-9">
+                <div class="col-sm-6">
                     <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/view_cv">View</a>
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-4">
                     <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/del_cv">Delete</a>
                 </div>
             </div>
             <div>
                 <div class="mb-3 row">
-                    <label for="staticScore" class="col-sm-4 col-form-label fw-semibold">Overall score</label>
-                    <div class="col-sm-8">
+                    <label for="staticScore" class="col-sm-8 col-form-label fw-semibold">Overall score</label>
+                    <div class="col-sm-3">
                         <input type="text" readonly class="form-control-plaintext" id="staticScore" value="{{ cv[2] }}/50">
                     </div>
                 </div>
             </div>
             <div>
                 <div class="mb-3 row">
-                    <label for="staticStructure" class="col-sm-4 col-form-label fw-semibold">Structure and organization</label>
-                    <div class="col-sm-8">
+                    <label for="staticStructure" class="col-sm-8 col-form-label fw-semibold">Structure and organization</label>
+                    <div class="col-sm-3">
                         <input type="text" readonly class="form-control-plaintext" id="staticStructure" value="{{ cv[3] }}/5">
                     </div>
                 </div>
             </div>
             <div>
                 <div class="mb-3 row">
-                    <label for="staticContactInfo" class="col-sm-4 col-form-label fw-semibold">Contact information</label>
-                    <div class="col-sm-8">
+                    <label for="staticContactInfo" class="col-sm-8 col-form-label fw-semibold">Contact information</label>
+                    <div class="col-sm-3">
                         <input type="text" readonly class="form-control-plaintext" id="staticContactInfo" value="{{ cv[4] }}/5">
                     </div>
                 </div>
             </div>
             <div>
                 <div class="mb-3 row">
-                    <label for="staticWork" class="col-sm-4 col-form-label fw-semibold">Work experience</label>
-                    <div class="col-sm-8">
+                    <label for="staticWork" class="col-sm-8 col-form-label fw-semibold">Work experience</label>
+                    <div class="col-sm-3">
                         <input type="text" readonly class="form-control-plaintext" id="staticWork" value="{{ cv[5] }}/10">
                     </div>
                 </div>
             </div>
             <div>
                 <div class="mb-3 row">
-                    <label for="staticEducation" class="col-sm-4 col-form-label fw-semibold">Education</label>
-                    <div class="col-sm-8">
+                    <label for="staticEducation" class="col-sm-8 col-form-label fw-semibold">Education</label>
+                    <div class="col-sm-3">
                         <input type="text" readonly class="form-control-plaintext" id="staticEducation" value="{{ cv[6] }}/10">
                     </div>
                 </div>
             </div>
             <div>
                 <div class="mb-3 row">
-                    <label for="staticSkills" class="col-sm-4 col-form-label fw-semibold">Skills</label>
-                    <div class="col-sm-8">
+                    <label for="staticSkills" class="col-sm-8 col-form-label fw-semibold">Skills</label>
+                    <div class="col-sm-3">
                         <input type="text" readonly class="form-control-plaintext" id="staticSkills" value="{{ cv[7] }}/10">
                     </div>
                 </div>
             </div>
             <div>
                 <div class="mb-3 row">
-                    <label for="staticLanguages" class="col-sm-4 col-form-label fw-semibold">Languages</label>
-                    <div class="col-sm-8">
+                    <label for="staticLanguages" class="col-sm-8 col-form-label fw-semibold">Languages</label>
+                    <div class="col-sm-3">
                         <input type="text" readonly class="form-control-plaintext" id="staticLanguages" value="{{ cv[8] }}/10">
                     </div>
                 </div>
             </div>
             <div>
                 <div class="mb-3 row">
-                    <label for="staticLength" class="col-sm-4 col-form-label fw-semibold">Length</label>
-                    <div class="col-sm-8">
+                    <label for="staticLength" class="col-sm-8 col-form-label fw-semibold">Length</label>
+                    <div class="col-sm-3">
                         <input type="text" readonly class="form-control-plaintext" id="staticLength" value="{{ cv[9] }} pages">
                     </div>
                 </div>
             </div>
         </div>
     {% endif %}
-    <div class="col-6 border-start border-end border-success-subtle">
+    <div class="col-md-5 border-start border-end border-success-subtle">
         {% if ml %}
             <div class="border-bottom border-success-subtle">
                 <div class="row">
@@ -187,7 +187,7 @@
             </div>
         {% endif %}
         {% if cv %}
-            <p class="mt-3 fs-5 fw-semibold">Advantages and Disadvantages</p>
+            <p class="mt-md-3 fs-5 fw-semibold">Advantages and Disadvantages</p>
             <div class="row">
                 <label for="staticPros" class="col-sm-1 col-form-label fw-semibold">Pros:</label>
                 <div class="col-sm-11">
@@ -200,6 +200,31 @@
                     <textarea readonly class="form-control-plaintext" id="staticCons" rows="3" style="resize:none">{{ cons }}</textarea>
                 </div>
             </div>
+        {% endif %}
+    </div>
+    <div class="col-md-4 border-start border-end border-success-subtle">
+        {% if interview %}
+            <p class="fs-5 fw-semibold">Interview feedback</p>
+            <div class="mb-3 row">
+                <label for="staticScore" class="col-sm-4 col-form-label fw-semibold">Score</label>
+                <div class="col-sm-8">
+                    <input type="text" readonly class="form-control-plaintext" id="staticScore" value="{{ interview[3] }}/10">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="staticNotes" class="col-sm-4 form-label fw-semibold">Notes</label>
+                <div class="col-sm-8">
+                    <textarea readonly class="form-control-plaintext" id="staticNotes" rows="5" style="resize:none">{{ interview[4] }}</textarea>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="staticDate" class="col-sm-4 form-label fw-semibold">Date of the interview</label>
+                <div class="col-sm-8">
+                    <input type="text" readonly class="form-control-plaintext" id="staticDate" value="{{ interview[5] }}">
+                </div>
+            </div>
+        {% else %}
+            <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/interview">Add interview feedback</a>
         {% endif %}
     </div>
 </div>

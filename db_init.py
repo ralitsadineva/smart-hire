@@ -104,4 +104,18 @@ class TableRepository(AbstractRepository):
             """)
         conn.commit()
 
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS interviews (
+                id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
+                cand_id UUID NOT NULL REFERENCES candidates (cand_id),
+                pos_id UUID NOT NULL REFERENCES positions (pos_id),
+                score INTEGER CHECK (score >= 1 AND score <= 10),
+                notes VARCHAR,
+                date DATE NOT NULL,
+                created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+            """)
+        conn.commit()
+
 TableRepository().create_tables()

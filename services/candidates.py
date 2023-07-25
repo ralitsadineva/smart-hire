@@ -2,6 +2,7 @@ from models.candidate_repo import CandidateRepository
 from models.cv_repo import CVRepository
 from models.ml_repo import MLRepository
 from models.pros_cons_repo import ProsConsRepository
+from models.interview_repo import InterviewRepository
 from models.position_repo import PositionRepository
 from models.user_repo import UserRepository
 from exceptions import DatabaseError
@@ -18,6 +19,7 @@ candidates_db = CandidateRepository()
 cvs_db = CVRepository()
 mls_db = MLRepository()
 pros_cons_db = ProsConsRepository()
+interviews_db = InterviewRepository()
 positions_db = PositionRepository()
 users_db = UserRepository()
 
@@ -38,7 +40,8 @@ def get(id):
         pros, cons = plus_minus[2:4]
     else:
         pros, cons = None, None
-    return {'candidate': candidate, 'cv': cv, 'ml': ml, 'pros': pros, 'cons': cons}
+    interview = interviews_db.get(id)
+    return {'candidate': candidate, 'cv': cv, 'ml': ml, 'pros': pros, 'cons': cons, 'interview': interview}
 
 def get_all():
     return candidates_db.get_all()
@@ -216,3 +219,14 @@ def rejection_email_with_reasons(pos_id, cand_id, user_id):
     else:
         subject = RESPONSE_EMAIL_SUBJECT
     return {'candidate': candidate, 'response': response, 'subject': subject, 'cons': True, 'reasons': True}
+
+def interview(cand_id, pos_id, score, notes, date):
+    try:
+        interviews_db.insert(cand_id, pos_id, date)
+        id = interviews_db.get(cand_id)[0]
+        interviews_db.update_score(int(score), id)
+        interviews_db.update_notes(notes, id)
+        return {'success': True}
+    except DatabaseError as error:
+        logger.error(f"{type(error)}\n{error}")
+        return {'success': False, 'error': {'error': True}}

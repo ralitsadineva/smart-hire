@@ -30,7 +30,7 @@
                 {% if candidate %}
                     <option value="{{ candidate[0] }}" selected>{{ candidate[2] }} {{ candidate[3] }}</option>
                 {% else %}
-                    <option selected>Choose candidate</option>
+                    <option selected disabled>Choose candidate</option>
                     {% for candidate in candidates %}
                         <option value="{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</option>
                     {% endfor %}

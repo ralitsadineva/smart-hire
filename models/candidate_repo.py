@@ -12,10 +12,11 @@ class CandidateRepository(AbstractRepository):
     def get_all_for_pos(self, pos_id, sort_column, **kwargs):
         cursor = kwargs.get('cursor')
         cursor.execute(f"""
-            SELECT candidates.*, cvs.score, cvs.structure, cvs.contact_info, cvs.work_experience, cvs.education, cvs.skills, cvs.languages, mls.motivation_lvl
+            SELECT candidates.*, cvs.score, cvs.structure, cvs.contact_info, cvs.work_experience, cvs.education, cvs.skills, cvs.languages, mls.motivation_lvl, interviews.score, interviews.date
             FROM candidates
             LEFT JOIN cvs ON candidates.cand_id = cvs.cand_id
             LEFT JOIN mls ON candidates.cand_id = mls.cand_id
+            LEFT JOIN interviews ON candidates.cand_id = interviews.cand_id
             WHERE candidates.pos_id = %s
             ORDER BY {sort_column} {'ASC' if sort_column == 'candidates.first_name' else 'DESC'} NULLS LAST;
             """, (pos_id, ))

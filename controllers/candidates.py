@@ -1,5 +1,6 @@
 from flask import render_template, request, redirect, session, send_from_directory
 import services.candidates as candidate_service
+import services.positions as position_service
 
 def add_candidate(position_id):
     if request.method == 'POST':
@@ -94,3 +95,20 @@ def rejection_email(position_id, candidate_id):
 def rejection_email_with_reasons(position_id, candidate_id):
     result = candidate_service.rejection_email_with_reasons(position_id, candidate_id, session['user_id'])
     return render_template('response_negative.html', **result, avatar=session['avatar'])
+
+def interview(position_id, candidate_id):
+    if request.method == 'POST':
+        score = request.form['score']
+        notes = request.form['notes']
+        date = request.form['date']
+        result = candidate_service.interview(candidate_id, position_id, score, notes, date)
+        if result['success']:
+            return redirect(f'/positions/{position_id}/{candidate_id}')
+        else:
+            candidate = candidate_service.get(candidate_id)['candidate']
+            position = position_service.get(position_id)
+            return render_template('interview.html', **result['error'], candidate=candidate, position=position, avatar=session['avatar'])
+    else:
+        candidate = candidate_service.get(candidate_id)['candidate']
+        position = position_service.get(position_id)
+        return render_template('interview.html', candidate=candidate, position=position, avatar=session['avatar'])
