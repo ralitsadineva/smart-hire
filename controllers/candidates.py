@@ -96,12 +96,12 @@ def rejection_email_with_reasons(position_id, candidate_id):
     result = candidate_service.rejection_email_with_reasons(position_id, candidate_id, session['user_id'])
     return render_template('response_negative.html', **result, avatar=session['avatar'])
 
-def interview(position_id, candidate_id):
+def add_interview(position_id, candidate_id):
     if request.method == 'POST':
         score = request.form['score']
         notes = request.form['notes']
         date = request.form['date']
-        result = candidate_service.interview(candidate_id, position_id, score, notes, date)
+        result = candidate_service.add_interview(candidate_id, position_id, score, notes, date)
         if result['success']:
             return redirect(f'/positions/{position_id}/{candidate_id}')
         else:
@@ -112,3 +112,24 @@ def interview(position_id, candidate_id):
         candidate = candidate_service.get(candidate_id)['candidate']
         position = position_service.get(position_id)
         return render_template('interview.html', candidate=candidate, position=position, avatar=session['avatar'])
+
+def edit_interview(position_id, candidate_id):
+    if request.method == 'POST':
+        score = request.form['score']
+        notes = request.form['notes']
+        date = request.form['date']
+        result = candidate_service.edit_interview(candidate_id, score, notes, date)
+        if result['success']:
+            return redirect(f'/positions/{position_id}/{candidate_id}')
+        else:
+            candidate = candidate_service.get(candidate_id)['candidate']
+            position = position_service.get(position_id)
+            interview = candidate_service.get(candidate_id)['interview']
+            return render_template('interview.html', **result['error'], candidate=candidate, position=position, interview=interview, avatar=session['avatar'])
+    else:
+        candidate = candidate_service.get(candidate_id)['candidate']
+        position = position_service.get(position_id)
+        interview = candidate_service.get(candidate_id)['interview']
+        if interview is None:
+            return redirect(f'/positions/{position_id}/{candidate_id}/add_interview')
+        return render_template('interview.html', candidate=candidate, position=position, interview=interview, avatar=session['avatar'])

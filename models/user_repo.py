@@ -27,7 +27,7 @@ class UserRepository(AbstractRepository):
         try:
             cursor.execute("""
                 UPDATE users
-                SET password = %s
+                SET password = %s, last_updated = CURRENT_TIMESTAMP
                 WHERE id = %s;
                 """, (password, id))
             conn.commit()
@@ -42,7 +42,7 @@ class UserRepository(AbstractRepository):
         try:
             cursor.execute("""
                 UPDATE users
-                SET avatar = %s
+                SET avatar = %s, last_updated = CURRENT_TIMESTAMP
                 WHERE id = %s;
                 """, (avatar, id))
             conn.commit()
@@ -57,7 +57,7 @@ class UserRepository(AbstractRepository):
         try:
             cursor.execute("""
                 UPDATE users
-                SET signature = %s
+                SET signature = %s, last_updated = CURRENT_TIMESTAMP
                 WHERE id = %s;
                 """, (signature, id))
             conn.commit()
@@ -72,7 +72,7 @@ class UserRepository(AbstractRepository):
         try:
             cursor.execute("""
                 UPDATE users
-                SET company = %s
+                SET company = %s, last_updated = CURRENT_TIMESTAMP
                 WHERE id = %s;
                 """, (company, id))
             conn.commit()

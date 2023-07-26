@@ -1,14 +1,25 @@
 {% extends "base_logged_in.html" %}
 
-{% set title = candidate[2] ~ ' ' ~ candidate[3] ~ ' - Add interview feedback' %}
+{% if interview %}
+    {% set interview_action = 'Edit' %}
+{% else %}
+    {% set interview_action = 'Add' %}
+{% endif %}
+
+{% set title = candidate[2] ~ ' ' ~ candidate[3] ~ ' - ' ~ interview_action ~ ' interview feedback' %}
 {% set active_class = 'positions' %}
 
 {% block main %}
-<p class="text-center mt-5 fs-4 fw-semibold">Add interview feedback</p>
+<p class="text-center mt-5 fs-4 fw-semibold">{{ interview_action }} interview feedback</p>
 <div class="d-flex justify-content-center">
     {% if error %}
         <div class="alert alert-danger" role="alert">
             Something went wrong. Please try again.
+        </div>
+    {% endif %}
+    {% if exist %}
+        <div class="alert alert-danger text-center" role="alert">
+            Interview feedback for this candidate and position is already available.
         </div>
     {% endif %}
 </div>
@@ -32,18 +43,20 @@
                 <div class="col-sm-9">
                     <div class="input-group">
                         <div>
-                            <select class="form-select" id="inputScore" name="score">
-                                <option selected disabled>-</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
+                            <select class="form-select" id="inputScore" name="score" required>
+                                {% if not interview %}
+                                    <option selected disabled value="">-</option>
+                                {% endif %}
+                                <option {% if interview and interview[3]==1 %}selected{% endif %} value="1">1</option>
+                                <option {% if interview and interview[3]==2 %}selected{% endif %} value="2">2</option>
+                                <option {% if interview and interview[3]==3 %}selected{% endif %} value="3">3</option>
+                                <option {% if interview and interview[3]==4 %}selected{% endif %} value="4">4</option>
+                                <option {% if interview and interview[3]==5 %}selected{% endif %} value="5">5</option>
+                                <option {% if interview and interview[3]==6 %}selected{% endif %} value="6">6</option>
+                                <option {% if interview and interview[3]==7 %}selected{% endif %} value="7">7</option>
+                                <option {% if interview and interview[3]==8 %}selected{% endif %} value="8">8</option>
+                                <option {% if interview and interview[3]==9 %}selected{% endif %} value="9">9</option>
+                                <option {% if interview and interview[3]==10 %}selected{% endif %} value="10">10</option>
                             </select>
                         </div>
                         <label class="input-group-text" for="inputScore"> / 10</label>
@@ -53,17 +66,17 @@
             <div class="mb-3 row">
                 <label for="inputNotes" class="col-sm-3 form-label fw-semibold">Notes</label>
                 <div class="col-sm-9">
-                    <textarea maxlength="1000" class="form-control" id="inputNotes" name="notes" rows="5" oninput="updateCounter('inputNotes', 'counterNotes')" required></textarea>
-                    <span class="badge text-bg-success float-end mt-1" id="counterNotes">0 / 1000</span>
+                    <textarea maxlength="1000" class="form-control" id="inputNotes" name="notes" rows="5" oninput="updateCounter('inputNotes', 'counterNotes')" required>{% if interview %}{{ interview[4] }}{% endif %}</textarea>
+                    <span class="badge text-bg-success float-end mt-1" id="counterNotes">{% if interview %}{{ interview[4] | length }}{% else %}0{% endif %} / 1000</span>
                 </div>
             </div>
             <div class="mb-3 row">
                 <label for="inputDate" class="col-sm-3 col-form-label fw-semibold">Date of the interview</label>
                 <div class="col-sm-9">
-                    <input type="date" class="form-control" id="inputDate" name="date" required>
+                    <input type="date" class="form-control" id="inputDate" name="date" {% if interview %}value="{{ interview[5] }}"{% endif %} required>
                 </div>
             </div>
-            <button type="submit" class="btn btn-success">Add</button>
+            <button type="submit" class="btn btn-success">{{ interview_action }}</button>
         </form>
     </div>
 </div>

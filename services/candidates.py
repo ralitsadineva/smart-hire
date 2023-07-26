@@ -220,12 +220,22 @@ def rejection_email_with_reasons(pos_id, cand_id, user_id):
         subject = RESPONSE_EMAIL_SUBJECT
     return {'candidate': candidate, 'response': response, 'subject': subject, 'cons': True, 'reasons': True}
 
-def interview(cand_id, pos_id, score, notes, date):
+def add_interview(cand_id, pos_id, score, notes, date):
+    if interviews_db.get(cand_id) is not None:
+        return {'success': False, 'error': {'exist': True}}
     try:
-        interviews_db.insert(cand_id, pos_id, date)
+        interviews_db.insert(cand_id, pos_id, score, notes, date)
+        return {'success': True}
+    except DatabaseError as error:
+        logger.error(f"{type(error)}\n{error}")
+        return {'success': False, 'error': {'error': True}}
+
+def edit_interview(cand_id, score, notes, date):
+    try:
         id = interviews_db.get(cand_id)[0]
         interviews_db.update_score(int(score), id)
         interviews_db.update_notes(notes, id)
+        interviews_db.update_date(date, id)
         return {'success': True}
     except DatabaseError as error:
         logger.error(f"{type(error)}\n{error}")

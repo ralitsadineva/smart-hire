@@ -54,13 +54,13 @@
                     <th scope="col" class="text-end"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=cvs.skills">Skills</a></th>
                     <th scope="col" class="text-end"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=cvs.languages">Languages</a></th>
                     <th scope="col" class="text-end"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=mls.motivation_lvl">Motivation level</a></th>
-                    <th scope="col" class="text-center">Actions</th>
                     <th scope="col" class="text-center">Interview</th>
+                    <th scope="col" class="text-center">Actions</th>
                 </tr>
             </thead>
             <tbody class="table-group-divider">
                 {% for candidate in candidates %}
-                    <tr>
+                    <tr id="candidate-{{ loop.index }}">
                         <th scope="row">{{ loop.index }}</th>
                         <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position[0] }}/{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</a></td>
                         <td class="text-end col-md-1">{% if candidate[13]==None %}-{% else %}{{ candidate[13] }}{% endif %}</td>
@@ -71,16 +71,16 @@
                         <td class="text-end col-md-1">{% if candidate[18]==None %}-{% else %}{{ candidate[18] }}{% endif %}</td>
                         <td class="text-end col-md-1">{% if candidate[19]==None %}-{% else %}{{ candidate[19] }}{% endif %}</td>
                         <td class="text-end col-md-1">{% if candidate[20]==None %}-{% else %}{{ candidate[20] }}{% endif %}</td>
+                        <td>
+                            {% if candidate[22] %}<i class="fa-solid fa-check ms-2" style="color: #027e1b;"></i>{% else %}<i class="fa-solid fa-minus ms-2" style="color: #027e1b;"></i>{% endif %}
+                            {% if candidate[21] %}<span class="ms-2" title="Score">{{ candidate[21] }}/10{% endif %}</span>
+                            {% if candidate[22] %}<span class="ms-2" title="Date of the interview">{{ candidate[22] }}{% endif %}</span>
+                        </td>
                         <td class="text-end">
                             <a class="ms-2" href="{{ base_url }}add_cv?cand={{ candidate[0] }}" title="Add CV"><i class="fa-solid fa-file" style="color: #027e1b;"></i></a>
                             <a class="ms-2" href="{{ base_url }}add_ml?cand={{ candidate[0] }}" title="Add motivational letter"><i class="fa-solid fa-file-lines" style="color: #027e1b;"></i></a>
                             <a class="ms-2" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/invitation" onclick="spinner.show()" title="Send interview invitation"><i class="fa-solid fa-square-plus" style="color: #027e1b;"></i></a>
                             <a class="ms-2" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/rejection" onclick="spinner.show()" title="Send rejection e-mail"><i class="fa-solid fa-square-minus" style="color: #027e1b;"></i></a>
-                        </td>
-                        <td>
-                            {% if candidate[22] %}<i class="fa-solid fa-check ms-2" style="color: #027e1b;"></i>{% else %}<i class="fa-solid fa-minus ms-2" style="color: #027e1b;"></i>{% endif %}
-                            {% if candidate[21] %}<span class="ms-2" title="Score">{{ candidate[21] }}/10{% endif %}</span>
-                            {% if candidate[22] %}<span class="ms-2" title="Date of the interview">{{ candidate[22] }}{% endif %}</span>
                         </td>
                     </tr>
                 {% endfor %}
