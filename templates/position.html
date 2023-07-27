@@ -1,31 +1,31 @@
 {% extends "base_logged_in.html" %}
 
-{% set title = position[2] %}
+{% set title = position['title'] %}
 {% set active_class = 'positions' %}
 
 {% block main %}
 <div class="row mx-3">
     <div class="col-11">
-        <p class="mt-5 fs-4 fw-semibold">{{ position[2] }}</p>
+        <p class="mt-5 fs-4 fw-semibold">{{ position['title'] }}</p>
     </div>
     <div class="col-1 d-flex justify-content-end align-self-end">
-        <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ position[0] }}/edit">Edit</a>
+        <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ position['pos_id'] }}/edit">Edit</a>
     </div>
 </div>
 <div class="row me-3">
     <div class="col-11">
-        <p class="ms-4 mt-4 fs-5 fw-semibold">{{ position[3] }}</p>
+        <p class="ms-4 mt-4 fs-5 fw-semibold">{{ position['description'] }}</p>
     </div>
     <div class="col-1 d-flex justify-content-end align-self-end">
-        <a role="button" class="btn btn-success" href="{{ base_url }}positions/add/{{ position[0] }}">Duplicate</a>
+        <a role="button" class="btn btn-success" href="{{ base_url }}positions/add/{{ position['pos_id'] }}">Duplicate</a>
     </div>
 </div>
 <div class="row me-3">
     <div class="col-11">
-        <p class="ms-4 mt-5 fw-semibold">Created on: {{ position[5].replace(microsecond=0) }}   Last updated on: {{ position[6].replace(microsecond=0) }}</p>
+        <p class="ms-4 mt-5 fw-semibold">Created on: {{ position['created'].replace(microsecond=0) }}   Last updated on: {{ position['last_updated'].replace(microsecond=0) }}</p>
     </div>
     <div class="col-1 d-flex justify-content-end align-self-end">
-        <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ position[0] }}/{% if position[4] %}archive{% else %}activate{% endif %}">{% if position[4] %}Archive{% else %}Activate{% endif %}</a>
+        <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ position['pos_id'] }}/{% if position['active'] %}archive{% else %}activate{% endif %}">{% if position['active'] %}Archive{% else %}Activate{% endif %}</a>
     </div>
 </div>
 <!-- candidates for this position (* candidates with this pos_id) -->
@@ -34,7 +34,7 @@
         <p class="mt-5 fs-5 fw-semibold">Candidates</p>
     </div>
     <div class="col-1 d-flex justify-content-end align-self-end">
-        <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ position[0] }}/add_candidate">+</a>
+        <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ position['pos_id'] }}/add_candidate">+</a>
     </div>
 </div>
 {% if candidates == [] %}
@@ -54,7 +54,7 @@
                     <th scope="col" class="text-end"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=cvs.skills">Skills</a></th>
                     <th scope="col" class="text-end"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=cvs.languages">Languages</a></th>
                     <th scope="col" class="text-end"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=mls.motivation_lvl">Motivation level</a></th>
-                    <th scope="col" class="text-center">Interview</th>
+                    <th scope="col" class="text-center"><a class="link-body-emphasis link-underline link-underline-opacity-0" href="?sort_column=interviews.score">Interview</a></th>
                     <th scope="col" class="text-center">Actions</th>
                 </tr>
             </thead>
@@ -62,25 +62,25 @@
                 {% for candidate in candidates %}
                     <tr id="candidate-{{ loop.index }}">
                         <th scope="row">{{ loop.index }}</th>
-                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position[0] }}/{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</a></td>
-                        <td class="text-end col-md-1">{% if candidate[13]==None %}-{% else %}{{ candidate[13] }}{% endif %}</td>
-                        <td class="text-end col-md-1">{% if candidate[14]==None %}-{% else %}{{ candidate[14] }}{% endif %}</td>
-                        <td class="text-end col-md-1">{% if candidate[15]==None %}-{% else %}{{ candidate[15] }}{% endif %}</td>
-                        <td class="text-end col-md-1">{% if candidate[16]==None %}-{% else %}{{ candidate[16] }}{% endif %}</td>
-                        <td class="text-end col-md-1">{% if candidate[17]==None %}-{% else %}{{ candidate[17] }}{% endif %}</td>
-                        <td class="text-end col-md-1">{% if candidate[18]==None %}-{% else %}{{ candidate[18] }}{% endif %}</td>
-                        <td class="text-end col-md-1">{% if candidate[19]==None %}-{% else %}{{ candidate[19] }}{% endif %}</td>
-                        <td class="text-end col-md-1">{% if candidate[20]==None %}-{% else %}{{ candidate[20] }}{% endif %}</td>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position['pos_id'] }}/{{ candidate['cand_id'] }}">{{ candidate['first_name'] }} {{ candidate['last_name'] }}</a></td>
+                        <td class="text-end col-md-1">{% if candidate['cv_score']==None %}-{% else %}{{ candidate['cv_score'] }}{% endif %}</td>
+                        <td class="text-end col-md-1">{% if candidate['structure']==None %}-{% else %}{{ candidate['structure'] }}{% endif %}</td>
+                        <td class="text-end col-md-1">{% if candidate['contact_info']==None %}-{% else %}{{ candidate['contact_info'] }}{% endif %}</td>
+                        <td class="text-end col-md-1">{% if candidate['work_experience']==None %}-{% else %}{{ candidate['work_experience'] }}{% endif %}</td>
+                        <td class="text-end col-md-1">{% if candidate['education']==None %}-{% else %}{{ candidate['education'] }}{% endif %}</td>
+                        <td class="text-end col-md-1">{% if candidate['skills']==None %}-{% else %}{{ candidate['skills'] }}{% endif %}</td>
+                        <td class="text-end col-md-1">{% if candidate['languages']==None %}-{% else %}{{ candidate['languages'] }}{% endif %}</td>
+                        <td class="text-end col-md-1">{% if candidate['motivation_lvl']==None %}-{% else %}{{ candidate['motivation_lvl'] }}{% endif %}</td>
                         <td>
-                            {% if candidate[22] %}<i class="fa-solid fa-check ms-2" style="color: #027e1b;"></i>{% else %}<i class="fa-solid fa-minus ms-2" style="color: #027e1b;"></i>{% endif %}
-                            {% if candidate[21] %}<span class="ms-2" title="Score">{{ candidate[21] }}/10{% endif %}</span>
-                            {% if candidate[22] %}<span class="ms-2" title="Date of the interview">{{ candidate[22] }}{% endif %}</span>
+                            {% if candidate['invited'] %}{% if candidate['date'] %}<i class="fa-solid fa-check ms-2" title="The interview took place." style="color: #027e1b;"></i>{% else %}<i class="fa-solid fa-minus ms-2" title="The candidate has been invited, but the interview hasn't taken place yet." style="color: #027e1b;"></i>{% endif %}{% else %}<i class="fa-solid fa-xmark" title="The candidate hasn't been invited to an interview." style="color: #027e1b;"></i>{% endif %}
+                            {% if candidate['score'] %}<span class="ms-2" title="Score">{{ candidate['score'] }}/10{% endif %}</span>
+                            {% if candidate['date'] %}<span class="ms-2" title="Date of the interview">{{ candidate['date'] }}{% endif %}</span>
                         </td>
                         <td class="text-end">
-                            <a class="ms-2" href="{{ base_url }}add_cv?cand={{ candidate[0] }}" title="Add CV"><i class="fa-solid fa-file" style="color: #027e1b;"></i></a>
-                            <a class="ms-2" href="{{ base_url }}add_ml?cand={{ candidate[0] }}" title="Add motivational letter"><i class="fa-solid fa-file-lines" style="color: #027e1b;"></i></a>
-                            <a class="ms-2" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/invitation" onclick="spinner.show()" title="Send interview invitation"><i class="fa-solid fa-square-plus" style="color: #027e1b;"></i></a>
-                            <a class="ms-2" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/rejection" onclick="spinner.show()" title="Send rejection e-mail"><i class="fa-solid fa-square-minus" style="color: #027e1b;"></i></a>
+                            <a class="ms-2" href="{{ base_url }}add_cv?cand={{ candidate['cand_id'] }}" title="Add CV"><i class="fa-solid fa-file" style="color: #027e1b;"></i></a>
+                            <a class="ms-2" href="{{ base_url }}add_ml?cand={{ candidate['cand_id'] }}" title="Add motivational letter"><i class="fa-solid fa-file-lines" style="color: #027e1b;"></i></a>
+                            <a class="ms-2" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/invitation" onclick="spinner.show()" title="Send interview invitation"><i class="fa-solid fa-square-plus" style="color: #027e1b;"></i></a>
+                            <a class="ms-2" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/rejection" onclick="spinner.show()" title="Send rejection e-mail"><i class="fa-solid fa-square-minus" style="color: #027e1b;"></i></a>
                         </td>
                     </tr>
                 {% endfor %}

@@ -6,7 +6,7 @@
     {% set interview_action = 'Add' %}
 {% endif %}
 
-{% set title = candidate[2] ~ ' ' ~ candidate[3] ~ ' - ' ~ interview_action ~ ' interview feedback' %}
+{% set title = candidate['first_name'] ~ ' ' ~ candidate['last_name'] ~ ' - ' ~ interview_action ~ ' interview feedback' %}
 {% set active_class = 'positions' %}
 
 {% block main %}
@@ -28,13 +28,13 @@
         <div class="mb-3 row">
             <label for="staticCandidate" class="col-sm-3 col-form-label fw-semibold">Candidate</label>
             <div class="col-sm-9">
-                <input type="text" readonly class="form-control-plaintext" id="staticCandidate" value="{{ candidate[2] }} {{ candidate[3] }}">
+                <input type="text" readonly class="form-control-plaintext" id="staticCandidate" value="{{ candidate['first_name'] }} {{ candidate['last_name'] }}">
             </div>
         </div>
         <div class="mb-3 row ">
             <label for="staticPosition" class="col-sm-3 col-form-label fw-semibold">Position</label>
             <div class="col-sm-9">
-                <input type="text" readonly class="form-control-plaintext" id="staticPosition" value="{{ position[2] }}">
+                <input type="text" readonly class="form-control-plaintext" id="staticPosition" value="{{ position['title'] }}">
             </div>
         </div>
         <form method="POST">
@@ -47,16 +47,16 @@
                                 {% if not interview %}
                                     <option selected disabled value="">-</option>
                                 {% endif %}
-                                <option {% if interview and interview[3]==1 %}selected{% endif %} value="1">1</option>
-                                <option {% if interview and interview[3]==2 %}selected{% endif %} value="2">2</option>
-                                <option {% if interview and interview[3]==3 %}selected{% endif %} value="3">3</option>
-                                <option {% if interview and interview[3]==4 %}selected{% endif %} value="4">4</option>
-                                <option {% if interview and interview[3]==5 %}selected{% endif %} value="5">5</option>
-                                <option {% if interview and interview[3]==6 %}selected{% endif %} value="6">6</option>
-                                <option {% if interview and interview[3]==7 %}selected{% endif %} value="7">7</option>
-                                <option {% if interview and interview[3]==8 %}selected{% endif %} value="8">8</option>
-                                <option {% if interview and interview[3]==9 %}selected{% endif %} value="9">9</option>
-                                <option {% if interview and interview[3]==10 %}selected{% endif %} value="10">10</option>
+                                <option {% if interview and interview['score']==1 %}selected{% endif %} value="1">1</option>
+                                <option {% if interview and interview['score']==2 %}selected{% endif %} value="2">2</option>
+                                <option {% if interview and interview['score']==3 %}selected{% endif %} value="3">3</option>
+                                <option {% if interview and interview['score']==4 %}selected{% endif %} value="4">4</option>
+                                <option {% if interview and interview['score']==5 %}selected{% endif %} value="5">5</option>
+                                <option {% if interview and interview['score']==6 %}selected{% endif %} value="6">6</option>
+                                <option {% if interview and interview['score']==7 %}selected{% endif %} value="7">7</option>
+                                <option {% if interview and interview['score']==8 %}selected{% endif %} value="8">8</option>
+                                <option {% if interview and interview['score']==9 %}selected{% endif %} value="9">9</option>
+                                <option {% if interview and interview['score']==10 %}selected{% endif %} value="10">10</option>
                             </select>
                         </div>
                         <label class="input-group-text" for="inputScore"> / 10</label>
@@ -66,14 +66,14 @@
             <div class="mb-3 row">
                 <label for="inputNotes" class="col-sm-3 form-label fw-semibold">Notes</label>
                 <div class="col-sm-9">
-                    <textarea maxlength="1000" class="form-control" id="inputNotes" name="notes" rows="5" oninput="updateCounter('inputNotes', 'counterNotes')" required>{% if interview %}{{ interview[4] }}{% endif %}</textarea>
-                    <span class="badge text-bg-success float-end mt-1" id="counterNotes">{% if interview %}{{ interview[4] | length }}{% else %}0{% endif %} / 1000</span>
+                    <textarea maxlength="1000" class="form-control" id="inputNotes" name="notes" rows="5" oninput="updateCounter('inputNotes', 'counterNotes')" required>{% if interview %}{{ interview['notes'] }}{% endif %}</textarea>
+                    <span class="badge text-bg-success float-end mt-1" id="counterNotes">{% if interview %}{{ interview['notes'] | length }}{% else %}0{% endif %} / 1000</span>
                 </div>
             </div>
             <div class="mb-3 row">
                 <label for="inputDate" class="col-sm-3 col-form-label fw-semibold">Date of the interview</label>
                 <div class="col-sm-9">
-                    <input type="date" class="form-control" id="inputDate" name="date" {% if interview %}value="{{ interview[5] }}"{% endif %} required>
+                    <input type="date" class="form-control" id="inputDate" name="date" {% if interview %}value="{{ interview['date'] }}"{% endif %} required>
                 </div>
             </div>
             <button type="submit" class="btn btn-success">{{ interview_action }}</button>

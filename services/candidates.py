@@ -37,7 +37,7 @@ def get(id):
     ml = mls_db.get(id)
     plus_minus = pros_cons_db.get(id)
     if plus_minus is not None:
-        pros, cons = plus_minus[2:4]
+        pros, cons = plus_minus['pros'], plus_minus['cons']
     else:
         pros, cons = None, None
     interview = interviews_db.get(id)
@@ -48,7 +48,7 @@ def get_all():
 
 def update(cand_id, email, phone, address, postal_code, city, country, birthdate):
     if email == '':
-        email = candidates_db.get(cand_id)[4]
+        email = candidates_db.get(cand_id)['email']
     phone = check_empty(phone)
     address = check_empty(address)
     postal_code = check_empty(postal_code)
@@ -57,12 +57,12 @@ def update(cand_id, email, phone, address, postal_code, city, country, birthdate
     birthdate = check_empty(birthdate)
     try:
         candidates_db.update(cand_id, email, phone, address, postal_code, city, country, birthdate)
-        return {'success': True, 'pos_id': candidates_db.get(cand_id)[1]}
+        return {'success': True, 'pos_id': candidates_db.get(cand_id)['pos_id']}
     except DatabaseError as error:
         logger.error(f"{type(error)}\n{error}")
-        if os.path.exists(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}/{candidates_db.get(cand_id)[3]}-letter.pdf"):
+        if os.path.exists(f"uploads/{candidates_db.get(cand_id)['pos_id']}/{cand_id}/{candidates_db.get(cand_id)['last_name']}-letter.pdf"):
             try:
-                os.remove(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}/{candidates_db.get(cand_id)[3]}-letter.pdf")
+                os.remove(f"uploads/{candidates_db.get(cand_id)['pos_id']}/{cand_id}/{candidates_db.get(cand_id)['last_name']}-letter.pdf")
             except OSError as error:
                 logger.error(f"{type(error)}\n{error}")
         cvs_db.delete(cand_id)
@@ -84,7 +84,7 @@ def add_cv(cand_id, cv):
             logger.error(f"{type(error)}\n{error}")
             return {'success': False, 'error': {'error': True}}
         candidate = candidates_db.get(cand_id)
-        if candidate[2] != cand_info['First name'] or candidate[3] != cand_info['Last name']:
+        if candidate['first_name'] != cand_info['First name'] or candidate['last_name'] != cand_info['Last name']:
             different_names = True
         else:
             different_names = False
@@ -101,7 +101,7 @@ def add_cv(cand_id, cv):
         except (DatabaseError, Exception) as error:
             logger.error(f"{type(error)}\n{error}")
             return {'success': False, 'error': {'error': True}}
-        position = positions_db.get(candidate[1])
+        position = positions_db.get(candidate['pos_id'])
         plus_minus = pros_cons(contents, position)
         logger.info(plus_minus)
         pros, cons = convert_pros_cons(plus_minus)
@@ -112,11 +112,11 @@ def add_cv(cand_id, cv):
             logger.error(f"{type(error)}\n{error}")
             cvs_db.delete(cand_id)
             return {'success': False, 'error': {'error': True}}
-        filename = f"{candidate[3]}-cv.pdf"
-        if not os.path.exists(f"uploads/{candidate[1]}/{cand_id}"):
-            os.makedirs(f"uploads/{candidate[1]}/{cand_id}")
+        filename = f"{candidate['last_name']}-cv.pdf"
+        if not os.path.exists(f"uploads/{candidate['pos_id']}/{cand_id}"):
+            os.makedirs(f"uploads/{candidate['pos_id']}/{cand_id}")
         cv.seek(0)
-        cv.save(f"uploads/{candidate[1]}/{cand_id}/{filename}")
+        cv.save(f"uploads/{candidate['pos_id']}/{cand_id}/{filename}")
         return {'success': True, 'arguments': {'cand_info': cand_info, 'candidate': candidate, 'different_names': different_names}}
     else:
         return {'success': False, 'error': {'invalid': True}}
@@ -141,40 +141,40 @@ def add_ml(cand_id, ml):
         except DatabaseError as error:
             logger.error(f"{type(error)}\n{error}")
             return {'success': False, 'error': {'error': True}}
-        filename = f"{candidates_db.get(cand_id)[3]}-letter.pdf"
-        if not os.path.exists(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}"):
-            os.makedirs(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}")
+        filename = f"{candidates_db.get(cand_id)['last_name']}-letter.pdf"
+        if not os.path.exists(f"uploads/{candidates_db.get(cand_id)['pos_id']}/{cand_id}"):
+            os.makedirs(f"uploads/{candidates_db.get(cand_id)['pos_id']}/{cand_id}")
         ml.seek(0)
-        ml.save(f"uploads/{candidates_db.get(cand_id)[1]}/{cand_id}/{filename}")
-        return {'success': True, 'pos_id': candidates_db.get(cand_id)[1]}
+        ml.save(f"uploads/{candidates_db.get(cand_id)['pos_id']}/{cand_id}/{filename}")
+        return {'success': True, 'pos_id': candidates_db.get(cand_id)['pos_id']}
     else:
         return {'success': False, 'error': {'invalid': True}}
 
 def view_cv(pos_id, cand_id):
-    if os.path.exists(f"uploads/{pos_id}/{cand_id}/{candidates_db.get(cand_id)[3]}-cv.pdf"):
-        return {'success': True, 'filename': f"{candidates_db.get(cand_id)[3]}-cv.pdf"}
+    if os.path.exists(f"uploads/{pos_id}/{cand_id}/{candidates_db.get(cand_id)['last_name']}-cv.pdf"):
+        return {'success': True, 'filename': f"{candidates_db.get(cand_id)['last_name']}-cv.pdf"}
     else:
         return {'success': False}
 
 def view_ml(pos_id, cand_id):
-    if os.path.exists(f"uploads/{pos_id}/{cand_id}/{candidates_db.get(cand_id)[3]}-letter.pdf"):
-        return {'success': True, 'filename': f"{candidates_db.get(cand_id)[3]}-letter.pdf"}
+    if os.path.exists(f"uploads/{pos_id}/{cand_id}/{candidates_db.get(cand_id)['last_name']}-letter.pdf"):
+        return {'success': True, 'filename': f"{candidates_db.get(cand_id)['last_name']}-letter.pdf"}
     else:
         return {'success': False}
 
 def delete_cv(pos_id, cand_id):
-    if os.path.exists(f"uploads/{pos_id}/{cand_id}/{candidates_db.get(cand_id)[3]}-cv.pdf"):
+    if os.path.exists(f"uploads/{pos_id}/{cand_id}/{candidates_db.get(cand_id)['last_name']}-cv.pdf"):
         try:
-            os.remove(f"uploads/{pos_id}/{cand_id}/{candidates_db.get(cand_id)[3]}-cv.pdf")
+            os.remove(f"uploads/{pos_id}/{cand_id}/{candidates_db.get(cand_id)['last_name']}-cv.pdf")
         except OSError as error:
             logger.error(f"{type(error)}\n{error}")
     cvs_db.delete(cand_id)
     pros_cons_db.delete(cand_id)
 
 def delete_ml(pos_id, cand_id):
-    if os.path.exists(f"uploads/{pos_id}/{cand_id}/{candidates_db.get(cand_id)[3]}-letter.pdf"):
+    if os.path.exists(f"uploads/{pos_id}/{cand_id}/{candidates_db.get(cand_id)['last_name']}-letter.pdf"):
         try:
-            os.remove(f"uploads/{pos_id}/{cand_id}/{candidates_db.get(cand_id)[3]}-letter.pdf")
+            os.remove(f"uploads/{pos_id}/{cand_id}/{candidates_db.get(cand_id)['last_name']}-letter.pdf")
         except OSError as error:
             logger.error(f"{type(error)}\n{error}")
     mls_db.delete(cand_id)
@@ -182,7 +182,7 @@ def delete_ml(pos_id, cand_id):
 def interview_invitation(pos_id, cand_id, user_id):
     candidate = candidates_db.get(cand_id)
     position = positions_db.get(pos_id)
-    signature, company = users_db.get(user_id)[8:10]
+    signature, company = users_db.get(user_id)['signature'], users_db.get(user_id)['company']
     response = response_positive(candidate, position, signature, company)
     logger.info(response)
     if company:
@@ -195,7 +195,7 @@ def rejection_email(pos_id, cand_id, user_id):
     candidate = candidates_db.get(cand_id)
     position = positions_db.get(pos_id)
     cons = pros_cons_db.get(cand_id) is not None
-    signature, company = users_db.get(user_id)[8:10]
+    signature, company = users_db.get(user_id)['signature'], users_db.get(user_id)['company']
     response = response_negative(candidate, position, None, signature, company)
     logger.info(response)
     if company:
@@ -208,10 +208,10 @@ def rejection_email_with_reasons(pos_id, cand_id, user_id):
     candidate = candidates_db.get(cand_id)
     position = positions_db.get(pos_id)
     if pros_cons_db.get(cand_id) is not None:
-        cons = pros_cons_db.get(cand_id)[3]
+        cons = pros_cons_db.get(cand_id)['cons']
     else:
         cons = None
-    signature, company = users_db.get(user_id)[8:10]
+    signature, company = users_db.get(user_id)['signature'], users_db.get(user_id)['company']
     response = response_negative(candidate, position, cons, signature, company)
     logger.info(response)
     if company:
@@ -232,10 +232,42 @@ def add_interview(cand_id, pos_id, score, notes, date):
 
 def edit_interview(cand_id, score, notes, date):
     try:
-        id = interviews_db.get(cand_id)[0]
+        id = interviews_db.get(cand_id)['id']
         interviews_db.update_score(int(score), id)
         interviews_db.update_notes(notes, id)
         interviews_db.update_date(date, id)
+        return {'success': True}
+    except DatabaseError as error:
+        logger.error(f"{type(error)}\n{error}")
+        return {'success': False, 'error': {'error': True}}
+
+def mark_invited(cand_id):
+    try:
+        candidates_db.mark_invited(cand_id)
+        return {'success': True}
+    except DatabaseError as error:
+        logger.error(f"{type(error)}\n{error}")
+        return {'success': False, 'error': {'error': True}}
+
+def unmark_invited(cand_id):
+    try:
+        candidates_db.unmark_invited(cand_id)
+        return {'success': True}
+    except DatabaseError as error:
+        logger.error(f"{type(error)}\n{error}")
+        return {'success': False, 'error': {'error': True}}
+
+def mark_offer(cand_id):
+    try:
+        candidates_db.mark_offer(cand_id)
+        return {'success': True}
+    except DatabaseError as error:
+        logger.error(f"{type(error)}\n{error}")
+        return {'success': False, 'error': {'error': True}}
+
+def mark_hired(cand_id):
+    try:
+        candidates_db.mark_hired(cand_id)
         return {'success': True}
     except DatabaseError as error:
         logger.error(f"{type(error)}\n{error}")

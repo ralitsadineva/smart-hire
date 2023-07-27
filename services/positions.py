@@ -20,7 +20,7 @@ def add(id, title, description):
         return {'success': False, 'error': {'error': True}}
 
 def duplicate(id):
-    return positions_db.get(id)[2:4]
+    return [positions_db.get(id)['title'], positions_db.get(id)['description']]
 
 def history():
     return positions_db.get_all_inactive()

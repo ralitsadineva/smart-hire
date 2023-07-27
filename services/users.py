@@ -21,7 +21,7 @@ candidates_db = CandidateRepository()
 
 def login(username, password):
     user = users_db.get_by_username(username)
-    if user is None or not bcrypt.checkpw(password.encode(), bytes(user[3])):
+    if user is None or not bcrypt.checkpw(password.encode(), bytes(user['password'])):
         return {'success': False, 'error': {'invalid': True}}
     return {'success': True, 'user': user}
 
@@ -60,13 +60,13 @@ def signin_google(credential):
         except DatabaseError as error:
             logger.error(f"{type(error)}\n{error}")
             return {'success': False, 'error': {'error': True}}
-    elif user[5] == LOGIN_TYPE_PASSWORD:
+    elif user['type'] == LOGIN_TYPE_PASSWORD:
         return {'success': False, 'error': {'exist': True}}
     return {'success': True, 'user': user}
 
 def change_password(id, old_password, new_password):
     user = users_db.get(id)
-    if not bcrypt.checkpw(old_password.encode(), bytes(user[3])):
+    if not bcrypt.checkpw(old_password.encode(), bytes(user['password'])):
         return {'success': False, 'error': {'invalid': True}}
     if is_valid_password(new_password):
         hashed_password = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
@@ -105,10 +105,10 @@ def update_avatar(id, avatar):
         except DatabaseError as error:
             logger.error(f"{type(error)}\n{error}")
             return {'success': False, 'error': {'error': True}}
-        if user[4] != DEFAULT_AVATAR:
-            if os.path.exists(f"static/images/{user[4]}"):
+        if user['avatar'] != DEFAULT_AVATAR:
+            if os.path.exists(f"static/images/{user['avatar']}"):
                 try:
-                    os.remove(f"static/images/{user[4]}")
+                    os.remove(f"static/images/{user['avatar']}")
                 except OSError as error:
                     logger.error(f"{type(error)}\n{error}")
         return {'success': True, 'avatar': filename}
@@ -132,5 +132,5 @@ def update_company(id, company):
         return {'success': False, 'error': {'error': True}}
 
 def get_signature_company(id):
-    signature, company = users_db.get(id)[8:10]
+    signature, company = users_db.get(id)['signature'], users_db.get(id)['company']
     return signature, company

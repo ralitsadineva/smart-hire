@@ -133,3 +133,31 @@ def edit_interview(position_id, candidate_id):
         if interview is None:
             return redirect(f'/positions/{position_id}/{candidate_id}/add_interview')
         return render_template('interview.html', candidate=candidate, position=position, interview=interview, avatar=session['avatar'])
+
+def mark_invited(position_id, candidate_id):
+    result = candidate_service.mark_invited(candidate_id)
+    if result['success']:
+        return redirect(f'/positions/{position_id}/{candidate_id}')
+    else:
+        pass
+
+def unmark_invited(position_id, candidate_id):
+    result = candidate_service.unmark_invited(candidate_id)
+    if result['success']:
+        return redirect(f'/positions/{position_id}/{candidate_id}')
+    else:
+        pass
+
+def mark_offer(position_id, candidate_id):
+    result = candidate_service.mark_offer(candidate_id)
+    if result['success']:
+        return redirect(f'/positions/{position_id}/{candidate_id}')
+    else:
+        pass
+
+def mark_hired(position_id, candidate_id):
+    result = candidate_service.mark_hired(candidate_id)
+    if result['success']:
+        return redirect(f'/positions/{position_id}/{candidate_id}')
+    else:
+        pass

@@ -12,7 +12,7 @@ class CandidateRepository(AbstractRepository):
     def get_all_for_pos(self, pos_id, sort_column, **kwargs):
         cursor = kwargs.get('cursor')
         cursor.execute(f"""
-            SELECT candidates.*, cvs.score, cvs.structure, cvs.contact_info, cvs.work_experience, cvs.education, cvs.skills, cvs.languages, mls.motivation_lvl, interviews.score, interviews.date
+            SELECT candidates.*, cvs.score AS cv_score, cvs.structure, cvs.contact_info, cvs.work_experience, cvs.education, cvs.skills, cvs.languages, mls.motivation_lvl, interviews.score, interviews.date
             FROM candidates
             LEFT JOIN cvs ON candidates.cand_id = cvs.cand_id
             LEFT JOIN mls ON candidates.cand_id = mls.cand_id
@@ -102,3 +102,93 @@ class CandidateRepository(AbstractRepository):
             LIMIT 5;
             """)
         return cursor.fetchall()
+    
+    @AbstractRepository.connection_wrapper
+    def mark_invited(self, cand_id, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
+        try:
+            cursor.execute("""
+                UPDATE candidates
+                SET invited = TRUE, last_updated = CURRENT_TIMESTAMP
+                WHERE cand_id = %s;
+                """, (cand_id, ))
+            conn.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            conn.rollback()
+            raise DatabaseError(error)
+    
+    @AbstractRepository.connection_wrapper
+    def unmark_invited(self, cand_id, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
+        try:
+            cursor.execute("""
+                UPDATE candidates
+                SET invited = FALSE, last_updated = CURRENT_TIMESTAMP
+                WHERE cand_id = %s;
+                """, (cand_id, ))
+            conn.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            conn.rollback()
+            raise DatabaseError(error)
+
+    @AbstractRepository.connection_wrapper
+    def mark_offer(self, cand_id, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
+        try:
+            cursor.execute("""
+                UPDATE candidates
+                SET offer = TRUE, last_updated = CURRENT_TIMESTAMP
+                WHERE cand_id = %s;
+                """, (cand_id, ))
+            conn.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            conn.rollback()
+            raise DatabaseError(error)
+    
+    @AbstractRepository.connection_wrapper
+    def unmark_offer(self, cand_id, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
+        try:
+            cursor.execute("""
+                UPDATE candidates
+                SET offer = FALSE, last_updated = CURRENT_TIMESTAMP
+                WHERE cand_id = %s;
+                """, (cand_id, ))
+            conn.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            conn.rollback()
+            raise DatabaseError(error)
+        
+    @AbstractRepository.connection_wrapper
+    def mark_hired(self, cand_id, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
+        try:
+            cursor.execute("""
+                UPDATE candidates
+                SET hired = TRUE, last_updated = CURRENT_TIMESTAMP
+                WHERE cand_id = %s;
+                """, (cand_id, ))
+            conn.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            conn.rollback()
+            raise DatabaseError(error)
+    
+    @AbstractRepository.connection_wrapper
+    def unmark_hired(self, cand_id, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
+        try:
+            cursor.execute("""
+                UPDATE candidates
+                SET hired = FALSE, last_updated = CURRENT_TIMESTAMP
+                WHERE cand_id = %s;
+                """, (cand_id, ))
+            conn.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            conn.rollback()
+            raise DatabaseError(error)

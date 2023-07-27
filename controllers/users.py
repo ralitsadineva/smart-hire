@@ -10,9 +10,9 @@ def login():
         result = user_service.login(username, password)
         if result['success']:
             session['username'] = username
-            session['user_id'] = result['user'][0]
-            session['email'] = result['user'][1]
-            session['avatar'] = result['user'][4]
+            session['user_id'] = result['user']['id']
+            session['email'] = result['user']['email']
+            session['avatar'] = result['user']['avatar']
             return redirect('/home')
         else:
             return render_template('login.html', client_id=get_google_client_id(), **result['error'])
@@ -38,10 +38,10 @@ def googleCallback():
     credential = request.form.get('credential')
     result = user_service.signin_google(credential)
     if result['success']:
-        session['username'] = result['user'][2]
-        session['user_id'] = result['user'][0]
-        session['email'] = result['user'][1]
-        session['avatar'] = result['user'][4]
+        session['username'] = result['user']['username']
+        session['user_id'] = result['user']['id']
+        session['email'] = result['user']['email']
+        session['avatar'] = result['user']['avatar']
         return redirect('/home')
     else:
         return render_template('signup.html', client_id=get_google_client_id(), **result['error'])

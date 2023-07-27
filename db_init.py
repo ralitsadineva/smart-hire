@@ -60,6 +60,16 @@ class TableRepository(AbstractRepository):
         conn.commit()
 
         cursor.execute("""
+            ALTER TABLE candidates
+            ADD COLUMN IF NOT EXISTS invited BOOLEAN NOT NULL DEFAULT FALSE,
+            ADD COLUMN IF NOT EXISTS offer BOOLEAN NOT NULL DEFAULT FALSE,
+            ADD COLUMN IF NOT EXISTS hired BOOLEAN NOT NULL DEFAULT FALSE,
+            ADD COLUMN IF NOT EXISTS reject_reason CHAR CHECK (reject_reason IN ('1', '2', '3', '4', '5', '6', '7')),
+            ADD COLUMN IF NOT EXISTS decline_reason CHAR CHECK (decline_reason IN ('1', '2', '3', '4', '5', '6', '7'))
+            """)
+        conn.commit()
+
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS cvs (
                 cv_id UUID NOT NULL PRIMARY KEY DEFAULT gen_random_uuid(),
                 cand_id UUID NOT NULL REFERENCES candidates (cand_id),

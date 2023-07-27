@@ -13,10 +13,10 @@ def memoize(func):
     return wrapper
 
 def get_name(user):
-    if user[5]==LOGIN_TYPE_PASSWORD:
-        return user[2]
+    if user['type']==LOGIN_TYPE_PASSWORD:
+        return user['username']
     else:
-        return user[1].split('@')[0]
+        return user['email'].split('@')[0]
 
 def get_greeting():
     greetings = ["Hello", "Welcome back"]

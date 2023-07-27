@@ -1,10 +1,10 @@
 {% extends "base_logged_in.html" %}
 
-{% set title = candidate[2] ~ ' ' ~ candidate[3] ~ ' - ' ~ response_title %}
+{% set title = candidate['first_name'] ~ ' ' ~ candidate['last_name'] ~ ' - ' ~ response_title %}
 {% set active_class = 'positions' %}
 
 {% block main %}
-<p class="text-center mt-5 fs-4 fw-semibold">{{ response_title }} for {{ candidate[2] }} {{ candidate[3] }}</p>
+<p class="text-center mt-5 fs-4 fw-semibold">{{ response_title }} for {{ candidate['first_name'] }} {{ candidate['last_name'] }}</p>
 <form onsubmit="sendEmail(this);" method="get" enctype="text/plain">
     <div class="mt-5 d-flex justify-content-center">
         <div class="col-8">
@@ -28,11 +28,11 @@
             <div class="mt-2 row">
                 <div class="col-4 d-flex flex-column justify-content-start">
                     <div>
-                        <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/{{ response_link }}" onclick="spinner.show()">Generate another one{% if reasons %} without reasons{% endif %}</a>
+                        <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/{{ response_link }}" onclick="spinner.show()">Generate another one{% if reasons %} without reasons{% endif %}</a>
                     </div>
                     {% if cons %}
                         <div>
-                            <a role="button" class="btn btn-success mt-2" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/rejection_with_reasons" onclick="spinner.show()">Generate{% if reasons %} another{% endif %} one with specific reasons{% if not reasons %} for the rejection{% endif %}</a>
+                            <a role="button" class="btn btn-success mt-2" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/rejection_with_reasons" onclick="spinner.show()">Generate{% if reasons %} another{% endif %} one with specific reasons{% if not reasons %} for the rejection{% endif %}</a>
                         </div>
                     {% endif %}
                 </div>
@@ -55,7 +55,7 @@
         event.preventDefault();
         var subject = encodeURIComponent(form.subject.value);
         var body = encodeURIComponent(form.body.value);
-        var link = 'mailto:{{ candidate[4] }}?subject=' + subject + '&body=' + body;
+        var link = 'mailto:{{ candidate["email"] }}?subject=' + subject + '&body=' + body;
         window.open(link);
     }
 </script>
