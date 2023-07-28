@@ -62,7 +62,7 @@
                 {% for candidate in candidates %}
                     <tr id="candidate-{{ loop.index }}">
                         <th scope="row">{{ loop.index }}</th>
-                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position['pos_id'] }}/{{ candidate['cand_id'] }}">{{ candidate['first_name'] }} {{ candidate['last_name'] }}</a></td>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position['pos_id'] }}/{{ candidate['cand_id'] }}">{{ candidate['first_name'] }} {{ candidate['last_name'] }}{% if candidate['hired'] %}  <i class="fa-solid fa-crown" title="{{ candidate['first_name'] }} {{ candidate['last_name'] }} has been hired." style="color: #027e1b;"></i>{% endif %}</a></td>
                         <td class="text-end col-md-1">{% if candidate['cv_score']==None %}-{% else %}{{ candidate['cv_score'] }}{% endif %}</td>
                         <td class="text-end col-md-1">{% if candidate['structure']==None %}-{% else %}{{ candidate['structure'] }}{% endif %}</td>
                         <td class="text-end col-md-1">{% if candidate['contact_info']==None %}-{% else %}{{ candidate['contact_info'] }}{% endif %}</td>
@@ -72,7 +72,7 @@
                         <td class="text-end col-md-1">{% if candidate['languages']==None %}-{% else %}{{ candidate['languages'] }}{% endif %}</td>
                         <td class="text-end col-md-1">{% if candidate['motivation_lvl']==None %}-{% else %}{{ candidate['motivation_lvl'] }}{% endif %}</td>
                         <td>
-                            {% if candidate['invited'] %}{% if candidate['date'] %}<i class="fa-solid fa-check ms-2" title="The interview took place." style="color: #027e1b;"></i>{% else %}<i class="fa-solid fa-minus ms-2" title="The candidate has been invited, but the interview hasn't taken place yet." style="color: #027e1b;"></i>{% endif %}{% else %}<i class="fa-solid fa-xmark" title="The candidate hasn't been invited to an interview." style="color: #027e1b;"></i>{% endif %}
+                            {% if candidate['invited'] %}{% if candidate['date'] %}<i class="fa-solid fa-check ms-2" title="The interview took place." style="color: #027e1b;"></i>{% else %}<i class="fa-solid fa-minus ms-2" title="The candidate has been invited, but the interview hasn't taken place yet." style="color: #027e1b;"></i>{% endif %}{% else %}<i class="fa-solid fa-xmark ms-2" title="The candidate hasn't been invited to an interview." style="color: #027e1b;"></i>{% endif %}
                             {% if candidate['score'] %}<span class="ms-2" title="Score">{{ candidate['score'] }}/10{% endif %}</span>
                             {% if candidate['date'] %}<span class="ms-2" title="Date of the interview">{{ candidate['date'] }}{% endif %}</span>
                         </td>
@@ -81,6 +81,9 @@
                             <a class="ms-2" href="{{ base_url }}add_ml?cand={{ candidate['cand_id'] }}" title="Add motivational letter"><i class="fa-solid fa-file-lines" style="color: #027e1b;"></i></a>
                             <a class="ms-2" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/invitation" onclick="spinner.show()" title="Send interview invitation"><i class="fa-solid fa-square-plus" style="color: #027e1b;"></i></a>
                             <a class="ms-2" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/rejection" onclick="spinner.show()" title="Send rejection e-mail"><i class="fa-solid fa-square-minus" style="color: #027e1b;"></i></a>
+                            <form action="{{ base_url }}positions/{{ position['pos_id'] }}/{{ candidate['cand_id'] }}/delete" class="d-inline-block c-pointer">
+                                <i class="fa-solid fa-trash ms-3" title="Delete candidate" style="color: #027e1b;" onclick="confirm('Are you sure?') && this.parentNode.submit()"></i>
+                            </form>
                         </td>
                     </tr>
                 {% endfor %}

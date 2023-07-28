@@ -13,8 +13,30 @@ def add_candidate(position_id):
         return render_template('add_candidate.html', avatar=session['avatar'])
 
 def candidate(position_id, candidate_id):
-    result = candidate_service.get(candidate_id)
-    return render_template('candidate.html', **result, avatar=session['avatar'])
+    if request.method == 'POST':
+        if 'form_reject_reason' in request.form:
+            reject_reason = request.form['reject_reason']
+            result = candidate_service.update_reject_reason(candidate_id, reject_reason)
+        elif 'form_decline_reason' in request.form:
+            decline_reason = request.form['decline_reason']
+            result = candidate_service.update_decline_reason(candidate_id, decline_reason)
+        else:
+            return redirect(f'/positions/{position_id}/{candidate_id}')
+        if result['success']:
+            return redirect(f'/positions/{position_id}/{candidate_id}')
+        else:
+            cand = candidate_service.get(candidate_id)
+            return render_template('candidate.html', **result['error'], **cand, avatar=session['avatar'])
+    else:
+        result = candidate_service.get(candidate_id)
+        if request.args.get('error') is not None:
+            return render_template('candidate.html', **result, error=True, avatar=session['avatar'])
+        return render_template('candidate.html', **result, avatar=session['avatar'])
+
+def delete_candidate(position_id, candidate_id):
+    result = candidate_service.delete(candidate_id)
+    if result['success']:
+        return redirect(f'/positions/{position_id}')
 
 def add_cv():
     if request.method == 'POST':
@@ -139,25 +161,53 @@ def mark_invited(position_id, candidate_id):
     if result['success']:
         return redirect(f'/positions/{position_id}/{candidate_id}')
     else:
-        pass
+        return redirect(f'/positions/{position_id}/{candidate_id}?error=true')
 
 def unmark_invited(position_id, candidate_id):
     result = candidate_service.unmark_invited(candidate_id)
     if result['success']:
         return redirect(f'/positions/{position_id}/{candidate_id}')
     else:
-        pass
+        return redirect(f'/positions/{position_id}/{candidate_id}?error=true')
 
 def mark_offer(position_id, candidate_id):
     result = candidate_service.mark_offer(candidate_id)
     if result['success']:
         return redirect(f'/positions/{position_id}/{candidate_id}')
     else:
-        pass
+        return redirect(f'/positions/{position_id}/{candidate_id}?error=true')
+
+def unmark_offer(position_id, candidate_id):
+    result = candidate_service.unmark_offer(candidate_id)
+    if result['success']:
+        return redirect(f'/positions/{position_id}/{candidate_id}')
+    else:
+        return redirect(f'/positions/{position_id}/{candidate_id}?error=true')
 
 def mark_hired(position_id, candidate_id):
     result = candidate_service.mark_hired(candidate_id)
     if result['success']:
         return redirect(f'/positions/{position_id}/{candidate_id}')
     else:
-        pass
+        return redirect(f'/positions/{position_id}/{candidate_id}?error=true')
+
+def unmark_hired(position_id, candidate_id):
+    result = candidate_service.unmark_hired(candidate_id)
+    if result['success']:
+        return redirect(f'/positions/{position_id}/{candidate_id}')
+    else:
+        return redirect(f'/positions/{position_id}/{candidate_id}?error=true')
+
+def remove_reject_reason(position_id, candidate_id):
+    result = candidate_service.update_reject_reason(candidate_id, None)
+    if result['success']:
+        return redirect(f'/positions/{position_id}/{candidate_id}')
+    else:
+        return redirect(f'/positions/{position_id}/{candidate_id}?error=true')
+
+def remove_decline_reason(position_id, candidate_id):
+    result = candidate_service.update_decline_reason(candidate_id, None)
+    if result['success']:
+        return redirect(f'/positions/{position_id}/{candidate_id}')
+    else:
+        return redirect(f'/positions/{position_id}/{candidate_id}?error=true')

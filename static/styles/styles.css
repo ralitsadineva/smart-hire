@@ -2,6 +2,10 @@ table.table td.text-end {
     padding-right: 1rem;
 }
 
+.c-pointer {
+    cursor: pointer;
+}
+
 /** Spinner **/
 .spinner-grow {
     position: fixed;

@@ -43,6 +43,14 @@ def get(id):
     interview = interviews_db.get(id)
     return {'candidate': candidate, 'cv': cv, 'ml': ml, 'pros': pros, 'cons': cons, 'interview': interview}
 
+def delete(id):
+    try:
+        candidates_db.delete(id)
+        return {'success': True}
+    except DatabaseError as error:
+        logger.error(f"{type(error)}\n{error}")
+        return {'success': False, 'error': {'error': True}} 
+
 def get_all():
     return candidates_db.get_all()
 
@@ -265,9 +273,41 @@ def mark_offer(cand_id):
         logger.error(f"{type(error)}\n{error}")
         return {'success': False, 'error': {'error': True}}
 
+def unmark_offer(cand_id):
+    try:
+        candidates_db.unmark_offer(cand_id)
+        return {'success': True}
+    except DatabaseError as error:
+        logger.error(f"{type(error)}\n{error}")
+        return {'success': False, 'error': {'error': True}}
+
 def mark_hired(cand_id):
     try:
         candidates_db.mark_hired(cand_id)
+        return {'success': True}
+    except DatabaseError as error:
+        logger.error(f"{type(error)}\n{error}")
+        return {'success': False, 'error': {'error': True}}
+
+def unmark_hired(cand_id):
+    try:
+        candidates_db.unmark_hired(cand_id)
+        return {'success': True}
+    except DatabaseError as error:
+        logger.error(f"{type(error)}\n{error}")
+        return {'success': False, 'error': {'error': True}}
+
+def update_reject_reason(cand_id, reason):
+    try:
+        candidates_db.update_reject_reason(cand_id, reason)
+        return {'success': True}
+    except DatabaseError as error:
+        logger.error(f"{type(error)}\n{error}")
+        return {'success': False, 'error': {'error': True}}
+
+def update_decline_reason(cand_id, reason):
+    try:
+        candidates_db.update_decline_reason(cand_id, reason)
         return {'success': True}
     except DatabaseError as error:
         logger.error(f"{type(error)}\n{error}")

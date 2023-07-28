@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, session
 from controllers.users import login, signup, googleCallback, logout, change_password, home, profile
 from controllers.positions import positions, add_position, duplicate_position, positions_history, position, edit_position, archive_position, activate_position
-from controllers.candidates import add_candidate, candidate, add_cv, add_ml, view_cv, view_ml, delete_cv, delete_ml, interview_invitation, rejection_email, rejection_email_with_reasons, add_interview, edit_interview, mark_invited, unmark_invited, mark_offer, mark_hired
+from controllers.candidates import add_candidate, candidate, delete_candidate, add_cv, add_ml, view_cv, view_ml, delete_cv, delete_ml, interview_invitation, rejection_email, rejection_email_with_reasons, add_interview, edit_interview, mark_invited, unmark_invited, mark_offer, unmark_offer, mark_hired, unmark_hired, remove_reject_reason, remove_decline_reason
 import secrets
 import logging
 
@@ -43,7 +43,8 @@ app.add_url_rule('/positions/<string:position_id>/archive', 'archive_position', 
 app.add_url_rule('/positions/<string:position_id>/activate', 'activate_position', activate_position)
 
 app.add_url_rule('/positions/<string:position_id>/add_candidate', 'add_candidate', add_candidate, methods=['GET', 'POST'])
-app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>', 'candidate', candidate)
+app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>', 'candidate', candidate, methods=['GET', 'POST'])
+app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/delete', 'delete_candidate', delete_candidate)
 app.add_url_rule('/add_cv', 'add_cv', add_cv, methods=['GET', 'POST'])
 app.add_url_rule('/add_ml', 'add_ml', add_ml, methods=['GET', 'POST'])
 app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/view_cv', 'view_cv', view_cv)
@@ -58,7 +59,11 @@ app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/edit_int
 app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/invite', 'mark_invited', mark_invited)
 app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/uninvite', 'unmark_invited', unmark_invited)
 app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/offer_made', 'mark_offer', mark_offer)
+app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/offer_not_made', 'unmark_offer', unmark_offer)
 app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/hire', 'mark_hired', mark_hired)
+app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/unhire', 'unmark_hired', unmark_hired)
+app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/unreject', 'remove_reject_reason', remove_reject_reason)
+app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/undecline', 'remove_decline_reason', remove_decline_reason)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

@@ -17,7 +17,7 @@ class CandidateRepository(AbstractRepository):
             LEFT JOIN cvs ON candidates.cand_id = cvs.cand_id
             LEFT JOIN mls ON candidates.cand_id = mls.cand_id
             LEFT JOIN interviews ON candidates.cand_id = interviews.cand_id
-            WHERE candidates.pos_id = %s
+            WHERE candidates.pos_id = %s AND candidates.deleted = FALSE
             ORDER BY {sort_column} {'ASC' if sort_column == 'candidates.first_name' else 'DESC'} NULLS LAST;
             """, (pos_id, ))
         return cursor.fetchall()
@@ -25,7 +25,7 @@ class CandidateRepository(AbstractRepository):
     @AbstractRepository.connection_wrapper
     def get_all(self, **kwargs):
         cursor = kwargs.get('cursor')
-        cursor.execute("SELECT * FROM candidates;")
+        cursor.execute("SELECT * FROM candidates WHERE deleted = FALSE;")
         return cursor.fetchall()
 
     @AbstractRepository.connection_wrapper
@@ -52,7 +52,7 @@ class CandidateRepository(AbstractRepository):
             LEFT JOIN positions ON candidates.pos_id = positions.pos_id
             LEFT JOIN cvs ON candidates.cand_id = cvs.cand_id
             LEFT JOIN mls ON candidates.cand_id = mls.cand_id
-            WHERE positions.active = TRUE
+            WHERE positions.active = TRUE AND candidates.deleted = FALSE
             ORDER BY candidates.created DESC
             LIMIT 5;
             """)
@@ -67,7 +67,7 @@ class CandidateRepository(AbstractRepository):
             LEFT JOIN positions ON candidates.pos_id = positions.pos_id
             LEFT JOIN cvs ON candidates.cand_id = cvs.cand_id
             LEFT JOIN mls ON candidates.cand_id = mls.cand_id
-            WHERE positions.active = TRUE
+            WHERE positions.active = TRUE AND candidates.deleted = FALSE
             ORDER BY candidates.last_updated DESC
             LIMIT 5;
             """)
@@ -82,7 +82,7 @@ class CandidateRepository(AbstractRepository):
             LEFT JOIN positions ON candidates.pos_id = positions.pos_id
             JOIN cvs ON candidates.cand_id = cvs.cand_id
             LEFT JOIN mls ON candidates.cand_id = mls.cand_id
-            WHERE positions.active = TRUE
+            WHERE positions.active = TRUE AND candidates.deleted = FALSE
             ORDER BY cvs.score DESC
             LIMIT 5;
             """)
@@ -97,7 +97,7 @@ class CandidateRepository(AbstractRepository):
             LEFT JOIN positions ON candidates.pos_id = positions.pos_id
             LEFT JOIN cvs ON candidates.cand_id = cvs.cand_id
             JOIN mls ON candidates.cand_id = mls.cand_id
-            WHERE positions.active = TRUE
+            WHERE positions.active = TRUE AND candidates.deleted = FALSE
             ORDER BY mls.motivation_lvl DESC
             LIMIT 5;
             """)
@@ -186,6 +186,51 @@ class CandidateRepository(AbstractRepository):
             cursor.execute("""
                 UPDATE candidates
                 SET hired = FALSE, last_updated = CURRENT_TIMESTAMP
+                WHERE cand_id = %s;
+                """, (cand_id, ))
+            conn.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            conn.rollback()
+            raise DatabaseError(error)
+    
+    @AbstractRepository.connection_wrapper
+    def update_reject_reason(self, cand_id, reason, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
+        try:
+            cursor.execute("""
+                UPDATE candidates
+                SET reject_reason = %s, last_updated = CURRENT_TIMESTAMP
+                WHERE cand_id = %s;
+                """, (reason, cand_id))
+            conn.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            conn.rollback()
+            raise DatabaseError(error)
+    
+    @AbstractRepository.connection_wrapper
+    def update_decline_reason(self, cand_id, reason, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
+        try:
+            cursor.execute("""
+                UPDATE candidates
+                SET decline_reason = %s, last_updated = CURRENT_TIMESTAMP
+                WHERE cand_id = %s;
+                """, (reason, cand_id))
+            conn.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            conn.rollback()
+            raise DatabaseError(error)
+    
+    @AbstractRepository.connection_wrapper
+    def delete(self, cand_id, **kwargs):
+        cursor = kwargs.get('cursor')
+        conn = kwargs.get('conn')
+        try:
+            cursor.execute("""
+                UPDATE candidates
+                SET deleted = TRUE, last_updated = CURRENT_TIMESTAMP
                 WHERE cand_id = %s;
                 """, (cand_id, ))
             conn.commit()
