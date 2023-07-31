@@ -1,4 +1,5 @@
 from flask import render_template, request, redirect, session, send_from_directory
+from utils import check_empty
 import services.candidates as candidate_service
 import services.positions as position_service
 
@@ -211,3 +212,18 @@ def remove_decline_reason(position_id, candidate_id):
         return redirect(f'/positions/{position_id}/{candidate_id}')
     else:
         return redirect(f'/positions/{position_id}/{candidate_id}?error=true')
+
+def stats():
+    return render_template('stats.html', avatar=session['avatar'])
+
+def search():
+    if request.method == 'POST':
+        name = check_empty(request.form['name'])
+        email = check_empty(request.form['email'])
+        result = candidate_service.search(name, email)
+        if result['success']:
+            return render_template('search.html', result=result['result'], avatar=session['avatar'])
+        else:
+            return redirect('/search')
+    else:
+        return render_template('search.html', avatar=session['avatar'])

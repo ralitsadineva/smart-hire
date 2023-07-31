@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, session
 from controllers.users import login, signup, googleCallback, logout, change_password, home, profile
 from controllers.positions import positions, add_position, duplicate_position, positions_history, position, edit_position, archive_position, activate_position
-from controllers.candidates import add_candidate, candidate, delete_candidate, add_cv, add_ml, view_cv, view_ml, delete_cv, delete_ml, interview_invitation, rejection_email, rejection_email_with_reasons, add_interview, edit_interview, mark_invited, unmark_invited, mark_offer, unmark_offer, mark_hired, unmark_hired, remove_reject_reason, remove_decline_reason
+from controllers.candidates import add_candidate, candidate, delete_candidate, add_cv, add_ml, view_cv, view_ml, delete_cv, delete_ml, interview_invitation, rejection_email, rejection_email_with_reasons, add_interview, edit_interview, mark_invited, unmark_invited, mark_offer, unmark_offer, mark_hired, unmark_hired, remove_reject_reason, remove_decline_reason, stats, search
 import secrets
 import logging
 
@@ -64,6 +64,9 @@ app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/hire', '
 app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/unhire', 'unmark_hired', unmark_hired)
 app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/unreject', 'remove_reject_reason', remove_reject_reason)
 app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/undecline', 'remove_decline_reason', remove_decline_reason)
+
+app.add_url_rule('/stats', 'stats', stats)
+app.add_url_rule('/search', 'search', search, methods=['GET', 'POST'])
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

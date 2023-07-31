@@ -1,0 +1,30 @@
+{% extends "base_logged_in.html" %}
+
+{% set title = 'Search' %}
+{% set active_class = 'search' %}
+
+{% block main %}
+<p class="text-center mt-5 fs-4 fw-semibold">Search candidates by name or e-mail address</p>
+<form method="POST">
+    <div class="row ms-4 me-4 d-flex justify-content-center align-items-end">
+        <div class="col-2">
+            <input type="text" class="form-control mt-3" id="searchName" name="name" placeholder="Name">
+        </div>
+        <div class="col-1 text-center">
+            <p class="m-2 fw-semibold">or</p>
+        </div>
+        <div class="col-2">
+            <input type="text" class="form-control mt-3" id="searchEmail" name="email" placeholder="E-mail address">    
+        </div>
+    </div>
+    <div class="d-flex justify-content-center">
+        <div class="col-1">
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-success mt-3" id="searchButton">Search</button>
+            </div>
+        </div>
+    </div>
+</form>
+<!-- result -->
+<p>{{ result }}</p>
+{% endblock %}

@@ -29,9 +29,31 @@
     </div>
 </div>
 <!-- candidates for this position (* candidates with this pos_id) -->
+<div class="ms-4 me-4 mt-3 table-responsive-sm">
+    <table class="table table-success table-striped w-auto">
+        <thead>
+            <tr>
+                <th scope="col" class="text-end" title="Number of candidates applied">Candidates</th>
+                <th scope="col" class="text-end" title="Number of candidates invited to an interview">Invites</th>
+                <th scope="col" class="text-end" title="Number of candidates offered the position">Offers</th>
+                <th scope="col" class="text-end" title="Number of rejected candidates">Rejections</th>
+                <th scope="col" class="text-end" title="Number of candidates that declined">Declines</th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            <tr>
+                <td class="text-end">{{ stats['candidates_count'] }}</td>
+                <td class="text-end">{{ stats['invited_count'] }}</td>
+                <td class="text-end">{{ stats['offer_count'] }}</td>
+                <td class="text-end">{{ stats['rejected_count'] }}</td>
+                <td class="text-end">{{ stats['declined_count'] }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 <div class="row mx-3">
     <div class="col-11">
-        <p class="mt-5 fs-5 fw-semibold">Candidates</p>
+        <p class="mt-4 fs-5 fw-semibold">Candidates</p>
     </div>
     <div class="col-1 d-flex justify-content-end align-self-end">
         <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ position['pos_id'] }}/add_candidate">+</a>

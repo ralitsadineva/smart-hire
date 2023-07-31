@@ -312,3 +312,12 @@ def update_decline_reason(cand_id, reason):
     except DatabaseError as error:
         logger.error(f"{type(error)}\n{error}")
         return {'success': False, 'error': {'error': True}}
+
+def search(name, email):
+    if name is not None:
+        result = candidates_db.search_by_name(name)
+    elif email is not None:
+        result = candidates_db.search_by_email(email)
+    else:
+        return {'success': False}
+    return {'success': True, 'result': result}

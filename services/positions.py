@@ -30,7 +30,8 @@ def get_with_cand(id, sort_column):
         sort_column = 'candidates.first_name'
     position = positions_db.get(id)
     candidates = candidates_db.get_all_for_pos(id, sort_column)
-    return {'position': position, 'candidates': candidates}
+    stats = candidates_db.get_stats(id)
+    return {'position': position, 'candidates': candidates, 'stats': stats}
 
 def get(id):
     return positions_db.get(id)

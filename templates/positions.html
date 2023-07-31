@@ -19,6 +19,8 @@
                 <th scope="col">#</th>
                 <th scope="col">Title</th>
                 <th scope="col" class="text-end pe-5" title="Number of candidates applied">Candidates</th>
+                <th scope="col" class="text-end pe-5" title="Number of candidates invited to an interview">Invites</th>
+                <th scope="col" class="text-end pe-5" title="Number of candidates offered the position">Offers</th>
                 <th scope="col">Created</th>
                 <th scope="col">Updated</th>
             </tr>
@@ -28,7 +30,9 @@
                 <tr>
                     <th scope="row">{{ loop.index }}</th>
                     <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position['pos_id'] }}">{{ position['title'] }}</a></td>
-                    <td class="col-md-2 text-end pe-5">{{ position['candidates_count'] }}</td>
+                    <td class="col-md-1 text-end pe-5">{{ position['candidates_count'] }}</td>
+                    <td class="col-md-1 text-end pe-5">{{ position['invited_count'] }}</td>
+                    <td class="col-md-1 text-end pe-5">{{ position['offer_count'] }}</td>
                     <td class="col-md-2">{{ position['created'].replace(microsecond=0) }}</td>
                     <td class="col-md-2">{{ position['last_updated'].replace(microsecond=0) }}</td>
                 </tr>
