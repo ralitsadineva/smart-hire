@@ -313,9 +313,19 @@ def update_decline_reason(cand_id, reason):
         logger.error(f"{type(error)}\n{error}")
         return {'success': False, 'error': {'error': True}}
 
+def stats(date_from, date_to):
+    stats = candidates_db.get_stats_period(date_from, date_to)
+    return {'date_from': date_from, 'date_to': date_to, 'stats': stats}
+
 def search(name, email):
     if name is not None:
-        result = candidates_db.search_by_name(name)
+        name = name.strip().split()
+        if len(name) == 0:
+            return {'success': False}
+        elif len(name) == 1:
+            result = candidates_db.search_by_name(name[0])
+        else:
+            result = candidates_db.search_by_names(name[0], name[1])
     elif email is not None:
         result = candidates_db.search_by_email(email)
     else:

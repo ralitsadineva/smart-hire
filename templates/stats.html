@@ -4,4 +4,154 @@
 {% set active_class = 'stats' %}
 
 {% block main %}
+<!-- get statistics for the period from ... to ... -->
+<p class="text-center mt-5 fs-4 fw-semibold">Statistics</p>
+<p class="text-center mt-3 fs-5 fw-semibold">for the period from {{ date_from }} to {{ date_to }}</p>
+<form class="row ms-4 me-4 mt-2" method="POST">
+    <div class="row">
+        <div class="col-3">
+            <div class="input-group">
+                <label for="fromDate" class="input-group-text">From</label>
+                <input type="date" class="form-control" id="fromDate" name="date_from" required>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="input-group">
+                <label for="toDate" class="input-group-text">To</label>
+                <input type="date" class="form-control" id="toDate" name="date_to" required>
+            </div>
+        </div>
+        <div class="col-2">
+            <button type="submit" class="btn btn-success">Change period</button>
+        </div>
+    </div>
+</form>
+<div class="row ms-4 me-4 mt-3">
+    <div class="col-md-2 table-responsive-sm">
+        <table class="table table-success table-striped w-auto">
+            <thead>
+                <tr>
+                    <th scope="col" class="text-end" title="Number of candidates applied">Candidates</th>
+                    <th scope="col" class="text-end" title="Number of positions those candidates have applied for">Positions</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                <tr>
+                    <td class="text-end">{{ stats['candidates_count'] }}</td>
+                    <td class="text-end">{{ stats['positions_count'] }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row ms-4 me-4 mt-3">
+    <div class="col-md-2 table-responsive-sm">
+        <table class="table table-success table-striped w-auto">
+            <thead>
+                <tr>
+                    <th scope="col" class="text-end" title="Number of candidates invited to an interview">Invites</th>
+                    <th scope="col" class="text-end" title="Number of candidates offered the position">Offers</th>
+                    <th scope="col" class="text-end" title="Number of hired candidates">Hires</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                <tr>
+                    <td class="text-end">{{ stats['invited_count'] }}</td>
+                    <td class="text-end">{{ stats['offer_count'] }}</td>
+                    <td class="text-end">{{ stats['hired_count'] }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row ms-4 me-4 mt-3">
+    <div class="col-md-4 table-responsive-sm">
+        <table class="table table-success table-striped w-auto">
+            <thead>
+                <tr>
+                    <th scope="col">Reason</th>
+                    <th scope="col" class="text-end" title="Number of rejected candidates">Rejections</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                <tr>
+                    <th scope="row">Total</th>
+                    <td class="text-end">{{ stats['rejected_count'] }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Not enough experience</th>
+                    <td class="text-end">{{ stats['rr1_count'] }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">They do not fit</th>
+                    <td class="text-end">{{ stats['rr2_count'] }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Lack of soft skills</th>
+                    <td class="text-end">{{ stats['rr3_count'] }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Too high salary expectations</th>
+                    <td class="text-end">{{ stats['rr4_count'] }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">They are overqualified</th>
+                    <td class="text-end">{{ stats['rr5_count'] }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Negative references/background check</th>
+                    <td class="text-end">{{ stats['rr6_count'] }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Unprofessional behaviour</th>
+                    <td class="text-end">{{ stats['rr7_count'] }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-4 table-responsive-sm">
+        <table class="table table-success table-striped w-auto">
+            <thead>
+                <tr>
+                    <th scope="col">Reason</th>
+                    <th scope="col" class="text-end" title="Number of candidates that declined">Declines</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                <tr>
+                    <th scope="row">Total</th>
+                    <td class="text-end">{{ stats['declined_count'] }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">The company culture or environment</th>
+                    <td class="text-end">{{ stats['dr1_count'] }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">The salary</th>
+                    <td class="text-end">{{ stats['dr2_count'] }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">The location</th>
+                    <td class="text-end">{{ stats['dr3_count'] }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Not enough career growth opportunities</th>
+                    <td class="text-end">{{ stats['dr4_count'] }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">The job responsibilities</th>
+                    <td class="text-end">{{ stats['dr5_count'] }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Work-life balance</th>
+                    <td class="text-end">{{ stats['dr6_count'] }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Lack of home office/working hours flexibility</th>
+                    <td class="text-end">{{ stats['dr7_count'] }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

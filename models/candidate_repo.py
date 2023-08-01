@@ -268,11 +268,47 @@ class CandidateRepository(AbstractRepository):
             raise DatabaseError(error)
     
     @AbstractRepository.connection_wrapper
+    def get_stats_period(self, start_date, end_date, **kwargs):
+        cursor = kwargs.get('cursor')
+        cursor.execute("""
+            SELECT
+                COUNT(cand_id) FILTER (WHERE NOT deleted) AS candidates_count,
+                COUNT(DISTINCT pos_id) FILTER (WHERE NOT deleted) AS positions_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND invited) AS invited_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND offer) AS offer_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND hired) AS hired_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND reject_reason IS NOT NULL) AS rejected_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND reject_reason = '1') AS rr1_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND reject_reason = '2') AS rr2_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND reject_reason = '3') AS rr3_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND reject_reason = '4') AS rr4_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND reject_reason = '5') AS rr5_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND reject_reason = '6') AS rr6_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND reject_reason = '7') AS rr7_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND decline_reason IS NOT NULL) AS declined_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND decline_reason = '1') AS dr1_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND decline_reason = '2') AS dr2_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND decline_reason = '3') AS dr3_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND decline_reason = '4') AS dr4_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND decline_reason = '5') AS dr5_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND decline_reason = '6') AS dr6_count,
+                COUNT(cand_id) FILTER (WHERE NOT deleted AND decline_reason = '7') AS dr7_count
+            FROM candidates
+            WHERE created BETWEEN %s AND %s
+            """, (start_date, end_date))
+        return cursor.fetchone()
+    
+    @AbstractRepository.connection_wrapper
     def search_by_email(self, email, **kwargs):
         cursor = kwargs.get('cursor')
         cursor.execute("""
-            SELECT * FROM candidates
-            WHERE email = %s AND deleted = FALSE;
+            SELECT candidates.*, positions.title, cvs.score AS cv_score, mls.motivation_lvl, interviews.score, interviews.date
+            FROM candidates
+            LEFT JOIN positions ON candidates.pos_id = positions.pos_id
+            LEFT JOIN cvs ON candidates.cand_id = cvs.cand_id
+            LEFT JOIN mls ON candidates.cand_id = mls.cand_id
+            LEFT JOIN interviews ON candidates.cand_id = interviews.cand_id
+            WHERE candidates.email = %s AND candidates.deleted = FALSE;
             """, (email, ))
         return cursor.fetchall()
     
@@ -280,7 +316,26 @@ class CandidateRepository(AbstractRepository):
     def search_by_name(self, name, **kwargs):
         cursor = kwargs.get('cursor')
         cursor.execute("""
-            SELECT * FROM candidates
-            WHERE (first_name ILIKE %s OR last_name ILIKE %s) AND deleted = FALSE;
-            """, (name, name))
+            SELECT candidates.*, positions.title, cvs.score AS cv_score, mls.motivation_lvl, interviews.score, interviews.date
+            FROM candidates
+            LEFT JOIN positions ON candidates.pos_id = positions.pos_id
+            LEFT JOIN cvs ON candidates.cand_id = cvs.cand_id
+            LEFT JOIN mls ON candidates.cand_id = mls.cand_id
+            LEFT JOIN interviews ON candidates.cand_id = interviews.cand_id
+            WHERE (candidates.first_name ILIKE %s OR candidates.last_name ILIKE %s) AND candidates.deleted = FALSE;
+            """, (f'%{name}%', f'%{name}%'))
+        return cursor.fetchall()
+    
+    @AbstractRepository.connection_wrapper
+    def search_by_names(self, name1, name2, **kwargs):
+        cursor = kwargs.get('cursor')
+        cursor.execute("""
+            SELECT candidates.*, positions.title, cvs.score AS cv_score, mls.motivation_lvl, interviews.score, interviews.date
+            FROM candidates
+            LEFT JOIN positions ON candidates.pos_id = positions.pos_id
+            LEFT JOIN cvs ON candidates.cand_id = cvs.cand_id
+            LEFT JOIN mls ON candidates.cand_id = mls.cand_id
+            LEFT JOIN interviews ON candidates.cand_id = interviews.cand_id
+            WHERE ((candidates.first_name ILIKE %s AND candidates.last_name ILIKE %s) OR (candidates.first_name ILIKE %s AND candidates.last_name ILIKE %s)) AND candidates.deleted = FALSE;
+            """, (f'%{name1}%', f'%{name2}%', f'%{name2}%', f'%{name1}%'))
         return cursor.fetchall()

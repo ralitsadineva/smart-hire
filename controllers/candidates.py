@@ -1,4 +1,5 @@
 from flask import render_template, request, redirect, session, send_from_directory
+from datetime import datetime, timedelta
 from utils import check_empty
 import services.candidates as candidate_service
 import services.positions as position_service
@@ -214,7 +215,14 @@ def remove_decline_reason(position_id, candidate_id):
         return redirect(f'/positions/{position_id}/{candidate_id}?error=true')
 
 def stats():
-    return render_template('stats.html', avatar=session['avatar'])
+    if request.method == 'POST':
+        date_from = request.form['date_from']
+        date_to = request.form['date_to']
+        result = candidate_service.stats(date_from, date_to)
+        return render_template('stats.html', **result, avatar=session['avatar'])
+    else:
+        result = candidate_service.stats(datetime.now().date() - timedelta(days=30), datetime.now().date())
+        return render_template('stats.html', **result, avatar=session['avatar'])
 
 def search():
     if request.method == 'POST':

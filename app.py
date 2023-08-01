@@ -65,7 +65,7 @@ app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/unhire',
 app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/unreject', 'remove_reject_reason', remove_reject_reason)
 app.add_url_rule('/positions/<string:position_id>/<string:candidate_id>/undecline', 'remove_decline_reason', remove_decline_reason)
 
-app.add_url_rule('/stats', 'stats', stats)
+app.add_url_rule('/stats', 'stats', stats, methods=['GET', 'POST'])
 app.add_url_rule('/search', 'search', search, methods=['GET', 'POST'])
 
 if __name__ == '__main__':

@@ -94,7 +94,7 @@
                         <td class="text-end col-md-1">{% if candidate['languages']==None %}-{% else %}{{ candidate['languages'] }}{% endif %}</td>
                         <td class="text-end col-md-1">{% if candidate['motivation_lvl']==None %}-{% else %}{{ candidate['motivation_lvl'] }}{% endif %}</td>
                         <td>
-                            {% if candidate['invited'] %}{% if candidate['date'] %}<i class="fa-solid fa-check ms-2" title="The interview took place." style="color: #027e1b;"></i>{% else %}<i class="fa-solid fa-minus ms-2" title="The candidate has been invited, but the interview hasn't taken place yet." style="color: #027e1b;"></i>{% endif %}{% else %}<i class="fa-solid fa-xmark ms-2" title="The candidate hasn't been invited to an interview." style="color: #027e1b;"></i>{% endif %}
+                            {% if candidate['invited'] %}{% if candidate['date'] %}<i class="fa-solid fa-check ms-2" title="The interview took place." style="color: #027e1b;"></i>{% else %}<i class="fa-solid fa-minus ms-2" title="The candidate has been invited, but the interview has not taken place yet." style="color: #027e1b;"></i>{% endif %}{% else %}<i class="fa-solid fa-xmark ms-2" title="The candidate has not been invited to an interview." style="color: #027e1b;"></i>{% endif %}
                             {% if candidate['score'] %}<span class="ms-2" title="Score">{{ candidate['score'] }}/10{% endif %}</span>
                             {% if candidate['date'] %}<span class="ms-2" title="Date of the interview">{{ candidate['date'] }}{% endif %}</span>
                         </td>
