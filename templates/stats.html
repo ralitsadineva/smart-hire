@@ -60,6 +60,11 @@
                     <td class="text-end">{{ stats['offer_count'] }}</td>
                     <td class="text-end">{{ stats['hired_count'] }}</td>
                 </tr>
+                <tr>
+                    <td class="text-end" title="Percentage of candidates invited to an interview">{{ '%0.2f'|format(stats['invited_count'] * 100 / stats['candidates_count']) }}%</td>
+                    <td class="text-end" title="Percentage of candidates offered the position">{{ '%0.2f'|format(stats['offer_count'] * 100 / stats['candidates_count']) }}%</td>
+                    <td class="text-end" title="Percentage of hired candidates from the ones offered a position.">{{ '%0.2f'|format(stats['hired_count'] * 100 / stats['offer_count']) }}%</td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -71,40 +76,49 @@
                 <tr>
                     <th scope="col">Reason</th>
                     <th scope="col" class="text-end" title="Number of rejected candidates">Rejections</th>
+                    <th scope="col" class="text-end" title="Percentage of rejected candidates for a reason from the total number of rejected candidates">%</th> 
                 </tr>
             </thead>
             <tbody class="table-group-divider">
                 <tr>
                     <th scope="row">Total</th>
                     <td class="text-end">{{ stats['rejected_count'] }}</td>
+                    <td class="text-end">{{ '%0.2f'|format(stats['rejected_count'] * 100 / stats['rejected_count']) }}%</td>
                 </tr>
-                <tr>
+                <tr class="table-group-divider">
                     <th scope="row">Not enough experience</th>
                     <td class="text-end">{{ stats['rr1_count'] }}</td>
+                    <td class="text-end">{{ '%0.2f'|format(stats['rr1_count'] * 100 / stats['rejected_count']) }}%</td>
                 </tr>
                 <tr>
                     <th scope="row">They do not fit</th>
                     <td class="text-end">{{ stats['rr2_count'] }}</td>
+                    <td class="text-end">{{ '%0.2f'|format(stats['rr2_count'] * 100 / stats['rejected_count']) }}%</td>
                 </tr>
                 <tr>
                     <th scope="row">Lack of soft skills</th>
                     <td class="text-end">{{ stats['rr3_count'] }}</td>
+                    <td class="text-end">{{ '%0.2f'|format(stats['rr3_count'] * 100 / stats['rejected_count']) }}%</td>
                 </tr>
                 <tr>
                     <th scope="row">Too high salary expectations</th>
                     <td class="text-end">{{ stats['rr4_count'] }}</td>
+                    <td class="text-end">{{ '%0.2f'|format(stats['rr4_count'] * 100 / stats['rejected_count']) }}%</td>
                 </tr>
                 <tr>
                     <th scope="row">They are overqualified</th>
                     <td class="text-end">{{ stats['rr5_count'] }}</td>
+                    <td class="text-end">{{ '%0.2f'|format(stats['rr5_count'] * 100 / stats['rejected_count']) }}%</td>
                 </tr>
                 <tr>
                     <th scope="row">Negative references/background check</th>
                     <td class="text-end">{{ stats['rr6_count'] }}</td>
+                    <td class="text-end">{{ '%0.2f'|format(stats['rr6_count'] * 100 / stats['rejected_count']) }}%</td>
                 </tr>
                 <tr>
                     <th scope="row">Unprofessional behaviour</th>
                     <td class="text-end">{{ stats['rr7_count'] }}</td>
+                    <td class="text-end">{{ '%0.2f'|format(stats['rr7_count'] * 100 / stats['rejected_count']) }}%</td>
                 </tr>
             </tbody>
         </table>
@@ -115,40 +129,49 @@
                 <tr>
                     <th scope="col">Reason</th>
                     <th scope="col" class="text-end" title="Number of candidates that declined">Declines</th>
+                    <th scope="col" class="text-end" title="Percentage of candidates that declined for a reason from the total number of candidates that declined">%</th>
                 </tr>
             </thead>
             <tbody class="table-group-divider">
                 <tr>
                     <th scope="row">Total</th>
                     <td class="text-end">{{ stats['declined_count'] }}</td>
+                    <td class="text-end">{{ '%0.2f'|format(stats['declined_count'] * 100 / stats['declined_count']) }}%</td>
                 </tr>
-                <tr>
+                <tr class="table-group-divider">
                     <th scope="row">The company culture or environment</th>
                     <td class="text-end">{{ stats['dr1_count'] }}</td>
+                    <td class="text-end">{{ '%0.2f'|format(stats['dr1_count'] * 100 / stats['declined_count']) }}%</td>
                 </tr>
                 <tr>
                     <th scope="row">The salary</th>
                     <td class="text-end">{{ stats['dr2_count'] }}</td>
+                    <td class="text-end">{{ '%0.2f'|format(stats['dr2_count'] * 100 / stats['declined_count']) }}%</td>
                 </tr>
                 <tr>
                     <th scope="row">The location</th>
                     <td class="text-end">{{ stats['dr3_count'] }}</td>
+                    <td class="text-end">{{ '%0.2f'|format(stats['dr3_count'] * 100 / stats['declined_count']) }}%</td>
                 </tr>
                 <tr>
                     <th scope="row">Not enough career growth opportunities</th>
                     <td class="text-end">{{ stats['dr4_count'] }}</td>
+                    <td class="text-end">{{ '%0.2f'|format(stats['dr4_count'] * 100 / stats['declined_count']) }}%</td>
                 </tr>
                 <tr>
                     <th scope="row">The job responsibilities</th>
                     <td class="text-end">{{ stats['dr5_count'] }}</td>
+                    <td class="text-end">{{ '%0.2f'|format(stats['dr5_count'] * 100 / stats['declined_count']) }}%</td>
                 </tr>
                 <tr>
                     <th scope="row">Work-life balance</th>
                     <td class="text-end">{{ stats['dr6_count'] }}</td>
+                    <td class="text-end">{{ '%0.2f'|format(stats['dr6_count'] * 100 / stats['declined_count']) }}%</td>
                 </tr>
                 <tr>
                     <th scope="row">Lack of home office/working hours flexibility</th>
                     <td class="text-end">{{ stats['dr7_count'] }}</td>
+                    <td class="text-end">{{ '%0.2f'|format(stats['dr7_count'] * 100 / stats['declined_count']) }}%</td>
                 </tr>
             </tbody>
         </table>

@@ -45,8 +45,8 @@
                 <td class="text-end">{{ stats['candidates_count'] }}</td>
                 <td class="text-end">{{ stats['invited_count'] }}</td>
                 <td class="text-end">{{ stats['offer_count'] }}</td>
-                <td class="text-end">{{ stats['rejected_count'] }}</td>
-                <td class="text-end">{{ stats['declined_count'] }}</td>
+                <td class="text-end" title="Not enough experience: {{ stats['rr1_count'] }}&#013;They do not fit: {{ stats['rr2_count'] }}&#013;Lack of soft skills: {{ stats['rr3_count'] }}&#013;Too high salary expectations: {{ stats['rr4_count'] }}&#013;They are overqualified: {{ stats['rr5_count'] }}&#013;Negative references/background check: {{ stats['rr6_count'] }}&#013;Unprofessional behaviour: {{ stats['rr7_count'] }}">{{ stats['rejected_count'] }}</td>
+                <td class="text-end" title="The company culture or environment: {{ stats['dr1_count'] }}&#013;The salary: {{ stats['dr2_count'] }}&#013;The location: {{ stats['dr3_count'] }}&#013;Not enough career growth opportunities: {{ stats['dr4_count'] }}&#013;The job responsibilities: {{ stats['dr5_count'] }}&#013;Work-life balance: {{ stats['dr6_count'] }}&#013;Lack of home office/working hours flexibility: {{ stats['dr7_count'] }}">{{ stats['declined_count'] }}</td>
             </tr>
         </tbody>
     </table>
