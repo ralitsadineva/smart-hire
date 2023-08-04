@@ -1,6 +1,6 @@
 import random
 from datetime import datetime
-from constants import LOGIN_TYPE_PASSWORD
+from constants import LOGIN_TYPE_PASSWORD, REJECT_REASONS, DECLINE_REASONS
 
 def memoize(func):
     cache = {}
@@ -92,3 +92,9 @@ def convert_pros_cons(response):
     pros = split_response[0].split('\n', 1)[1]
     cons = split_response[1].split('\n', 1)[1]
     return pros, cons
+
+def get_reject_reason(reason):
+    return REJECT_REASONS[reason]
+
+def get_decline_reason(reason):
+    return DECLINE_REASONS[reason]

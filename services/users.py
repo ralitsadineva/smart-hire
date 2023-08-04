@@ -132,5 +132,5 @@ def update_company(id, company):
         return {'success': False, 'error': {'error': True}}
 
 def get_signature_company(id):
-    signature, company = users_db.get(id)['signature'], users_db.get(id)['company']
-    return signature, company
+    user = users_db.get(id)
+    return user['signature'], user['company']

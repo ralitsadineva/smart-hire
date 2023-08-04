@@ -85,41 +85,13 @@
                     <td class="text-end">{{ stats['rejected_count'] }}</td>
                     <td class="text-end" title="{% if stats['candidates_count'] == 0 %}{% else %}{{ '%0.2f'|format(stats['rejected_count'] * 100 / stats['candidates_count']) }}% of all candidates{% endif %}">{% if stats['rejected_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['rejected_count'] * 100 / stats['rejected_count']) }}%{% endif %}</td>
                 </tr>
-                <tr class="table-group-divider">
-                    <th scope="row">Not enough experience</th>
-                    <td class="text-end">{{ stats['rr1_count'] }}</td>
-                    <td class="text-end">{% if stats['rejected_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['rr1_count'] * 100 / stats['rejected_count']) }}%{% endif %}</td>
-                </tr>
-                <tr>
-                    <th scope="row">They do not fit</th>
-                    <td class="text-end">{{ stats['rr2_count'] }}</td>
-                    <td class="text-end">{% if stats['rejected_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['rr2_count'] * 100 / stats['rejected_count']) }}%{% endif %}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Lack of soft skills</th>
-                    <td class="text-end">{{ stats['rr3_count'] }}</td>
-                    <td class="text-end">{% if stats['rejected_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['rr3_count'] * 100 / stats['rejected_count']) }}%{% endif %}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Too high salary expectations</th>
-                    <td class="text-end">{{ stats['rr4_count'] }}</td>
-                    <td class="text-end">{% if stats['rejected_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['rr4_count'] * 100 / stats['rejected_count']) }}%{% endif %}</td>
-                </tr>
-                <tr>
-                    <th scope="row">They are overqualified</th>
-                    <td class="text-end">{{ stats['rr5_count'] }}</td>
-                    <td class="text-end">{% if stats['rejected_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['rr5_count'] * 100 / stats['rejected_count']) }}%{% endif %}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Negative references/background check</th>
-                    <td class="text-end">{{ stats['rr6_count'] }}</td>
-                    <td class="text-end">{% if stats['rejected_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['rr6_count'] * 100 / stats['rejected_count']) }}%{% endif %}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Unprofessional behaviour</th>
-                    <td class="text-end">{{ stats['rr7_count'] }}</td>
-                    <td class="text-end">{% if stats['rejected_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['rr7_count'] * 100 / stats['rejected_count']) }}%{% endif %}</td>
-                </tr>
+                {% for reject_reason in REJECT_REASONS.values() %}
+                    <tr{% if loop.index == 1 %} class="table-group-divider"{% endif %}>
+                        <th scope="row">{{ reject_reason.capitalize() }}</th>
+                        <td class="text-end">{{ stats['rr' ~ loop.index|string ~ '_count'] }}</td>
+                        <td class="text-end">{% if stats['rejected_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['rr' ~ loop.index|string ~ '_count'] * 100 / stats['rejected_count']) }}%{% endif %}</td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
@@ -138,41 +110,13 @@
                     <td class="text-end">{{ stats['declined_count'] }}</td>
                     <td class="text-end" title="{% if stats['candidates_count'] == 0 %}{% else %}{{ '%0.2f'|format(stats['declined_count'] * 100 / stats['candidates_count']) }}% of all candidates{% endif %}">{% if stats['declined_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['declined_count'] * 100 / stats['declined_count']) }}%{% endif %}</td>
                 </tr>
-                <tr class="table-group-divider">
-                    <th scope="row">The company culture or environment</th>
-                    <td class="text-end">{{ stats['dr1_count'] }}</td>
-                    <td class="text-end">{% if stats['declined_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['dr1_count'] * 100 / stats['declined_count']) }}%{% endif %}</td>
-                </tr>
-                <tr>
-                    <th scope="row">The salary</th>
-                    <td class="text-end">{{ stats['dr2_count'] }}</td>
-                    <td class="text-end">{% if stats['declined_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['dr2_count'] * 100 / stats['declined_count']) }}%{% endif %}</td>
-                </tr>
-                <tr>
-                    <th scope="row">The location</th>
-                    <td class="text-end">{{ stats['dr3_count'] }}</td>
-                    <td class="text-end">{% if stats['declined_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['dr3_count'] * 100 / stats['declined_count']) }}%{% endif %}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Not enough career growth opportunities</th>
-                    <td class="text-end">{{ stats['dr4_count'] }}</td>
-                    <td class="text-end">{% if stats['declined_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['dr4_count'] * 100 / stats['declined_count']) }}%{% endif %}</td>
-                </tr>
-                <tr>
-                    <th scope="row">The job responsibilities</th>
-                    <td class="text-end">{{ stats['dr5_count'] }}</td>
-                    <td class="text-end">{% if stats['declined_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['dr5_count'] * 100 / stats['declined_count']) }}%{% endif %}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Work-life balance</th>
-                    <td class="text-end">{{ stats['dr6_count'] }}</td>
-                    <td class="text-end">{% if stats['declined_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['dr6_count'] * 100 / stats['declined_count']) }}%{% endif %}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Lack of home office/working hours flexibility</th>
-                    <td class="text-end">{{ stats['dr7_count'] }}</td>
-                    <td class="text-end">{% if stats['declined_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['dr7_count'] * 100 / stats['declined_count']) }}%{% endif %}</td>
-                </tr>
+                {% for decline_reason in DECLINE_REASONS.values() %}
+                    <tr{% if loop.index == 1 %} class="table-group-divider"{% endif %}>
+                        <th scope="row">{{ decline_reason.capitalize() }}</th>
+                        <td class="text-end">{{ stats['dr' ~ loop.index|string ~ '_count'] }}</td>
+                        <td class="text-end">{% if stats['declined_count'] == 0 %}-{% else %}{{ '%0.2f'|format(stats['dr' ~ loop.index|string ~ '_count'] * 100 / stats['declined_count']) }}%{% endif %}</td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>

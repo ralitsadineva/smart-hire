@@ -8,8 +8,8 @@ from models.user_repo import UserRepository
 from exceptions import DatabaseError
 from read_pdf import read_pdf, page_count
 from openai_eval import extract_cv, evaluate_cv, evaluate_ml, pros_cons, response_positive, response_negative
-from utils import check_empty, convert_to_dict, convert_to_dict_extracted, convert_pros_cons
-from constants import RESPONSE_EMAIL_SUBJECT, RESPONSE_EMAIL_SUBJECT_WITH_COMPANY
+from utils import check_empty, convert_to_dict, convert_to_dict_extracted, convert_pros_cons, get_reject_reason, get_decline_reason
+from constants import RESPONSE_EMAIL_SUBJECT, RESPONSE_EMAIL_SUBJECT_WITH_COMPANY, REJECT_REASONS, DECLINE_REASONS
 import logging
 import os
 
@@ -33,6 +33,14 @@ def add(id, first_name, last_name, email):
 
 def get(id):
     candidate = candidates_db.get(id)
+    if candidate['reject_reason'] is not None:
+        reject_reason = get_reject_reason(candidate['reject_reason'])
+    else:
+        reject_reason = None
+    if candidate['decline_reason'] is not None:
+        decline_reason = get_decline_reason(candidate['decline_reason'])
+    else:
+        decline_reason = None
     cv = cvs_db.get(id)
     ml = mls_db.get(id)
     plus_minus = pros_cons_db.get(id)
@@ -41,7 +49,7 @@ def get(id):
     else:
         pros, cons = None, None
     interview = interviews_db.get(id)
-    return {'candidate': candidate, 'cv': cv, 'ml': ml, 'pros': pros, 'cons': cons, 'interview': interview}
+    return {'candidate': candidate, 'cv': cv, 'ml': ml, 'pros': pros, 'cons': cons, 'interview': interview, 'reject_reason': reject_reason, 'decline_reason': decline_reason, 'REJECT_REASONS': REJECT_REASONS, 'DECLINE_REASONS': DECLINE_REASONS}
 
 def delete(id):
     try:
@@ -190,7 +198,8 @@ def delete_ml(pos_id, cand_id):
 def interview_invitation(pos_id, cand_id, user_id):
     candidate = candidates_db.get(cand_id)
     position = positions_db.get(pos_id)
-    signature, company = users_db.get(user_id)['signature'], users_db.get(user_id)['company']
+    user = users_db.get(user_id)
+    signature, company = user['signature'], user['company']
     response = response_positive(candidate, position, signature, company)
     logger.info(response)
     if company:
@@ -203,7 +212,8 @@ def rejection_email(pos_id, cand_id, user_id):
     candidate = candidates_db.get(cand_id)
     position = positions_db.get(pos_id)
     cons = pros_cons_db.get(cand_id) is not None
-    signature, company = users_db.get(user_id)['signature'], users_db.get(user_id)['company']
+    user = users_db.get(user_id)
+    signature, company = user['signature'], user['company']
     response = response_negative(candidate, position, None, signature, company)
     logger.info(response)
     if company:
@@ -219,7 +229,8 @@ def rejection_email_with_reasons(pos_id, cand_id, user_id):
         cons = pros_cons_db.get(cand_id)['cons']
     else:
         cons = None
-    signature, company = users_db.get(user_id)['signature'], users_db.get(user_id)['company']
+    user = users_db.get(user_id)
+    signature, company = user['signature'], user['company']
     response = response_negative(candidate, position, cons, signature, company)
     logger.info(response)
     if company:
@@ -315,7 +326,7 @@ def update_decline_reason(cand_id, reason):
 
 def stats(date_from, date_to):
     stats = candidates_db.get_stats_period(date_from, date_to)
-    return {'date_from': date_from, 'date_to': date_to, 'stats': stats}
+    return {'date_from': date_from, 'date_to': date_to, 'stats': stats, 'REJECT_REASONS': REJECT_REASONS, 'DECLINE_REASONS': DECLINE_REASONS}
 
 def search(name, email):
     if name is not None:

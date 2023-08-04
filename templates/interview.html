@@ -47,16 +47,9 @@
                                 {% if not interview %}
                                     <option selected disabled value="">-</option>
                                 {% endif %}
-                                <option {% if interview and interview['score']==1 %}selected{% endif %} value="1">1</option>
-                                <option {% if interview and interview['score']==2 %}selected{% endif %} value="2">2</option>
-                                <option {% if interview and interview['score']==3 %}selected{% endif %} value="3">3</option>
-                                <option {% if interview and interview['score']==4 %}selected{% endif %} value="4">4</option>
-                                <option {% if interview and interview['score']==5 %}selected{% endif %} value="5">5</option>
-                                <option {% if interview and interview['score']==6 %}selected{% endif %} value="6">6</option>
-                                <option {% if interview and interview['score']==7 %}selected{% endif %} value="7">7</option>
-                                <option {% if interview and interview['score']==8 %}selected{% endif %} value="8">8</option>
-                                <option {% if interview and interview['score']==9 %}selected{% endif %} value="9">9</option>
-                                <option {% if interview and interview['score']==10 %}selected{% endif %} value="10">10</option>
+                                {% for i in range(1, 11) %}
+                                    <option {% if interview and interview['score']==i %}selected{% endif %} value="{{ i }}">{{ i }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                         <label class="input-group-text" for="inputScore"> / 10</label>

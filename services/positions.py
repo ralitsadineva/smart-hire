@@ -1,6 +1,7 @@
 from models.position_repo import PositionRepository
 from models.candidate_repo import CandidateRepository
 from exceptions import DatabaseError
+from constants import REJECT_REASONS, DECLINE_REASONS
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,7 +21,8 @@ def add(id, title, description):
         return {'success': False, 'error': {'error': True}}
 
 def duplicate(id):
-    return [positions_db.get(id)['title'], positions_db.get(id)['description']]
+    position = positions_db.get(id)
+    return [position['title'], position['description']]
 
 def history():
     return positions_db.get_all_inactive()
@@ -31,7 +33,7 @@ def get_with_cand(id, sort_column):
     position = positions_db.get(id)
     candidates = candidates_db.get_all_for_pos(id, sort_column)
     stats = candidates_db.get_stats(id)
-    return {'position': position, 'candidates': candidates, 'stats': stats}
+    return {'position': position, 'candidates': candidates, 'stats': stats, 'REJECT_REASONS': REJECT_REASONS, 'DECLINE_REASONS': DECLINE_REASONS}
 
 def get(id):
     return positions_db.get(id)
