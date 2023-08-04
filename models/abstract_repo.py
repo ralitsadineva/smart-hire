@@ -2,6 +2,7 @@ from abc import ABC
 from config import get_database_params
 from psycopg2 import pool
 import psycopg2
+import psycopg2.extras
 from exceptions import DatabaseError, UniqueViolationError
 
 class AbstractRepository(ABC):
@@ -10,7 +11,7 @@ class AbstractRepository(ABC):
 
     def get_connection(self):
         conn = self.connection_pool.getconn()
-        cursor = conn.cursor()
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         return conn, cursor
 
     def close_connection(self, conn, cursor):

@@ -12,10 +12,10 @@ class PositionRepository(AbstractRepository):
     def get_all_active(self, **kwargs):
         cursor = kwargs.get('cursor')
         cursor.execute("""
-            SELECT positions.*, COUNT(candidates.cand_id) AS candidates_count
+            SELECT positions.*, COUNT(candidates.cand_id) FILTER (WHERE NOT candidates.deleted) AS candidates_count, COUNT(candidates.cand_id) FILTER (WHERE NOT candidates.deleted AND candidates.invited) AS invited_count, COUNT(candidates.cand_id) FILTER (WHERE NOT candidates.deleted AND candidates.offer) AS offer_count
             FROM positions
             LEFT JOIN candidates ON positions.pos_id = candidates.pos_id
-            WHERE active = TRUE
+            WHERE positions.active = TRUE
             GROUP BY positions.pos_id;
             """)
         return cursor.fetchall()
@@ -24,10 +24,10 @@ class PositionRepository(AbstractRepository):
     def get_all_inactive(self, **kwargs):
         cursor = kwargs.get('cursor')
         cursor.execute("""
-            SELECT positions.*, COUNT(candidates.cand_id) AS candidates_count
+            SELECT positions.*, COUNT(candidates.cand_id) FILTER (WHERE NOT candidates.deleted) AS candidates_count, COUNT(candidates.cand_id) FILTER (WHERE NOT candidates.deleted AND candidates.invited) AS invited_count, COUNT(candidates.cand_id) FILTER (WHERE NOT candidates.deleted AND candidates.offer) AS offer_count
             FROM positions
             LEFT JOIN candidates ON positions.pos_id = candidates.pos_id
-            WHERE active = FALSE
+            WHERE positions.active = FALSE
             GROUP BY positions.pos_id;
             """)
         return cursor.fetchall()
@@ -81,7 +81,7 @@ class PositionRepository(AbstractRepository):
     def last_added(self, **kwargs):
         cursor = kwargs.get('cursor')
         cursor.execute("""
-            SELECT positions.*, COUNT(candidates.cand_id) AS candidates_count
+            SELECT positions.*, COUNT(CASE WHEN candidates.deleted = FALSE THEN candidates.cand_id END) AS candidates_count
             FROM positions
             LEFT JOIN candidates ON positions.pos_id = candidates.pos_id
             WHERE positions.active = TRUE
@@ -95,7 +95,7 @@ class PositionRepository(AbstractRepository):
     def last_updated(self, **kwargs):
         cursor = kwargs.get('cursor')
         cursor.execute("""
-            SELECT positions.*, COUNT(candidates.cand_id) AS candidates_count
+            SELECT positions.*, COUNT(candidates.cand_id) FILTER (WHERE NOT candidates.deleted) AS candidates_count
             FROM positions
             LEFT JOIN candidates ON positions.pos_id = candidates.pos_id
             WHERE positions.active = TRUE
@@ -109,7 +109,7 @@ class PositionRepository(AbstractRepository):
     def with_most_candidates(self, **kwargs):
         cursor = kwargs.get('cursor')
         cursor.execute("""
-            SELECT positions.*, COUNT(candidates.cand_id) AS candidates_count
+            SELECT positions.*, COUNT(candidates.cand_id) FILTER (WHERE NOT candidates.deleted) AS candidates_count
             FROM positions
             LEFT JOIN candidates ON positions.pos_id = candidates.pos_id
             WHERE positions.active = TRUE

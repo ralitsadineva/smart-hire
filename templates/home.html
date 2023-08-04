@@ -21,9 +21,9 @@
                 {% for position in last_updated_pos %}
                     <tr>
                         <th scope="row">{{ loop.index }}</th>
-                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position[0] }}">{{ position[2] }}</a></td>
-                        <td class="text-end pe-5">{{ position[7] }}</td>
-                        <td class="col-md-2">{{ position[5].date() }}</td>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position['pos_id'] }}">{{ position['title'] }}</a></td>
+                        <td class="text-end pe-5">{{ position['candidates_count'] }}</td>
+                        <td class="col-md-2">{{ position['created'].date() }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -45,10 +45,10 @@
                 {% for candidate in last_updated_cand %}
                     <tr>
                         <th scope="row">{{ loop.index }}</th>
-                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</a></td>
-                        <td>{{ candidate[13] }}</td>
-                        <td class="text-end">{% if candidate[14]==None %}-{% else %}{{ candidate[14] }}{% endif %}</td>
-                        <td class="text-end">{% if candidate[15]==None %}-{% else %}{{ candidate[15] }}{% endif %}</td>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}">{{ candidate['first_name'] }} {{ candidate['last_name'] }}</a></td>
+                        <td>{{ candidate['title'] }}</td>
+                        <td class="text-end">{% if candidate['score']==None %}-{% else %}{{ candidate['score'] }}{% endif %}</td>
+                        <td class="text-end">{% if candidate['motivation_lvl']==None %}-{% else %}{{ candidate['motivation_lvl'] }}{% endif %}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -71,9 +71,9 @@
                 {% for position in last_added_pos %}
                     <tr>
                         <th scope="row">{{ loop.index }}</th>
-                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position[0] }}">{{ position[2] }}</a></td>
-                        <td  class="text-end pe-5">{{ position[7] }}</td>
-                        <td class="col-md-2">{{ position[5].date() }}</td>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position['pos_id'] }}">{{ position['title'] }}</a></td>
+                        <td  class="text-end pe-5">{{ position['candidates_count'] }}</td>
+                        <td class="col-md-2">{{ position['created'].date() }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -95,10 +95,10 @@
                 {% for candidate in last_added_cand %}
                     <tr>
                         <th scope="row">{{ loop.index }}</th>
-                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</a></td>
-                        <td>{{ candidate[13] }}</td>
-                        <td class="text-end">{% if candidate[14]==None %}-{% else %}{{ candidate[14] }}{% endif %}</td>
-                        <td class="text-end">{% if candidate[15]==None %}-{% else %}{{ candidate[15] }}{% endif %}</td>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}">{{ candidate['first_name'] }} {{ candidate['last_name'] }}</a></td>
+                        <td>{{ candidate['title'] }}</td>
+                        <td class="text-end">{% if candidate['score']==None %}-{% else %}{{ candidate['score'] }}{% endif %}</td>
+                        <td class="text-end">{% if candidate['motivation_lvl']==None %}-{% else %}{{ candidate['motivation_lvl'] }}{% endif %}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -121,9 +121,9 @@
                 {% for position in most_applied_pos %}
                     <tr>
                         <th scope="row">{{ loop.index }}</th>
-                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position[0] }}">{{ position[2] }}</a></td>
-                        <td class="text-end pe-5">{{ position[7] }}</td>
-                        <td class="col-md-2">{{ position[5].date() }}</td>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ position['pos_id'] }}">{{ position['title'] }}</a></td>
+                        <td class="text-end pe-5">{{ position['candidates_count'] }}</td>
+                        <td class="col-md-2">{{ position['created'].date() }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -145,10 +145,10 @@
                 {% for candidate in cand_highest_cv_score %}
                     <tr>
                         <th scope="row">{{ loop.index }}</th>
-                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</a></td>
-                        <td>{{ candidate[13] }}</td>
-                        <td class="text-end">{% if candidate[14]==None %}-{% else %}{{ candidate[14] }}{% endif %}</td>
-                        <td class="text-end">{% if candidate[15]==None %}-{% else %}{{ candidate[15] }}{% endif %}</td>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}">{{ candidate['first_name'] }} {{ candidate['last_name'] }}</a></td>
+                        <td>{{ candidate['title'] }}</td>
+                        <td class="text-end">{% if candidate['score']==None %}-{% else %}{{ candidate['score'] }}{% endif %}</td>
+                        <td class="text-end">{% if candidate['motivation_lvl']==None %}-{% else %}{{ candidate['motivation_lvl'] }}{% endif %}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -173,10 +173,10 @@
                 {% for candidate in cand_highest_motivation_lvl %}
                     <tr>
                         <th scope="row">{{ loop.index }}</th>
-                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</a></td>
-                        <td>{{ candidate[13] }}</td>
-                        <td class="text-end">{% if candidate[14]==None %}-{% else %}{{ candidate[14] }}{% endif %}</td>
-                        <td class="text-end">{% if candidate[15]==None %}-{% else %}{{ candidate[15] }}{% endif %}</td>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}">{{ candidate['first_name'] }} {{ candidate['last_name'] }}</a></td>
+                        <td>{{ candidate['title'] }}</td>
+                        <td class="text-end">{% if candidate['score']==None %}-{% else %}{{ candidate['score'] }}{% endif %}</td>
+                        <td class="text-end">{% if candidate['motivation_lvl']==None %}-{% else %}{{ candidate['motivation_lvl'] }}{% endif %}</td>
                     </tr>
                 {% endfor %}
             </tbody>

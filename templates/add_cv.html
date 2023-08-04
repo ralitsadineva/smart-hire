@@ -29,13 +29,13 @@
     <form class="ms-3 col-sm-3" method="POST" enctype="multipart/form-data" onsubmit="spinner.show()">
         <div class="mb-3">
             <label for="inputTitle" class="form-label">For candidate:</label>
-            <select class="form-select" aria-label="Candidate" name="candidate" {% if cand_info %}disabled{% endif %}>
+            <select class="form-select" aria-label="Candidate" name="candidate" required {% if cand_info %}disabled{% endif %}>
                 {% if cand_info or candidate %}
-                    <option value="{{ candidate[0] }}" selected>{{ candidate[2] }} {{ candidate[3] }}</option>
+                    <option value="{{ candidate['cand_id'] }}" selected>{{ candidate['first_name'] }} {{ candidate['last_name'] }}</option>
                 {% else %}
-                    <option selected>Choose candidate</option>
+                    <option selected disabled value="">Choose candidate</option>
                     {% for candidate in candidates %}
-                        <option value="{{ candidate[0] }}">{{ candidate[2] }} {{ candidate[3] }}</option>
+                        <option value="{{ candidate['cand_id'] }}">{{ candidate['first_name'] }} {{ candidate['last_name'] }}</option>
                     {% endfor %}
                 {% endif %}
             </select>
@@ -51,13 +51,13 @@
 <div class="mt-4 d-flex justify-content-center">
     {% if different_names %}
         <div class="alert alert-warning text-center" role="alert">
-            The names found in the CV differ from the candidate's names. Are you sure you want to add this CV?<br>Candidate's names: {{ candidate[2] }} {{ candidate[3] }}&emsp;Names found in the CV: {{ cand_info['First name'] }} {{ cand_info['Last name'] }}
+            The names found in the CV differ from the candidate's names. Are you sure you want to add this CV?<br>Candidate's names: {{ candidate['first_name'] }} {{ candidate['last_name'] }}&emsp;Names found in the CV: {{ cand_info['First name'] }} {{ cand_info['Last name'] }}
         </div>
     {% endif %}
 </div>
 <form class="mt-4 d-flex justify-content-center row" method="POST" onsubmit="spinner.show()">
     <div class="col-4">
-        <input type="text" class="form-control" name="candidate" value="{{ candidate[0] }}" hidden>
+        <input type="text" class="form-control" name="candidate" value="{{ candidate['cand_id'] }}" hidden>
         <div class="mb-3 row">
             <label for="staticEmail" class="col-sm-3 col-form-label fw-semibold">Email</label>
             <div class="col-sm-9">
@@ -105,7 +105,7 @@
             </div>
         </div>
         <div class="d-flex justify-content-end">
-            <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate[1] }}/{{ candidate[0] }}/del_cv">Cancel</a>
+            <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/del_cv">Cancel</a>
         </div>
     </div>
 </form>
