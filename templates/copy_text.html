@@ -1,0 +1,9 @@
+<script>
+    function copyText(id) {
+        var element = document.getElementById(id);
+        element.select();
+        navigator.clipboard.writeText(element.value);
+        element.setSelectionRange(0, 0);
+        toastr.success('Copied!');
+    }
+</script>

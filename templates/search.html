@@ -1,0 +1,75 @@
+{% extends "base_logged_in.html" %}
+
+{% set title = 'Search' %}
+{% set active_class = 'search' %}
+
+{% block main %}
+<p class="text-center mt-5 fs-4 fw-semibold">Search candidates by name or e-mail address</p>
+<form method="POST">
+    <div class="row ms-4 me-4 d-flex justify-content-center align-items-end">
+        <div class="col-2">
+            <input type="text" class="form-control mt-3" id="searchName" name="name" placeholder="Name">
+        </div>
+        <div class="col-1 text-center">
+            <p class="m-2 fw-semibold">or</p>
+        </div>
+        <div class="col-2">
+            <input type="text" class="form-control mt-3" id="searchEmail" name="email" placeholder="E-mail address">    
+        </div>
+    </div>
+    <div class="d-flex justify-content-center">
+        <div class="col-1">
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-success mt-3" id="searchButton">Search</button>
+            </div>
+        </div>
+    </div>
+</form>
+<!-- result -->
+{% if result %}
+    <div class="ms-4 me-4 mt-2 table-responsive-sm">
+        <table class="table table-success table-striped w-auto">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Names</a></th>
+                    <th scope="col">E-mail</a>
+                    <th scope="col">Position</a></th>
+                    <th scope="col" class="text-end">CV score</a></th>
+                    <th scope="col" class="text-end">Motivation level</a></th>
+                    <th scope="col" class="text-center">Interview</a></th>
+                    <th scope="col">Offer</th>
+                    <th scope="col" class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for candidate in result %}
+                    <tr id="candidate-{{ loop.index }}">
+                        <th scope="row">{{ loop.index }}</th>
+                        <td><a class="link-body-emphasis link-underline link-underline-opacity-0" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}">{{ candidate['first_name'] }} {{ candidate['last_name'] }}{% if candidate['hired'] %}  <i class="fa-solid fa-crown" title="{{ candidate['first_name'] }} {{ candidate['last_name'] }} has been hired." style="color: #027e1b;"></i>{% endif %}</a></td>
+                        <td>{{ candidate['email'] }}</td>
+                        <td>{{ candidate['title'] }}</td>
+                        <td class="text-end col-md-1">{% if candidate['cv_score']==None %}-{% else %}{{ candidate['cv_score'] }}{% endif %}</td>
+                        <td class="text-end col-md-1">{% if candidate['motivation_lvl']==None %}-{% else %}{{ candidate['motivation_lvl'] }}{% endif %}</td>
+                        <td>
+                            {% if candidate['invited'] %}{% if candidate['date'] %}<i class="fa-solid fa-check ms-2" title="The interview took place." style="color: #027e1b;"></i>{% else %}<i class="fa-solid fa-minus ms-2" title="The candidate has been invited, but the interview has not taken place yet." style="color: #027e1b;"></i>{% endif %}{% else %}<i class="fa-solid fa-xmark ms-2" title="The candidate has not been invited to an interview." style="color: #027e1b;"></i>{% endif %}
+                            {% if candidate['score'] %}<span class="ms-2" title="Score">{{ candidate['score'] }}/10{% endif %}</span>
+                            {% if candidate['date'] %}<span class="ms-2" title="Date of the interview">{{ candidate['date'] }}{% endif %}</span>
+                        </td>
+                        <td>{% if candidate['offer'] %}<i class="fa-solid fa-check ms-2" title="The candidate has been offered the position." style="color: #027e1b;"></i>{% else %}<i class="fa-solid fa-xmark ms-2" title="The candidate has not received an offer." style="color: #027e1b;"></i>{% endif %}</td>
+                        <td class="text-end">
+                            <a class="ms-2" href="{{ base_url }}add_cv?cand={{ candidate['cand_id'] }}" title="Add CV"><i class="fa-solid fa-file" style="color: #027e1b;"></i></a>
+                            <a class="ms-2" href="{{ base_url }}add_ml?cand={{ candidate['cand_id'] }}" title="Add motivational letter"><i class="fa-solid fa-file-lines" style="color: #027e1b;"></i></a>
+                            <a class="ms-2" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/invitation" onclick="spinner.show()" title="Send interview invitation"><i class="fa-solid fa-square-plus" style="color: #027e1b;"></i></a>
+                            <a class="ms-2" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/rejection" onclick="spinner.show()" title="Send rejection e-mail"><i class="fa-solid fa-square-minus" style="color: #027e1b;"></i></a>
+                            <form action="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/delete" class="d-inline-block c-pointer">
+                                <i class="fa-solid fa-trash ms-3" title="Delete candidate" style="color: #027e1b;" onclick="confirm('Are you sure?') && this.parentNode.submit()"></i>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+{% endblock %}

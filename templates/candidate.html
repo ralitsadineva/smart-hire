@@ -1,0 +1,306 @@
+{% extends "base_logged_in.html" %}
+
+{% set title = candidate['first_name'] ~ ' ' ~ candidate['last_name'] %}
+{% set active_class = 'positions' %}
+
+{% block main %}
+<p class="text-center mt-5 fs-4 fw-semibold">{{ candidate['first_name'] }} {{ candidate['last_name'] }}</p>
+<div class="mx-4 mt-4">
+    <div class="mb-3 row">
+        <label for="staticEmail" class="col-sm-2 col-form-label fw-semibold">Email</label>
+        <div class="col-sm-3">
+            <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="{{ candidate['email'] }}">
+        </div>
+        <div class="col-sm-3">
+            <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/invitation" onclick="spinner.show()">Generate an interview invitation</a>
+            <div class="mt-1 col-6">
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/rejection" onclick="spinner.show()">Generate a rejection e-mail</a>
+            <div class="mt-1 col-4">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mx-4">
+    <div class="mb-3 row">
+        <label for="staticPhone" class="col-sm-2 col-form-label fw-semibold">Phone number</label>
+        <div class="col-sm-10">
+            <input type="text" readonly class="form-control-plaintext" id="staticPhone" value="{% if candidate['phone_number'] %}{{ candidate['phone_number'] }}{% else %}-{% endif %}">
+        </div>
+    </div>
+</div>
+<div class="mx-4">
+    <div class="mb-3 row">
+        <label for="staticBirthDate" class="col-sm-2 col-form-label fw-semibold">Date of birth</label>
+        <div class="col-sm-10">
+            <input type="text" readonly class="form-control-plaintext" id="staticBirthDate" value="{% if candidate['date_of_birth'] %}{{ candidate['date_of_birth'] }}{% else %}-{% endif %}">
+        </div>
+    </div>
+</div>
+<div class="mx-4">
+    <div class="mb-3 border-bottom border-success-subtle row">
+        <label for="staticAddress" class="col-sm-2 col-form-label fw-semibold">Address</label>
+        <div class="col-sm-10">
+            <textarea readonly class="form-control-plaintext" id="staticAddress" rows="3" style="resize:none">{% if candidate['address'] or candidate['postal_code'] or candidate['city'] or candidate['country'] %}{% if candidate['address'] %}{{ candidate['address'] }}{% else %}{% endif %}
+{% if candidate['postal_code'] %}{{ candidate['postal_code'] }} {% else %}{% endif %}{% if candidate['city'] %}{{ candidate['city'] }}{% else %}{% endif %}
+{% if candidate['country'] %}{{ candidate['country'] }}{% else %}{% endif %}{% else %}-{% endif %}</textarea>
+        </div>
+    </div>
+</div>
+<!-- information about documents -->
+<div class="mx-3 row">
+    {% if cv %}
+        <div class="col-md-3 border-start border-end border-success-subtle">
+            <div class="row">
+                <div class="col-sm-2">
+                    <p class="fs-5 fw-semibold">CV</p>
+                </div>
+                <div class="col-sm-6">
+                    <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/view_cv">View</a>
+                </div>
+                <div class="col-sm-4">
+                    <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/del_cv">Delete</a>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticScore" class="col-sm-8 col-form-label fw-semibold">Overall score</label>
+                    <div class="col-sm-3">
+                        <input type="text" readonly class="form-control-plaintext" id="staticScore" value="{{ cv['score'] }}/50">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticStructure" class="col-sm-8 col-form-label fw-semibold">Structure and organization</label>
+                    <div class="col-sm-3">
+                        <input type="text" readonly class="form-control-plaintext" id="staticStructure" value="{{ cv['structure'] }}/5">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticContactInfo" class="col-sm-8 col-form-label fw-semibold">Contact information</label>
+                    <div class="col-sm-3">
+                        <input type="text" readonly class="form-control-plaintext" id="staticContactInfo" value="{{ cv['contact_info'] }}/5">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticWork" class="col-sm-8 col-form-label fw-semibold">Work experience</label>
+                    <div class="col-sm-3">
+                        <input type="text" readonly class="form-control-plaintext" id="staticWork" value="{{ cv['work_experience'] }}/10">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticEducation" class="col-sm-8 col-form-label fw-semibold">Education</label>
+                    <div class="col-sm-3">
+                        <input type="text" readonly class="form-control-plaintext" id="staticEducation" value="{{ cv['education'] }}/10">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticSkills" class="col-sm-8 col-form-label fw-semibold">Skills</label>
+                    <div class="col-sm-3">
+                        <input type="text" readonly class="form-control-plaintext" id="staticSkills" value="{{ cv['skills'] }}/10">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticLanguages" class="col-sm-8 col-form-label fw-semibold">Languages</label>
+                    <div class="col-sm-3">
+                        <input type="text" readonly class="form-control-plaintext" id="staticLanguages" value="{{ cv['languages'] }}/10">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3 row">
+                    <label for="staticLength" class="col-sm-8 col-form-label fw-semibold">Length</label>
+                    <div class="col-sm-3">
+                        <input type="text" readonly class="form-control-plaintext" id="staticLength" value="{{ cv['length'] }} pages">
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <div class="col-md-5 border-start border-end border-success-subtle">
+        {% if ml %}
+            <div class="border-bottom border-success-subtle">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <p class="fs-5 fw-semibold">Motivational letter</p>
+                    </div>
+                    <div class="col-sm-7">
+                        <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/view_ml">View</a>
+                    </div>
+                    <div class="col-sm-2">
+                        <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/del_ml">Delete</a>
+                    </div>
+                </div>
+                <div>
+                    <div class="mb-2 row">
+                        <label for="staticMotivationLvl" class="col-sm-4 col-form-label fw-semibold">Motivation level</label>
+                        <div class="col-sm-8">
+                            <input type="text" readonly class="form-control-plaintext" id="staticMotivationLvl" value="{{ ml['motivation_lvl'] }}/10">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="mb-2 row">
+                        <label for="staticSentiment" class="col-sm-4 col-form-label fw-semibold">Overall sentiment</label>
+                        <div class="col-sm-8">
+                            <input type="text" readonly class="form-control-plaintext" id="staticSentiment" value="{{ ml['sentiment'] }}">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="mb-2 row">
+                        <label for="staticTone" class="col-sm-4 col-form-label fw-semibold">Tone</label>
+                        <div class="col-sm-8">
+                            <input type="text" readonly class="form-control-plaintext" id="staticTone" value="{{ ml['tone'] }}">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="mb-2 row">
+                        <label for="staticLength" class="col-sm-4 col-form-label fw-semibold">Length</label>
+                        <div class="col-sm-8">
+                            <input type="text" readonly class="form-control-plaintext" id="staticLength" value="{{ ml['length'] }} words">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="mb-2 row">
+                        <label for="staticGrammar" class="col-sm-4 col-form-label fw-semibold">Grammar and language usage</label>
+                        <div class="col-sm-8">
+                            <textarea readonly class="form-control-plaintext" id="staticGrammar" rows="2" style="resize:none">{{ ml['grammar'] }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        {% if cv %}
+            <p class="mt-md-3 fs-5 fw-semibold">Advantages and Disadvantages</p>
+            <div class="row">
+                <label for="staticPros" class="col-sm-1 col-form-label fw-semibold">Pros:</label>
+                <div class="col-sm-11">
+                    <textarea readonly class="form-control-plaintext" id="staticPros" rows="3" style="resize:none">{{ pros }}</textarea>
+                </div>
+            </div>
+            <div class="row">
+                <label for="staticCons" class="col-sm-1 col-form-label fw-semibold">Cons:</label>
+                <div class="col-sm-11">
+                    <textarea readonly class="form-control-plaintext" id="staticCons" rows="3" style="resize:none">{{ cons }}</textarea>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    <div class="col-md-4 border-start border-end border-success-subtle">
+        <div class="d-flex justify-content-center mb-2">
+            {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    Something went wrong. Please try again.
+                </div>
+            {% endif %}
+        </div>
+        {% if interview %}
+            <div class="row">
+                <div class="col-sm-10">
+                    <p class="fs-5 fw-semibold">Interview feedback</p>
+                </div>
+                <div class="col-sm-2">
+                    <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/edit_interview">Edit</a>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="staticScore" class="col-sm-4 col-form-label fw-semibold">Score</label>
+                <div class="col-sm-8">
+                    <input type="text" readonly class="form-control-plaintext" id="staticScore" value="{{ interview['score'] }}/10">
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="staticNotes" class="col-sm-4 form-label fw-semibold">Notes</label>
+                <div class="col-sm-8">
+                    <textarea readonly class="form-control-plaintext" id="staticNotes" rows="5" style="resize:none">{{ interview['notes'] }}</textarea>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="staticDate" class="col-sm-4 form-label fw-semibold">Date of the interview</label>
+                <div class="col-sm-8">
+                    <input type="text" readonly class="form-control-plaintext" id="staticDate" value="{{ interview['date'] }}">
+                </div>
+            </div>
+        {% elif candidate['invited'] %}
+            <div class="row">
+                <div class="col-8">
+                    <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/add_interview">Add interview feedback</a>
+                </div>
+                <div class="col-4">
+                    <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/uninvite">Unmark invited</a>
+                </div>
+            </div>
+        {% else %}
+            <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/invite">Mark as invited to interview</a>
+        {% endif %}
+        <div class="mt-2">
+            {% if candidate['offer'] %}
+                <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/offer_not_made">Unmark offer</a>
+            {% elif not candidate['reject_reason'] %}
+                <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/offer_made">Mark that they have been offered the position</a>
+            {% endif %}
+        </div>
+        <div class="mt-2">
+            {% if candidate['hired'] %}
+                <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/unhire">Unmark hired</a>
+            {% elif not candidate['reject_reason'] and not candidate['decline_reason'] %}
+                <a role="button" class="btn btn-success" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/hire">Mark as hired</a>
+            {% endif %}
+        </div>
+        {% if reject_reason %}
+            <p class="mt-3 fw-semibold border-top border-success-subtle">Rejected because of {{ reject_reason }}.</p>
+        {% endif %}
+        {% if not candidate['offer'] and not candidate['hired'] %}
+            <form class="mt-2 input-group" method="POST">
+                <button type="submit" class="btn btn-success" name="form_reject_reason">{% if reject_reason %}Update reason{% else %}Mark as rejected because of{% endif %}</button>
+                <select class="form-select" id="rejectReason" name="reject_reason" required>
+                    <option selected disabled value="">Choose reason</option>
+                    {% for key,value in REJECT_REASONS.items() %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        {% endif %}
+        {% if reject_reason %}
+            <div class="border-bottom border-success-subtle">
+                <a role="button" class="btn btn-success mt-2 mb-2" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/unreject">Unmark rejected</a>
+            </div>
+        {% endif %}
+        {% if decline_reason %}
+            <p class="mt-3 fw-semibold border-top border-success-subtle">Declined because of {{ decline_reason }}.</p>
+        {% endif %}
+        {% if not candidate['hired'] %}
+            <form class="mt-2 input-group" method="POST">
+                <button type="submit" class="btn btn-success" name="form_decline_reason">{% if decline_reason %}Update reason{% else %}Mark that they declined because of{% endif %}</button>
+                <select class="form-select" id="declineReason" name="decline_reason" required>
+                    <option selected disabled value="">Choose reason</option>
+                    {% for key,value in DECLINE_REASONS.items() %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        {% endif %}
+        {% if decline_reason %}
+            <div class="border-bottom border-success-subtle">
+                <a role="button" class="btn btn-success mt-2 mb-2" href="{{ base_url }}positions/{{ candidate['pos_id'] }}/{{ candidate['cand_id'] }}/undecline">Unmark declined</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

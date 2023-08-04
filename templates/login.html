@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% set title = 'Log in' %}
+
+{% block content %}
+<p class="text-center mt-5 mb-5 fs-4 fw-semibold">Welcome back</p>
+{% include 'google_buttons.html' %}
+<p class="text-center mt-3 fs-5 fw-semibold">or</p>
+<div class="d-flex justify-content-center">
+    {% if invalid %}
+        <div class="alert alert-danger" role="alert">
+            Wrong username or password. Please try again.
+        </div>
+    {% endif %}
+    {% if exist %}
+        <div class="alert alert-danger" role="alert">
+            An account with that email already exists. Please log in with username and password.
+        </div>
+    {% endif %}
+</div>
+<div class="d-flex justify-content-center">
+    <form class="ms-3 col-sm-3" method="POST">
+        <!--<div class="mb-3">
+            <label for="inputEmail1" class="form-label">Email address</label>
+            <input type="email" class="form-control" id="inputEmail1">
+        </div>-->
+        <div class="mb-3">
+            <label for="inputUsername1" class="form-label">Username</label>
+            <input type="text" class="form-control" id="inputUsername1" name="username" required>
+        </div>
+        <div class="mb-3">
+            <label for="inputPassword1" class="form-label">Password</label>
+            <input type="password" class="form-control" id="inputPassword1" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-success">Submit</button>
+    </form>
+</div>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+{% endblock %}

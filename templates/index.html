@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-center mt-5">Welcome to SmartHire!</h1>
+<p class="text-center mt-5 fs-4 fw-semibold">Log in to continue</p>
+<div class="text-center">
+  <a role="button" class="btn btn-success" href="{{ base_url }}login">Log in</a>
+  <a role="button" class="btn btn-success" href="{{ base_url }}signup">Sign up</a>
+</div>
+{% endblock %}

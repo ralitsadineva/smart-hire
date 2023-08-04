@@ -1,0 +1,32 @@
+{% extends "base_logged_in.html" %}
+
+{% set title = 'Add a candidate' %}
+{% set active_class = 'positions' %}
+
+{% block main %}
+<p class="text-center mt-5 fs-4 fw-semibold">Add a new candidate for this position</p>
+<div class="d-flex justify-content-center">
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            Something went wrong. Please try again.
+        </div>
+    {% endif %}
+</div>
+<div class="d-flex justify-content-center">
+    <form class="ms-3 col-sm-3" method="POST">
+        <div class="mb-3">
+            <label for="inputFirstName" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="inputFirstName" name="first_name" required>
+        </div>
+        <div class="mb-3">
+            <label for="inputLastName" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="inputLastName" name="last_name" required>
+        </div>
+        <div class="mb-3">
+            <label for="inputEmail" class="form-label">Email</label>
+            <input type="email" class="form-control" id="inputEmail" name="email" required>
+        </div>
+        <button type="submit" class="btn btn-success">Add</button>
+    </form>
+</div>
+{% endblock %}

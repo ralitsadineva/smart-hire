@@ -1,0 +1,46 @@
+{% extends "base_logged_in.html" %}
+
+{% set title = 'Add a motivational letter' %}
+{% set active_class = 'add_ml' %}
+
+{% block main %}
+<p class="text-center mt-5 fs-4 fw-semibold">Add a new motivational letter</p>
+<div class="d-flex justify-content-center">
+    {% if invalid %}
+        <div class="alert alert-danger" role="alert">
+            Not a pdf file or too big! Only pdf files less than 2MB are allowed.
+        </div>
+    {% endif %}
+    {% if exist %}
+        <div class="alert alert-danger text-center" role="alert">
+            A motivational letter for this candidate has already been uploaded.<br>If you want to change it, please delete the old one first.
+        </div>
+    {% endif %}
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            Something went wrong. Please try again.
+        </div>
+    {% endif %}
+</div>
+<div class="d-flex justify-content-center">
+    <form class="ms-3 col-sm-3" method="POST" enctype="multipart/form-data" onsubmit="spinner.show()">
+        <div class="mb-3">
+            <label for="inputTitle" class="form-label">For candidate:</label>
+            <select class="form-select" aria-label="Candidate" name="candidate" required>
+                {% if candidate %}
+                    <option value="{{ candidate['cand_id'] }}" selected>{{ candidate['first_name'] }} {{ candidate['last_name'] }}</option>
+                {% else %}
+                    <option selected disabled value="">Choose candidate</option>
+                    {% for candidate in candidates %}
+                        <option value="{{ candidate['cand_id'] }}">{{ candidate['first_name'] }} {{ candidate['last_name'] }}</option>
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <input class="form-control" type="file" id="formFile" name= "ml" required>
+        </div>
+        <button type="submit" class="btn btn-success">Add</button>
+    </form>
+</div>
+{% endblock %}

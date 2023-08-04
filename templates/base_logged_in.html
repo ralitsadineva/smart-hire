@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<nav class="navbar navbar-expand-lg sticky-top bg-success">
+    <div class="container-fluid">
+        <a class="navbar-brand text-white" href="{{ base_url }}home">SmartHire</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav me-auto mb-2 mb-lg-0">
+                <a class="nav-link {% if active_class == 'dashboard' %}active{% endif %} text-white" {% if active_class == 'dashboard' %}aria-current="page"{% endif %} href="{{ base_url }}home">Dashboard</a>
+                <a class="nav-link {% if active_class == 'positions' %}active{% endif %} text-white" {% if active_class == 'positions' %}aria-current="page"{% endif %} href="{{ base_url }}positions">Positions</a>
+                <a class="nav-link {% if active_class == 'add_cv' %}active{% endif %} text-white" {% if active_class == 'add_cv' %}aria-current="page"{% endif %} href="{{ base_url }}add_cv">Add CV</a>
+                <a class="nav-link {% if active_class == 'add_ml' %}active{% endif %} text-white" {% if active_class == 'add_ml' %}aria-current="page"{% endif %} href="{{ base_url }}add_ml">Add ML</a>
+                <a class="nav-link {% if active_class == 'stats' %}active{% endif %} text-white" {% if active_class == 'stats' %}aria-current="page"{% endif %} href="{{ base_url }}stats">Statistics</a>
+                <a class="nav-link {% if active_class == 'search' %}active{% endif %} text-white" {% if active_class == 'search' %}aria-current="page"{% endif %} href="{{ base_url }}search">Search</a>
+            </div>
+            <div class="nav-item dropdown text-white">
+                <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="{{ base_url }}static/images/{{ avatar }}" alt="Profile Picture" width="30" height="24" class="rounded-circle img-fluid">
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{{ base_url }}profile">Profile</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{{ base_url }}logout">Log out</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+{% block main %}
+{% endblock %}
+{% endblock %}
